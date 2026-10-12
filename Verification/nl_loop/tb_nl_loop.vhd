@@ -104,6 +104,8 @@ architecture sim of tb_nl_loop is
     c      : integer;
     b      : integer;
     n      : integer;
+    b0     : integer;
+    n0     : integer;
   end record t_exp;
 
   type t_exp_q is array (0 to 15) of t_exp;
@@ -135,6 +137,9 @@ architecture sim of tb_nl_loop is
   signal oCq       : signed(CO_C_WIDTH - 1 downto 0);
   signal oBq       : signed(BW - 1 downto 0);
   signal oNq       : unsigned(NW - 1 downto 0);
+  signal oBpre     : signed(BW - 1 downto 0);
+  signal oNpre     : unsigned(NW - 1 downto 0);
+  signal oNRes     : std_logic;
 
 
   function quant (
@@ -240,7 +245,10 @@ begin
       oCtx      => oCtx,
       oCq       => oCq,
       oBq       => oBq,
-      oNq       => oNq
+      oNq       => oNq,
+      oBpre     => oBpre,
+      oNpre     => oNpre,
+      oNRes     => oNRes
     );
 
   stim_proc : process is
@@ -332,6 +340,8 @@ begin
                    integer'image(ex.ctx) & "/" & integer'image(ex.c) & "/" &
                    integer'image(ex.b) & "/" & integer'image(ex.n)
             severity failure;
+          assert to_integer(oBpre) = ex.b0 and to_integer(oNpre) = ex.n0 and (oNRes = '1') = (ex.n0 = RESET)
+            report "pre-update B/N mismatch at " & integer'image(qRd) severity failure;
         end if;
         if (ex.mode = 2) then
           assert (oRiType = '1') = ex.riType report "RItype mismatch" severity failure;
@@ -477,6 +487,8 @@ begin
           e  := quantize(e);
           rx := clampv(px + sg * e * D);
           e  := mod_range(e);
+          ex.b0 := bv;
+          ex.n0 := nv;
           -- A.12
           bv := bv + e * D;
           if (nv = RESET) then

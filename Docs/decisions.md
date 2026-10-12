@@ -66,3 +66,16 @@ picked. **Picked** marks the choice; everything here is open for review.
 ## D11. Runtime NEAR setup
 - iNear latched while iRst = 1 (like width/height). After reset a serial
   divider computes RANGE and the 1/(2N+1) reciprocal; oReady stays low meanwhile.
+
+## D12. Front-end pipeline depth
+- Loop input at issue+8 (I8), exit at I15. Ctx RAM read at I6, data at I8.
+  The only write the RAM can miss is the same lane's previous pixel, still in
+  the loop: compared against the loop's exit ctx at I7 and forwarded (D6).
+- Neighbours: rotating 4-entry ring per lane (prev Rd, prev Rb, col-0 Rb),
+  so one line-buffer read per pixel.
+
+## D13. A RAM layout
+- A: one 512-deep RAM per lane (4 small RAMs). **Picked**: no port sharing,
+  clear runs in parallel with the ctx clear.
+- B: one shared 2048-deep RAM, lane in the address. Fewer BRAMs, but 4 lanes
+  RMW in the same 4-cycle window needs a second port. Later if area matters.

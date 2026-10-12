@@ -82,7 +82,10 @@ entity nl_loop is
     oCtx      : out   unsigned(CO_CTX_WIDTH - 1 downto 0);
     oCq       : out   signed(CO_C_WIDTH - 1 downto 0);
     oBq       : out   signed;
-    oNq       : out   unsigned
+    oNq       : out   unsigned;
+    oBpre     : out   signed;                                         -- before the update (A.10, A.11)
+    oNpre     : out   unsigned;
+    oNRes     : out   std_logic                                       -- N = RESET before the update
   );
 end entity nl_loop;
 
@@ -553,5 +556,8 @@ begin
   oCq     <= r(STAGES).c1;
   oBq     <= r(STAGES).b1;
   oNq     <= r(STAGES).n1;
+  oBpre   <= r(STAGES).b;
+  oNpre   <= r(STAGES).n;
+  oNRes   <= r(STAGES).nRes;
 
 end architecture behavioral;

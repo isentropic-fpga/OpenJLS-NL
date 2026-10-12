@@ -53,7 +53,10 @@ entity nl_loop_wrap is
     oCtx      : out   std_logic_vector(CO_CTX_WIDTH - 1 downto 0);
     oCq       : out   std_logic_vector(CO_C_WIDTH - 1 downto 0);
     oBq       : out   std_logic_vector(6 downto 0);
-    oNq       : out   std_logic_vector(6 downto 0)
+    oNq       : out   std_logic_vector(6 downto 0);
+    oBpre     : out   std_logic_vector(6 downto 0);
+    oNpre     : out   std_logic_vector(6 downto 0);
+    oNRes     : out   std_logic
   );
 end entity nl_loop_wrap;
 
@@ -72,6 +75,8 @@ architecture behavioral of nl_loop_wrap is
   signal sCq       : signed(CO_C_WIDTH - 1 downto 0);
   signal sBq       : signed(6 downto 0);
   signal sNq       : unsigned(6 downto 0);
+  signal sB        : signed(6 downto 0);
+  signal sN        : unsigned(6 downto 0);
 
 begin
 
@@ -119,7 +124,10 @@ begin
       oCtx      => sCtx,
       oCq       => sCq,
       oBq       => sBq,
-      oNq       => sNq
+      oNq       => sNq,
+      oBpre     => sB,
+      oNpre     => sN,
+      oNRes     => oNRes
     );
 
   oRx     <= std_logic_vector(sRx);
@@ -128,5 +136,7 @@ begin
   oCq     <= std_logic_vector(sCq);
   oBq     <= std_logic_vector(sBq);
   oNq     <= std_logic_vector(sNq);
+  oBpre   <= std_logic_vector(sB);
+  oNpre   <= std_logic_vector(sN);
 
 end architecture behavioral;
