@@ -102,3 +102,18 @@ picked. **Picked** marks the choice; everything here is open for review.
 ## D17. Reference
 - Verification/ref/nl_charls.cpp: CharLS per stripe at the same NEAR. Gated
   on T16E3.JLS byte-exact. nl_top output is compared byte-exact per lane.
+
+## Status (nl_top, xczu7eg-1, OOC, Vivado 2025.2)
+| BITNESS | est. fmax | LUT | FF | BRAM | DSP |
+|---|---|---|---|---|---|
+| 8  | 284 MHz | 16650 | 5338 | 9.5  | 3 |
+| 12 | 282 MHz | 19669 | 6109 | 11   | 4 |
+| 16 | 279 MHz | 21605 | 6979 | 14.5 | 4 |
+- Worst path is still the loop's quantizer (DSP), same as nl_loop alone.
+- Sim throughput ~0.98 pix/cycle on 512-wide images (no back-pressure).
+
+## Open (for review)
+- Output: 4 separate JPEG-LS streams today. Options: keep 4 AXI-S ports,
+  merge into one stream (needs a container or restart-marker scheme), or
+  DMA each stripe to its own buffer.
+- Constraint W % 4 = 0, W/4 >= 8 (asserted in nl_top).
