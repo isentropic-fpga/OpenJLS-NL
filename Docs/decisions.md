@@ -79,3 +79,26 @@ picked. **Picked** marks the choice; everything here is open for review.
   clear runs in parallel with the ctx clear.
 - B: one shared 2048-deep RAM, lane in the address. Fewer BRAMs, but 4 lanes
   RMW in the same 4-cycle window needs a second port. Later if area matters.
+
+## D14. Back end sharing (revises D10)
+- A: one Golomb/run/bit-packer pipeline per lane (D10 as written). 4x logic,
+  each idle 3 cycles out of 4.
+- B: one shared back end and bit packer, words tagged with the lane and
+  demuxed into the per-lane skid FIFOs. **Picked**: run state and A RAMs are
+  per lane, but the arithmetic is shared because lanes never collide (one
+  loop exit per cycle). Byte stuffers and framers stay per lane.
+
+## D15. Skid FIFO sizing
+- Per lane: 32 words of {last, len, LIMIT bits}, AlmFull at 20 drives the
+  front-end hold (OR of 4, registered). Pops when the byte stuffer's
+  AlmostFull (registered) is low. Tested with iReady at 1% duty; removing the
+  hold trips the overflow assertion.
+
+## D16. Framer start / header
+- Framer iStart = loop exit FirstPix of that lane (not the input), so the
+  start is in order with that lane's words. Header width = W/4, NEAR in the
+  SOF/SOS as in T.87; default thresholds, so no LSE marker (matches CharLS).
+
+## D17. Reference
+- Verification/ref/nl_charls.cpp: CharLS per stripe at the same NEAR. Gated
+  on T16E3.JLS byte-exact. nl_top output is compared byte-exact per lane.
