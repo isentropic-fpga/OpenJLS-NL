@@ -111,6 +111,9 @@ picked. **Picked** marks the choice; everything here is open for review.
 - A23 is combinational, and the A RAM word settles deltas after r(2). Its inputs
   are built in one process (one delta), and RItype is dropped when A = Errval = 0.
   That is a sim-only guard: real RItype=1 tokens have Errval /= 0.
+- Golden suite (Verification/Golden model): all images <= 0.5 MP at NEAR 3, 7,
+  plus a small set at NEAR 0..16, byte-exact vs CharLS per stripe: 524/524.
+
 ## D19. One byte stuffer and framer for all 4 lanes
 - The 4 lanes take turns on one byte stuffer and one framer (lane = slot
   counter, one lane per clock). Each register in them is a 4-slot ring that

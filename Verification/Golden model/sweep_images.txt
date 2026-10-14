@@ -1,0 +1,11 @@
+# Images for the NEAR sweep batch (stems, Images/ or T.87 reference set)
+TEST16
+TEST8G
+usc-misc_4.1.01
+usc-sequences_6.1.01
+synth-rand10_1
+synth-checker-12
+synth-rand14_1
+synth-rand16_1
+synth-spikes-16
+synth-hstripe-16

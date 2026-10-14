@@ -1,1 +1,6 @@
 build/
+Verification/Golden model/Output/
+.Xil/
+clockInfo.txt
+cong/
+iter_*_CongestedCLBsAndNets.txt
