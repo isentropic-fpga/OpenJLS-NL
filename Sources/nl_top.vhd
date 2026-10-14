@@ -18,8 +18,11 @@
 --              iNear, iImageWidth and iImageHeight are sampled while iRst = '1'.
 --              W must be a multiple of 4 and W/4 >= 8.
 --
---              nl_config -> nl_frontend -> nl_loop -> nl_backend -> per lane:
---              skid FIFO -> byte_stuffer -> nl_framer
+--              nl_config -> nl_frontend -> nl_loop -> nl_backend -> per lane
+--              skid FIFO -> byte_stuffer_nl -> nl_framer -> per lane output
+--              FIFO. One byte_stuffer_nl and one nl_framer serve the 4 lanes
+--              taking turns (lane sSlot this cycle), so the whole core emits
+--              at most 4 payload bytes per clock.
 --
 ----------------------------------------------------------------------------------
 
@@ -129,6 +132,28 @@ architecture rtl of nl_top is
 
   signal sSkidIn    : std_logic_vector(SKID_W - 1 downto 0);
   signal sAlm       : std_logic_vector(3 downto 0);
+
+  -- Shared stuffer + framer, lane sSlot this cycle
+  constant OB_W     : natural := log2ceil(OUT_WIDTH / 8 + 1);
+  constant OUTF_W   : natural := 1 + OB_W + OUT_WIDTH;
+  signal sSlot      : unsigned(1 downto 0);
+  signal sSkidOut   : t_slv_array(0 to 3)(SKID_W - 1 downto 0);
+  signal sSkidValid : std_logic_vector(3 downto 0);
+  signal sPop       : std_logic_vector(3 downto 0);
+  signal sBsAlm     : std_logic_vector(3 downto 0);
+  signal sBsAlmReg  : std_logic_vector(3 downto 0);
+  signal sStartPend : std_logic_vector(3 downto 0);
+  signal sBsIn      : std_logic_vector(SKID_W - 1 downto 0);
+  signal sBsWord    : std_logic_vector(BS_OUT_W - 1 downto 0);
+  signal sBsValid   : std_logic;
+  signal sBsBytes   : unsigned(2 downto 0);
+  signal sBsDone    : std_logic;
+  signal sFrReady   : std_logic;
+  signal sFrWord    : std_logic_vector(OUT_WIDTH - 1 downto 0);
+  signal sFrValid   : std_logic;
+  signal sFrBytes   : unsigned(OB_W - 1 downto 0);
+  signal sFrLast    : std_logic;
+  signal sOutRdy    : std_logic_vector(3 downto 0);
 
   function bool2sl (
     b : boolean
@@ -304,23 +329,35 @@ begin
 
   sSkidIn <= bLast & std_logic_vector(bLen) & bWord;
 
-  -- Per lane output chain -------------------------------------------------------------------------
-  gen_lane : for l in 0 to 3 generate
+  -- Lane turn counter and per-lane start flags ----------------------------------------------------
+  p_slot : process (iClk) is
+  begin
 
-    signal sSkidWe    : std_logic;
-    signal sSkidRdy   : std_logic;
-    signal sSkidOut   : std_logic_vector(SKID_W - 1 downto 0);
-    signal sSkidValid : std_logic;
-    signal sPop       : std_logic;
-    signal sBsAlm     : std_logic;
-    signal sBsAlmReg  : std_logic;
-    signal sBsWord    : std_logic_vector(BS_OUT_W - 1 downto 0);
-    signal sBsValid   : std_logic;
-    signal sBsBytes   : unsigned(2 downto 0);
-    signal sBsDone    : std_logic;
-    signal sFrReady   : std_logic;
-    signal sFrStart   : std_logic;
-    signal sFrBytes   : unsigned(log2ceil(OUT_WIDTH / 8 + 1) - 1 downto 0);
+    if rising_edge(iClk) then
+      sBsAlmReg <= sBsAlm;
+      if (iRst = '1') then
+        sSlot      <= (others => '0');
+        sStartPend <= (others => '0');
+      else
+        sSlot <= sSlot + 1;
+        for l in 0 to 3 loop
+          -- Held until lane l's turn, then handed to the framer
+          if (xValid = '1' and xFirstPix = '1' and xLane = l) then
+            sStartPend(l) <= '1';
+          elsif (sSlot = l) then
+            sStartPend(l) <= '0';
+          end if;
+        end loop;
+      end if;
+    end if;
+
+  end process p_slot;
+
+  -- Per lane skid FIFO, popped on the lane's turn ------------------------------------------------
+  gen_skid : for l in 0 to 3 generate
+
+    signal sSkidWe  : std_logic;
+    signal sSkidRdy : std_logic;
 
   begin
 
@@ -342,79 +379,102 @@ begin
         In_Data   => sSkidIn,
         In_Valid  => sSkidWe,
         In_Ready  => sSkidRdy,
-        Out_Data  => sSkidOut,
-        Out_Valid => sSkidValid,
-        Out_Ready => sPop,
+        Out_Data  => sSkidOut(l),
+        Out_Valid => sSkidValid(l),
+        Out_Ready => sPop(l),
         AlmFull   => sAlm(l)
       );
 
-    p_bs_alm : process (iClk) is
-    begin
+    sPop(l) <= sSkidValid(l) and not sBsAlmReg(l) and bool2sl(sSlot = l);
 
-      if rising_edge(iClk) then
-        sBsAlmReg <= sBsAlm;
-      end if;
+  end generate gen_skid;
 
-    end process p_bs_alm;
+  sBsIn <= sSkidOut(to_integer(sSlot));
 
-    sPop <= sSkidValid and not sBsAlmReg;
+  -- Shared stuffer + framer -----------------------------------------------------------------------
+  u_bs : entity work.byte_stuffer_nl
+    generic map (
+      IN_WIDTH            => LIMIT,
+      OUT_BYTES_PER_CYCLE => 4,
+      BURST_DEPTH         => 16
+    )
+    port map (
+      iClk          => iClk,
+      iRst          => iRst,
+      iSlot         => sSlot,
+      iStall        => '0',
+      iWord         => sBsIn(LIMIT - 1 downto 0),
+      iWordValid    => sPop(to_integer(sSlot)),
+      iWordValidLen => unsigned(sBsIn(LIMIT + LENW - 1 downto LIMIT)),
+      iFlush        => sPop(to_integer(sSlot)) and sBsIn(SKID_W - 1),
+      oWord         => sBsWord,
+      oWordValid    => sBsValid,
+      oValidBytes   => sBsBytes,
+      iReady        => sFrReady,
+      oAlmostFull   => sBsAlm,
+      oFlushDone    => sBsDone
+    );
 
-    u_bs : entity work.byte_stuffer
+  u_framer : entity work.nl_framer
+    generic map (
+      BITNESS          => BITNESS,
+      IN_WIDTH         => BS_OUT_W,
+      OUT_WIDTH        => OUT_WIDTH,
+      MAX_IMAGE_WIDTH  => MAX_IMAGE_WIDTH / 4,
+      MAX_IMAGE_HEIGHT => MAX_IMAGE_HEIGHT
+    )
+    port map (
+      iClk         => iClk,
+      iRst         => iRst,
+      iStart       => sStartPend(to_integer(sSlot)),
+      iNear        => sNear,
+      iImageWidth  => resize(shift_right(sWidth, 2), FW_W),
+      iImageHeight => resize(sHeight, FH_W),
+      iEoi         => sBsDone,
+      iWord        => sBsWord,
+      iValid       => sBsValid,
+      iByteEnable  => sBsBytes,
+      oReady       => sFrReady,
+      oWord        => sFrWord,
+      oValid       => sFrValid,
+      oByteEnable  => sFrBytes,
+      oLast        => sFrLast,
+      iReady       => sOutRdy(to_integer(sSlot))
+    );
+
+  -- Per lane output FIFO, written on the lane's turn ---------------------------------------------
+  gen_out : for l in 0 to 3 generate
+
+    signal sOutData : std_logic_vector(OUTF_W - 1 downto 0);
+    signal sOutBytes : unsigned(OB_W - 1 downto 0);
+
+  begin
+
+    u_out : entity work.olo_base_fifo_sync
       generic map (
-        IN_WIDTH            => LIMIT,
-        OUT_BYTES_PER_CYCLE => 4,
-        BURST_DEPTH         => 16
+        Width_g  => OUTF_W,
+        Depth_g  => 4
       )
       port map (
-        iClk          => iClk,
-        iRst          => iRst,
-        iStall        => '0',
-        iWord         => sSkidOut(LIMIT - 1 downto 0),
-        iWordValid    => sPop,
-        iWordValidLen => unsigned(sSkidOut(LIMIT + LENW - 1 downto LIMIT)),
-        iFlush        => sPop and sSkidOut(SKID_W - 1),
-        oWord         => sBsWord,
-        oWordValid    => sBsValid,
-        oValidBytes   => sBsBytes,
-        iReady        => sFrReady,
-        oAlmostFull   => sBsAlm,
-        oFlushDone    => sBsDone
+        Clk       => iClk,
+        Rst       => iRst,
+        In_Data   => sFrLast & std_logic_vector(sFrBytes) & sFrWord,
+        In_Valid  => sFrValid and bool2sl(sSlot = l),
+        In_Ready  => sOutRdy(l),
+        Out_Data  => sOutData,
+        Out_Valid => oValid(l),
+        Out_Ready => iReady(l)
       );
 
-    sFrStart <= xValid and xFirstPix and bool2sl(xLane = l);
-
-    u_framer : entity work.nl_framer
-      generic map (
-        BITNESS          => BITNESS,
-        IN_WIDTH         => BS_OUT_W,
-        OUT_WIDTH        => OUT_WIDTH,
-        MAX_IMAGE_WIDTH  => MAX_IMAGE_WIDTH / 4,
-        MAX_IMAGE_HEIGHT => MAX_IMAGE_HEIGHT
-      )
-      port map (
-        iClk         => iClk,
-        iRst         => iRst,
-        iStart       => sFrStart,
-        iNear        => sNear,
-        iImageWidth  => resize(shift_right(sWidth, 2), FW_W),
-        iImageHeight => resize(sHeight, FH_W),
-        iEoi         => sBsDone,
-        iWord        => sBsWord,
-        iValid       => sBsValid,
-        iByteEnable  => sBsBytes,
-        oReady       => sFrReady,
-        oWord        => oData((l + 1) * OUT_WIDTH - 1 downto l * OUT_WIDTH),
-        oValid       => oValid(l),
-        oByteEnable  => sFrBytes,
-        oLast        => oLast(l),
-        iReady       => iReady(l)
-      );
+    oData((l + 1) * OUT_WIDTH - 1 downto l * OUT_WIDTH) <= sOutData(OUT_WIDTH - 1 downto 0);
+    sOutBytes <= unsigned(sOutData(OUT_WIDTH + OB_W - 1 downto OUT_WIDTH));
+    oLast(l) <= sOutData(OUTF_W - 1);
 
     gen_keep : for i in 0 to OUT_WIDTH / 8 - 1 generate
-      oKeep(l * OUT_WIDTH / 8 + OUT_WIDTH / 8 - 1 - i) <= '1' when sFrBytes > i else
+      oKeep(l * OUT_WIDTH / 8 + OUT_WIDTH / 8 - 1 - i) <= '1' when sOutBytes > i else
                                                          '0';
     end generate gen_keep;
 
-  end generate gen_lane;
+  end generate gen_out;
 
 end architecture rtl;

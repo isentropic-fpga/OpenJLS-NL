@@ -21,6 +21,7 @@ package nl_pkg is
 
   type t_signed_array is array (natural range <>) of signed;
   type t_unsigned_array is array (natural range <>) of unsigned;
+  type t_slv_array is array (natural range <>) of std_logic_vector;
 
   constant CO_C_WIDTH   : natural := 8;
   constant CO_CTX_WIDTH : natural := 9;   -- 0..366

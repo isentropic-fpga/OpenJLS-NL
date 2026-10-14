@@ -11,6 +11,11 @@
 -- Module Name: nl_framer - Behavioral
 -- Description:
 --
+--   NL: shared by 4 lanes taking turns, one lane per clock. Every register
+--   is kept 4 times in a ring X_r(0..3) that rotates each clock: slot 0
+--   holds the lane served this cycle, the logic reads X = X_r(0) and writes
+--   X_r(3). All ports belong to that lane this cycle.
+--
 --   Wraps the byte-stuffed compressed payload with JPEG-LS framing markers:
 --     SOI + SOF55 + SOS  (header, 25 bytes, before data)
 --     EOI = FF D9        (footer, 2 bytes, after data)
@@ -110,6 +115,7 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
   use work.openjls_pkg.all;
+  use work.nl_pkg.all;
 
 library work;
   use work.olo_base_pkg_math.log2ceil;
@@ -177,6 +183,8 @@ architecture behavioral of nl_framer is
   type fsm_t is (idle, header, data);
 
   signal sFsmState              : fsm_t;
+  type sFsmState_ring_t is array (0 to 3) of fsm_t;  -- NL
+  signal sFsmState_r : sFsmState_ring_t;  -- NL
 
   -- EoI tracker: queue of footer (D9) byte offsets for in-flight images.
   -- Needed for really small images, like the 4x4 image on T.87 H.3 example
@@ -185,22 +193,37 @@ architecture behavioral of nl_framer is
   type eoi_offsets_t is array(natural range <>) of natural range 0 to BUFFER_BYTES;
 
   signal sBuffer                : std_logic_vector(BUFFER_WIDTH - 1 downto 0);
+  signal sBuffer_r : t_slv_array(0 to 3)(BUFFER_WIDTH - 1 downto 0);  -- NL
   signal sFifoByteCount         : natural range 0 to BUFFER_BYTES;
+  type sFifoByteCount_ring_t is array (0 to 3) of natural range 0 to BUFFER_BYTES;  -- NL
+  signal sFifoByteCount_r : sFifoByteCount_ring_t;  -- NL
   signal sEoiFifo               : eoi_offsets_t(0 to EOI_FIFO_DEPTH - 1);
+  type sEoiFifo_ring_t is array (0 to 3) of eoi_offsets_t(0 to EOI_FIFO_DEPTH - 1);  -- NL
+  signal sEoiFifo_r : sEoiFifo_ring_t;  -- NL
   signal sEoiCount              : natural range 0 to EOI_FIFO_DEPTH;
+  type sEoiCount_ring_t is array (0 to 3) of natural range 0 to EOI_FIFO_DEPTH;  -- NL
+  signal sEoiCount_r : sEoiCount_ring_t;  -- NL
 
   signal sOutWord               : std_logic_vector(OUT_WIDTH - 1 downto 0);
+  signal sOutWord_r : t_slv_array(0 to 3)(OUT_WIDTH - 1 downto 0);  -- NL
   signal sOutValid              : std_logic;
+  signal sOutValid_r : std_logic_vector(0 to 3);  -- NL
   signal sOutLast               : std_logic;
+  signal sOutLast_r : std_logic_vector(0 to 3);  -- NL
   signal sValidBytes            : unsigned(log2ceil(OUT_WIDTH / 8 + 1) - 1 downto 0);
+  signal sValidBytes_r : t_unsigned_array(0 to 3)(log2ceil(OUT_WIDTH / 8 + 1) - 1 downto 0);  -- NL
 
   signal sHeaderByteIdx         : natural range 0 to HEADER_LEN;
+  type sHeaderByteIdx_ring_t is array (0 to 3) of natural range 0 to HEADER_LEN;  -- NL
+  signal sHeaderByteIdx_r : sHeaderByteIdx_ring_t;  -- NL
   -- Pending-start counter. Holds iStart pulses that arrive while an earlier
   -- image is still being framed. Each EOI dequeues one. Sized to absorb the
   -- worst-case lead of upstream over the framer when byte_stuffer's FIFO is
   -- buffering several images at once.
   constant START_QUEUE_DEPTH    : natural := 4;
   signal   sNextPending         : natural range 0 to START_QUEUE_DEPTH;
+  type sNextPending_ring_t is array (0 to 3) of natural range 0 to START_QUEUE_DEPTH;  -- NL
+  signal sNextPending_r : sNextPending_ring_t;  -- NL
 
   signal sAxiHandshake          : boolean;
 
@@ -383,6 +406,19 @@ architecture behavioral of nl_framer is
 
 begin
 
+  -- NL: lane served this cycle = ring slot 0
+  sFsmState <= sFsmState_r(0);
+  sBuffer <= sBuffer_r(0);
+  sFifoByteCount <= sFifoByteCount_r(0);
+  sEoiFifo <= sEoiFifo_r(0);
+  sEoiCount <= sEoiCount_r(0);
+  sOutWord <= sOutWord_r(0);
+  sOutValid <= sOutValid_r(0);
+  sOutLast <= sOutLast_r(0);
+  sValidBytes <= sValidBytes_r(0);
+  sHeaderByteIdx <= sHeaderByteIdx_r(0);
+  sNextPending <= sNextPending_r(0);
+
   assert IN_WIDTH mod 8 = 0
     report "nl_framer: IN_WIDTH must be a multiple of 8"
     severity failure;
@@ -402,7 +438,7 @@ begin
   -- plain comments to synthesis).
   -- psl default clock is rising_edge(iClk);
   -- psl assert always (iRst = '1' -> next (oValid = '0' and oLast = '0')) report "nl_framer: reset must clear the output stream";
-  -- psl assert always ((iRst = '0' and oValid = '1' and iReady = '0') -> next (oValid = '1')) report "nl_framer: oValid must hold until the beat is accepted (AXIS)";
+  -- psl assert always ((iRst = '0' and oValid = '1' and iReady = '0') -> next[4] (oValid = '1')) report "nl_framer: oValid must hold until the beat is accepted (AXIS)";
   -- psl assert never (oLast = '1' and oValid = '0') report "nl_framer: oLast is only meaningful on a valid beat";
 
   oWord       <= sOutWord;
@@ -438,18 +474,30 @@ begin
   begin
 
     if rising_edge(iClk) then
+      -- NL: rotate lane rings
+      sFsmState_r <= sFsmState_r(1 to 3) & sFsmState_r(0);
+      sBuffer_r <= sBuffer_r(1 to 3) & sBuffer_r(0);
+      sFifoByteCount_r <= sFifoByteCount_r(1 to 3) & sFifoByteCount_r(0);
+      sEoiFifo_r <= sEoiFifo_r(1 to 3) & sEoiFifo_r(0);
+      sEoiCount_r <= sEoiCount_r(1 to 3) & sEoiCount_r(0);
+      sOutWord_r <= sOutWord_r(1 to 3) & sOutWord_r(0);
+      sOutValid_r <= sOutValid_r(1 to 3) & sOutValid_r(0);
+      sOutLast_r <= sOutLast_r(1 to 3) & sOutLast_r(0);
+      sValidBytes_r <= sValidBytes_r(1 to 3) & sValidBytes_r(0);
+      sHeaderByteIdx_r <= sHeaderByteIdx_r(1 to 3) & sHeaderByteIdx_r(0);
+      sNextPending_r <= sNextPending_r(1 to 3) & sNextPending_r(0);
       if (iRst = '1') then
-        sFsmState      <= idle;
-        sBuffer        <= (others => '0');
-        sFifoByteCount <= 0;
-        sEoiFifo       <= (others => 0);
-        sEoiCount      <= 0;
-        sOutWord       <= (others => '0');
-        sOutValid      <= '0';
-        sOutLast       <= '0';
-        sValidBytes    <= (others => '0');
-        sHeaderByteIdx <= 0;
-        sNextPending   <= 0;
+        sFsmState_r <= (others => idle);
+        sBuffer_r <= (others => (others => '0'));
+        sFifoByteCount_r <= (others => 0);
+        sEoiFifo_r <= (others => (others => 0));
+        sEoiCount_r <= (others => 0);
+        sOutWord_r <= (others => (others => '0'));
+        sOutValid_r <= (others => '0');
+        sOutLast_r <= (others => '0');
+        sValidBytes_r <= (others => (others => '0'));
+        sHeaderByteIdx_r <= (others => 0);
+        sNextPending_r <= (others => 0);
       else
         vBuffer        := sBuffer;
         vFifoByteCount := sFifoByteCount;
@@ -474,8 +522,8 @@ begin
         -----------------------------------------------------------------------------------------------------
         -- Beat was consumed
         if (sAxiHandshake) then
-          sOutValid <= '0';
-          sOutLast  <= '0';
+          sOutValid_r(3) <= '0';
+          sOutLast_r(3) <= '0';
         end if;
 
         case sFsmState is
@@ -483,8 +531,8 @@ begin
           when idle =>
 
             if (vNextPending > 0) then
-              sFsmState      <= header;
-              sHeaderByteIdx <= 0;
+              sFsmState_r(3) <= header;
+              sHeaderByteIdx_r(3) <= 0;
               vNextPending   := vNextPending - 1;
             end if;
 
@@ -498,18 +546,18 @@ begin
 
                 for i in 0 to BYTES_OUT - 1 loop
 
-                  sOutWord(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= get_header_byte(sHeaderByteIdx + i, vWidth, vHeight);
+                  sOutWord_r(3)(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= get_header_byte(sHeaderByteIdx + i, vWidth, vHeight);
 
                 end loop;
 
-                sValidBytes <= to_unsigned(BYTES_OUT, sValidBytes'length);
-                sOutValid   <= '1';
-                sOutLast    <= '0';
+                sValidBytes_r(3) <= to_unsigned(BYTES_OUT, sValidBytes'length);
+                sOutValid_r(3) <= '1';
+                sOutLast_r(3) <= '0';
 
                 if (sHeaderByteIdx + BYTES_OUT = HEADER_LEN) then
-                  sFsmState <= data;
+                  sFsmState_r(3) <= data;
                 else
-                  sHeaderByteIdx <= sHeaderByteIdx + BYTES_OUT;
+                  sHeaderByteIdx_r(3) <= sHeaderByteIdx + BYTES_OUT;
                 end if;
               else
                 -- Last partial beat, fill remaining bytes from the DATA FIFO
@@ -531,36 +579,36 @@ begin
                   for i in 0 to BYTES_OUT - 1 loop
 
                     if (i < vHeaderBytesRemain) then
-                      sOutWord(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= get_header_byte(sHeaderByteIdx + i, vWidth, vHeight);
+                      sOutWord_r(3)(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= get_header_byte(sHeaderByteIdx + i, vWidth, vHeight);
                     elsif (i < vHeaderBytesRemain + vEmitDataBytes) then
                       vOffsetI                                                       := i - vHeaderBytesRemain;
-                      sOutWord(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= vBuffer(BUFFER_WIDTH - 1 - vOffsetI * 8 downto BUFFER_WIDTH - (vOffsetI + 1) * 8);
+                      sOutWord_r(3)(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= vBuffer(BUFFER_WIDTH - 1 - vOffsetI * 8 downto BUFFER_WIDTH - (vOffsetI + 1) * 8);
                     else
-                      sOutWord(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= (others => '0');
+                      sOutWord_r(3)(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= (others => '0');
                     end if;
 
                   end loop;
 
-                  sValidBytes    <= to_unsigned(vHeaderBytesRemain + vEmitDataBytes, sValidBytes'length);
-                  sOutValid      <= '1';
+                  sValidBytes_r(3) <= to_unsigned(vHeaderBytesRemain + vEmitDataBytes, sValidBytes'length);
+                  sOutValid_r(3) <= '1';
                   vBuffer        := std_logic_vector(shift_left(unsigned(vBuffer), vEmitDataBytes * 8));
                   vFifoByteCount := vFifoByteCount - vEmitDataBytes;
 
                   if (vEoiInBeat) then
-                    sOutLast <= '1';
+                    sOutLast_r(3) <= '1';
                     pop_eoi(vEoiIdxFifo, vEoiCount, vEmitDataBytes);
 
                     if (vNextPending > 0) then
-                      sFsmState      <= header;
-                      sHeaderByteIdx <= 0;
+                      sFsmState_r(3) <= header;
+                      sHeaderByteIdx_r(3) <= 0;
                       vNextPending   := vNextPending - 1;
                     else
-                      sFsmState <= idle;
+                      sFsmState_r(3) <= idle;
                     end if;
                   else
-                    sOutLast  <= '0';
+                    sOutLast_r(3) <= '0';
                     dec_eoi(vEoiIdxFifo, vEoiCount, vEmitDataBytes);
-                    sFsmState <= data;
+                    sFsmState_r(3) <= data;
                   end if;
                 end if;
               end if;
@@ -581,31 +629,31 @@ begin
                 for i in 0 to BYTES_OUT - 1 loop
 
                   if (i < vEmitDataBytes) then
-                    sOutWord(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= vBuffer(BUFFER_WIDTH - 1 - i * 8 downto BUFFER_WIDTH - (i + 1) * 8);
+                    sOutWord_r(3)(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= vBuffer(BUFFER_WIDTH - 1 - i * 8 downto BUFFER_WIDTH - (i + 1) * 8);
                   else
-                    sOutWord(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= (others => '0');
+                    sOutWord_r(3)(OUT_WIDTH - 1 - i * 8 downto OUT_WIDTH - (i + 1) * 8) <= (others => '0');
                   end if;
 
                 end loop;
 
-                sValidBytes    <= to_unsigned(vEmitDataBytes, sValidBytes'length);
-                sOutValid      <= '1';
+                sValidBytes_r(3) <= to_unsigned(vEmitDataBytes, sValidBytes'length);
+                sOutValid_r(3) <= '1';
                 vBuffer        := std_logic_vector(shift_left(unsigned(vBuffer), vEmitDataBytes * 8));
                 vFifoByteCount := vFifoByteCount - vEmitDataBytes;
 
                 if (vEoiInBeat) then
-                  sOutLast <= '1';
+                  sOutLast_r(3) <= '1';
                   pop_eoi(vEoiIdxFifo, vEoiCount, vEmitDataBytes);
 
                   if (vNextPending > 0) then
-                    sFsmState      <= header;
-                    sHeaderByteIdx <= 0;
+                    sFsmState_r(3) <= header;
+                    sHeaderByteIdx_r(3) <= 0;
                     vNextPending   := vNextPending - 1;
                   else
-                    sFsmState <= idle;
+                    sFsmState_r(3) <= idle;
                   end if;
                 else
-                  sOutLast <= '0';
+                  sOutLast_r(3) <= '0';
                   dec_eoi(vEoiIdxFifo, vEoiCount, vEmitDataBytes);
                 end if;
               end if;
@@ -647,11 +695,11 @@ begin
           report "nl_framer: payload FIFO overflow (vCount exceeds BUFFER_BYTES; check sizing assumptions or sustained backpressure)"
           severity failure;
 
-        sBuffer        <= vBuffer;
-        sFifoByteCount <= vFifoByteCount;
-        sEoiFifo       <= vEoiIdxFifo;
-        sEoiCount      <= vEoiCount;
-        sNextPending   <= vNextPending;
+        sBuffer_r(3) <= vBuffer;
+        sFifoByteCount_r(3) <= vFifoByteCount;
+        sEoiFifo_r(3) <= vEoiIdxFifo;
+        sEoiCount_r(3) <= vEoiCount;
+        sNextPending_r(3) <= vNextPending;
       end if;
     end if;
 
