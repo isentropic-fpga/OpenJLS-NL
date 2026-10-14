@@ -12,15 +12,16 @@
 --
 -- Notes:
 --              Entropy coding of the loop exit stream (4 lanes, same-lane pixels
---              at least 4 cycles apart), one shared pipeline:
---                X0  run coding (A.14-A.16) per lane state, A RAM read
+--              at least 4 cycles apart), one shared pipeline of OpenJLS blocks:
+--                X0  run coding (A.15/A.16 NL copy, state per lane), A RAM read
 --                X2  A RAM data, A/N/Nn update (A.12, A.23), TEMP (A.20)
---                X3  A RAM write, N<<i >= A compares (A.10)
---                X4  k, mapping (A.11, A.21, A.22), glimit
---                X5  limited Golomb (A.11.1)
+--                X3  A RAM write, k (A.10)
+--                X4  mapping (A.11, A.21, A.22)
+--                X5  limited Golomb (A.11.1, NL copy: runtime QBPP)
 --                X6  bit packer -> oWord (lane tagged)
---              A RAM per lane: {A, N, Nn}; regular contexts use A only (N comes
+--              A RAM per lane: {A, N, Nn}; regular contexts use A only (B, N come
 --              from the loop), RI contexts live at address RItype.
+--              A.14 (|Ix - Ra| <= NEAR) is in the loop, iMode carries the result.
 --
 ----------------------------------------------------------------------------------
 
@@ -28,7 +29,6 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
   use work.nl_pkg.all;
-  use work.openjls_pkg.CO_J_TABLE;
 
 library work;
   use work.olo_base_pkg_math.log2ceil;
@@ -39,44 +39,45 @@ entity nl_backend is
     RESET   : natural               := 64
   );
   port (
-    iClk      : in    std_logic;
-    iRst      : in    std_logic;
+    iClk     : in    std_logic;
+    iRst     : in    std_logic;
     -- Per image
-    iNear     : in    unsigned(7 downto 0);
-    iQbpp     : in    unsigned(4 downto 0);
-    iAinit    : in    unsigned(BITNESS - 1 downto 0);
-    iClr      : in    std_logic;
-    iClrAddr  : in    unsigned(8 downto 0);
+    iNear    : in    unsigned(7 downto 0);
+    iQbpp    : in    unsigned(4 downto 0);
+    iAinit   : in    unsigned(BITNESS - 1 downto 0);
+    iClr     : in    std_logic;
+    iClrAddr : in    unsigned(8 downto 0);
     -- Loop exit + tags
-    iValid    : in    std_logic;
-    iMode     : in    std_logic_vector(1 downto 0);
-    iRiType   : in    std_logic;
-    iErrval   : in    signed(BITNESS downto 0);
-    iCtx      : in    unsigned(CO_CTX_WIDTH - 1 downto 0);
-    iBpre     : in    signed(6 downto 0);
-    iNpre     : in    unsigned(6 downto 0);
-    iNRes     : in    std_logic;
-    iLane     : in    unsigned(1 downto 0);
-    iFirstPix : in    std_logic;
-    iLastPix  : in    std_logic;
-    iEol      : in    std_logic;
+    iValid   : in    std_logic;
+    iMode    : in    std_logic_vector(1 downto 0);
+    iRiType  : in    std_logic;
+    iErrval  : in    signed(BITNESS downto 0);
+    iCtx     : in    unsigned(CO_CTX_WIDTH - 1 downto 0);
+    iBpre    : in    signed(6 downto 0);
+    iNpre    : in    unsigned(6 downto 0);
+    iLane    : in    unsigned(1 downto 0);
+    iLastPix : in    std_logic;
+    iEol     : in    std_logic;
     -- Bit packer output
-    oWord     : out   std_logic_vector(2 * (BITNESS + maximum(8, BITNESS)) - 1 downto 0);
-    oValid    : out   std_logic;
-    oLen      : out   unsigned(log2ceil(2 * (BITNESS + maximum(8, BITNESS)) + 1) - 1 downto 0);
-    oLane     : out   unsigned(1 downto 0);
-    oLast     : out   std_logic
+    oWord    : out   std_logic_vector(2 * (BITNESS + maximum(8, BITNESS)) - 1 downto 0);
+    oValid   : out   std_logic;
+    oLen     : out   unsigned(log2ceil(2 * (BITNESS + maximum(8, BITNESS)) + 1) - 1 downto 0);
+    oLane    : out   unsigned(1 downto 0);
+    oLast    : out   std_logic
   );
 end entity nl_backend;
 
 architecture behavioral of nl_backend is
 
-  constant LIMIT  : natural := 2 * (BITNESS + maximum(8, BITNESS));
-  constant AWID   : natural := BITNESS + 7;
-  constant MW     : natural := BITNESS + 2;                               -- mapped error width
-  constant UW     : natural := log2ceil(LIMIT);
-  constant SUFW   : natural := AWID;
-  constant WORD_W : natural := AWID + 14;
+  constant LIMIT   : natural := 2 * (BITNESS + maximum(8, BITNESS));
+  constant AWID    : natural := BITNESS + 7;
+  constant NWID    : natural := 7;
+  constant KWID    : natural := log2ceil(AWID + 1);
+  constant MW      : natural := BITNESS + 2;                              -- mapped error width
+  constant UW      : natural := log2ceil(LIMIT);
+  constant SUFW    : natural := AWID;
+  constant WORD_W  : natural := AWID + 2 * NWID;
+  constant RUN_CNT : natural := 16;
 
   type t_stage is record
     valid  : std_logic;
@@ -85,56 +86,98 @@ architecture behavioral of nl_backend is
     errval : signed(BITNESS downto 0);
     ctx    : unsigned(CO_CTX_WIDTH - 1 downto 0);
     bpre   : signed(6 downto 0);
-    npre   : unsigned(6 downto 0);
-    nres   : std_logic;
+    npre   : unsigned(NWID - 1 downto 0);
     lane   : unsigned(1 downto 0);
-    first  : std_logic;
     last   : std_logic;
     eol    : std_logic;
     -- run coding
     rawv   : std_logic;
     rawlen : unsigned(4 downto 0);
-    rawval : unsigned(15 downto 0);
-    j      : natural range 0 to 15;
+    rawval : unsigned(RUN_CNT - 1 downto 0);
+    runidx : unsigned(4 downto 0);
     -- A.10 / mapping
-    n      : unsigned(6 downto 0);
-    nn     : unsigned(6 downto 0);
+    n      : unsigned(NWID - 1 downto 0);
+    nn     : unsigned(NWID - 1 downto 0);
     temp   : unsigned(AWID - 1 downto 0);
-    cmp    : std_logic_vector(0 to AWID);
-    k      : natural range 0 to AWID;
+    k      : unsigned(KWID - 1 downto 0);
     merr   : unsigned(MW - 1 downto 0);
-    glimit : natural range 0 to LIMIT;
   end record t_stage;
 
   type t_pipe is array (0 to 5) of t_stage;
 
-  type t_idx_array is array (0 to 3) of natural range 0 to 31;
-  type t_cnt_array is array (0 to 3) of unsigned(15 downto 0);
+  type t_cnt_array is array (0 to 3) of unsigned(RUN_CNT - 1 downto 0);
+  type t_bound_array is array (0 to 3) of unsigned(RUN_CNT downto 0);
+  type t_idx_array is array (0 to 3) of unsigned(4 downto 0);
   type t_word_array is array (0 to 3) of std_logic_vector(WORD_W - 1 downto 0);
 
-  signal r        : t_pipe;
-  signal sRunIdx  : t_idx_array;
-  signal sRunCnt  : t_cnt_array;
+  signal r         : t_pipe;
 
-  signal sRdAddr  : std_logic_vector(8 downto 0);
-  signal sRd      : t_word_array;
-  signal sWe      : std_logic_vector(0 to 3);
-  signal sWrAddr  : std_logic_vector(8 downto 0);
-  signal sWrData  : std_logic_vector(WORD_W - 1 downto 0);
-  signal sAWe     : std_logic;
-  signal sAWrAddr : unsigned(8 downto 0);
-  signal sAWrData : std_logic_vector(WORD_W - 1 downto 0);
-  signal sAWrLane : unsigned(1 downto 0);
+  -- X0 run coding
+  signal sL         : natural range 0 to 3;
+  signal sRun       : std_logic;
+  signal sHit       : std_logic;
+  signal sCont      : std_logic;
+  signal sEoi       : std_logic;
+  signal sRunCnt    : t_cnt_array;                                        -- per lane: A.14 RUNcnt
+  signal sRunIdx    : t_idx_array;                                        --   RUNindex
+  signal sBound     : t_bound_array;                                      --   A.15 next boundary
+  signal sCntIn     : unsigned(RUN_CNT - 1 downto 0);
+  signal sIdxNext   : unsigned(4 downto 0);
+  signal sBoundNext : unsigned(RUN_CNT downto 0);
+  signal sRawV      : std_logic;
+  signal sRawLen    : unsigned(4 downto 0);
+  signal sRawVal    : unsigned(RUN_CNT - 1 downto 0);
+  signal sRunIdxOut : unsigned(4 downto 0);
 
-  signal sGolV    : std_logic;
-  signal sUnary   : unsigned(UW - 1 downto 0);
-  signal sSufLen  : unsigned(4 downto 0);
-  signal sSufVal  : unsigned(SUFW - 1 downto 0);
-  signal sRawV    : std_logic;
-  signal sRawLen  : unsigned(4 downto 0);
-  signal sRawVal  : unsigned(SUFW - 1 downto 0);
-  signal sTagLane : unsigned(1 downto 0);
-  signal sTagLast : std_logic;
+  -- X2 context update
+  signal sRdAddr   : std_logic_vector(8 downto 0);
+  signal sRd       : t_word_array;
+  signal sWord     : std_logic_vector(WORD_W - 1 downto 0);
+  signal sAq       : unsigned(AWID - 1 downto 0);
+  signal sRiErr    : signed(BITNESS downto 0);                          -- A.23 inputs, one snapshot
+  signal sRiRt     : std_logic;
+  signal sRiAqIn   : unsigned(AWID - 1 downto 0);
+  signal sRiNqIn   : unsigned(NWID - 1 downto 0);
+  signal sRiNnIn   : unsigned(NWID - 1 downto 0);
+  signal sNq       : unsigned(NWID - 1 downto 0);
+  signal sNn       : unsigned(NWID - 1 downto 0);
+  signal sN2       : unsigned(NWID - 1 downto 0);
+  signal sRiType   : std_logic;                                         -- RItype of valid RI tokens, else 0 (A.23 sees all cycles)
+  signal sTemp     : unsigned(AWID - 1 downto 0);
+  signal sRegAq    : unsigned(AWID - 1 downto 0);
+  signal sRegNq    : unsigned(NWID - 1 downto 0);
+  signal sRegBq    : signed(6 downto 0);
+  signal sRiAq     : unsigned(AWID - 1 downto 0);
+  signal sRiNq     : unsigned(NWID - 1 downto 0);
+  signal sRiNn     : unsigned(NWID - 1 downto 0);
+  signal sWe       : std_logic_vector(0 to 3);
+  signal sWrAddr   : std_logic_vector(8 downto 0);
+  signal sWrData   : std_logic_vector(WORD_W - 1 downto 0);
+  signal sAWe      : std_logic;
+  signal sAWrAddr  : unsigned(8 downto 0);
+  signal sAWrData  : std_logic_vector(WORD_W - 1 downto 0);
+  signal sAWrLane  : unsigned(1 downto 0);
+
+  -- X3 .. X5
+  signal sK        : unsigned(KWID - 1 downto 0);
+  signal sBqMap    : signed(6 downto 0);
+  signal sRegMerr  : unsigned(MW - 1 downto 0);
+  signal sRiMap    : std_logic;
+  signal sRiMerr   : unsigned(MW - 1 downto 0);
+  signal sUnary    : unsigned(UW - 1 downto 0);
+  signal sSufLen   : unsigned(4 downto 0);
+  signal sSufVal   : unsigned(SUFW - 1 downto 0);
+
+  -- X6 bit packer inputs
+  signal sBpRawV   : std_logic;
+  signal sBpRawLen : unsigned(4 downto 0);
+  signal sBpRawVal : unsigned(SUFW - 1 downto 0);
+  signal sBpGolV   : std_logic;
+  signal sBpUnary  : unsigned(UW - 1 downto 0);
+  signal sBpSufLen : unsigned(4 downto 0);
+  signal sBpSufVal : unsigned(SUFW - 1 downto 0);
+  signal sTagLane  : unsigned(1 downto 0);
+  signal sTagLast  : std_logic;
 
   function bool2sl (
     b : boolean
@@ -153,22 +196,7 @@ begin
 
   pipe_proc : process (iClk) is
 
-    variable vL     : natural range 0 to 3;
-    variable vIdx   : natural range 0 to 31;
-    variable vCnt   : unsigned(15 downto 0);
-    variable vJ     : natural range 0 to 15;
-    variable vS     : t_stage;
-    variable vWord  : std_logic_vector(WORD_W - 1 downto 0);
-    variable vA     : unsigned(AWID - 1 downto 0);
-    variable vN     : unsigned(6 downto 0);
-    variable vNn    : unsigned(6 downto 0);
-    variable vAbs   : unsigned(BITNESS downto 0);
-    variable vRes   : boolean;
-    variable vK     : natural range 0 to AWID;
-    variable vMap   : boolean;
-    variable vMerr  : unsigned(MW - 1 downto 0);
-    variable vQ     : unsigned(MW - 1 downto 0);
-    variable vLim   : integer range -32 to LIMIT;
+    variable vS : t_stage;
 
   begin
 
@@ -181,157 +209,58 @@ begin
       r(0).ctx    <= iCtx;
       r(0).bpre   <= iBpre;
       r(0).npre   <= iNpre;
-      r(0).nres   <= iNRes;
       r(0).lane   <= iLane;
-      r(0).first  <= iFirstPix;
       r(0).last   <= iLastPix;
       r(0).eol    <= iEol;
 
-      -- X0: run coding (A.14-A.16), RUNindex/RUNcnt per lane ----------------------------------
+      -- X0: run coding tokens of the current lane ---------------------------------------------
       vS        := r(0);
-      vS.rawv   := '0';
-      vS.rawlen := to_unsigned(1, 5);
-      vS.rawval := to_unsigned(1, 16);
-      vL        := to_integer(r(0).lane);
-      vIdx      := sRunIdx(vL);
-      vCnt      := sRunCnt(vL);
-      if (r(0).first = '1') then
-        vIdx := 0;
-        vCnt := (others => '0');
-      end if;
-      vJ   := CO_J_TABLE(vIdx);
-      vS.j := vJ;
-      if (r(0).valid = '1') then
-        if (r(0).mode = "01") then
-          -- Hit: '1' per full 2^J block; at end of line a partial block also gives '1'
-          vCnt := vCnt + 1;
-          if (vCnt = shift_left(to_unsigned(1, 16), vJ)) then
-            vS.rawv := '1';
-            vCnt    := (others => '0');
-            vIdx    := minimum(31, vIdx + 1);
-          end if;
-          if (r(0).eol = '1') then
-            vS.rawv := '1';
-            vCnt    := (others => '0');
-          end if;
-        elsif (r(0).mode = "10") then
-          -- Interruption: '0' + RUNcnt in J bits, RUNindex decremented after the RI sample
-          vS.rawv   := '1';
-          vS.rawlen := to_unsigned(vJ + 1, 5);
-          vS.rawval := vCnt;
-          vCnt      := (others => '0');
-          vIdx      := maximum(0, vIdx - 1);
-        end if;
-        sRunIdx(vL) <= vIdx;
-        sRunCnt(vL) <= vCnt;
-      end if;
-      r(1) <= vS;
+      vS.rawv   := sRawV;
+      vS.rawlen := sRawLen;
+      vS.rawval := sRawVal;
+      vS.runidx := sRunIdxOut;
+      r(1)      <= vS;
 
       r(2) <= r(1);
 
-      -- X2: A RAM data, update word and TEMP ---------------------------------------------------
-      vS    := r(2);
-      vWord := sRd(to_integer(r(2).lane));
-      vA    := unsigned(vWord(WORD_W - 1 downto 14));
-      vNn   := unsigned(vWord(6 downto 0));
-      vAbs  := unsigned(abs(r(2).errval));
-      if (r(2).mode = "00") then
-        vN   := r(2).npre;
-        vRes := r(2).nres = '1';
-        vA   := vA + vAbs;
-      else
-        vN   := unsigned(vWord(13 downto 7));
-        vRes := vN = RESET;
-        vA   := vA + vAbs - ("" & r(2).ritype);
-        if (r(2).errval < 0) then
-          vNn := vNn + 1;
-        end if;
-      end if;
-      vS.n    := vN;
-      vS.nn   := unsigned(vWord(6 downto 0));
-      vS.temp := unsigned(vWord(WORD_W - 1 downto 14));
-      if (r(2).mode = "10" and r(2).ritype = '1') then
-        vS.temp := vS.temp + shift_right(vN, 1);
-      end if;
-      if (vRes) then
-        vA  := shift_right(vA, 1);
-        vN  := shift_right(vN, 1);
-        vNn := shift_right(vNn, 1);
-      end if;
-      vN       := vN + 1;
+      -- X2: context update (A.12 regular A, A.23 RI), TEMP (A.20) ------------------------------
+      vS       := r(2);
+      vS.n     := sN2;
+      vS.nn    := sNn;
+      vS.temp  := sTemp;
       sAWe     <= r(2).valid and bool2sl(r(2).mode /= "01");
       sAWrLane <= r(2).lane;
       if (r(2).mode = "00") then
         sAWrAddr <= r(2).ctx;
+        sAWrData <= std_logic_vector(sRegAq) & std_logic_vector(sRegNq) & std_logic_vector(sNn);
       else
         sAWrAddr <= (0 => r(2).ritype, others => '0');
+        sAWrData <= std_logic_vector(sRiAq) & std_logic_vector(sRiNq) & std_logic_vector(sRiNn);
       end if;
-      sAWrData <= std_logic_vector(vA) & std_logic_vector(vN) & std_logic_vector(vNn);
-      r(3)     <= vS;
+      r(3) <= vS;
 
-      -- X3: N<<i >= TEMP ------------------------------------------------------------------------
-      vS := r(3);
-      for i in 0 to AWID loop
-        vS.cmp(i) := bool2sl(shift_left(resize(r(3).n, AWID + 8), i) >= resize(r(3).temp, AWID + 8));
-      end loop;
+      -- X3: k (A.10) ----------------------------------------------------------------------------
+      vS   := r(3);
+      vS.k := sK;
       r(4) <= vS;
 
-      -- X4: k, mapped error, glimit -------------------------------------------------------------
+      -- X4: mapped error (A.11 regular, A.21/A.22 RI) --------------------------------------------
       vS := r(4);
-      vK := AWID;
-      for i in AWID downto 0 loop
-        if (r(4).cmp(i) = '1') then
-          vK := i;
-        end if;
-      end loop;
-      vS.k := vK;
-      vAbs := unsigned(abs(r(4).errval));
       if (r(4).mode = "00") then
-        -- A.11: special mapping for NEAR = 0, k = 0, 2B <= -N
-        vMap := iNear = 0 and r(4).cmp(0) = '1' and
-                resize(r(4).bpre, 9) + resize(r(4).bpre, 9) <= -signed(resize(r(4).npre, 9));
-        if (r(4).errval >= 0) then
-          vMerr := resize(vAbs & '0', MW);
-        else
-          vMerr := resize(vAbs & '0', MW) - 1;
-        end if;
-        if (vMap) then
-          if (r(4).errval >= 0) then
-            vMerr := vMerr + 1;
-          else
-            vMerr := vMerr - 1;
-          end if;
-        end if;
-        vS.glimit := LIMIT;
+        vS.merr := sRegMerr;
       else
-        -- A.21 / A.22
-        vMap := (r(4).cmp(0) = '1' and r(4).errval > 0 and (r(4).nn & '0') < ('0' & r(4).n)) or
-                (r(4).errval < 0 and ((r(4).nn & '0') >= ('0' & r(4).n) or r(4).cmp(0) = '0'));
-        vMerr := resize(vAbs & '0', MW) - ("" & r(4).ritype);
-        if (vMap) then
-          vMerr := vMerr - 1;
-        end if;
-        vS.glimit := LIMIT - r(4).j - 1;
+        vS.merr := sRiMerr;
       end if;
-      vS.merr := vMerr;
-      r(5)    <= vS;
+      r(5) <= vS;
 
       -- X5: limited Golomb (A.11.1) -> bit packer -------------------------------------------------
-      vLim := r(5).glimit - to_integer(iQbpp) - 1;
-      vQ   := shift_right(r(5).merr, r(5).k);
-      sRawV   <= r(5).valid and r(5).rawv;
-      sRawLen <= r(5).rawlen;
-      sRawVal <= resize(r(5).rawval, SUFW);
-      sGolV   <= r(5).valid and bool2sl(r(5).mode /= "01");
-      if (vLim < 0 or vQ < vLim) then
-        sUnary  <= resize(vQ, UW);
-        sSufLen <= to_unsigned(r(5).k, 5);
-        sSufVal <= resize(r(5).merr, SUFW);
-      else
-        sUnary  <= to_unsigned(vLim, UW);
-        sSufLen <= resize(iQbpp, 5);
-        sSufVal <= resize(r(5).merr - 1, SUFW);
-      end if;
+      sBpRawV   <= r(5).valid and r(5).rawv;
+      sBpRawLen <= r(5).rawlen;
+      sBpRawVal <= resize(r(5).rawval, SUFW);
+      sBpGolV   <= r(5).valid and bool2sl(r(5).mode /= "01");
+      sBpUnary  <= sUnary;
+      sBpSufLen <= sSufLen;
+      sBpSufVal <= sSufVal;
       -- Last pixel always gives a word (EOL hit or coded sample)
       sTagLane <= r(5).lane;
       sTagLast <= r(5).valid and r(5).last;
@@ -342,20 +271,245 @@ begin
         for i in 0 to 5 loop
           r(i).valid <= '0';
         end loop;
-        sAWe  <= '0';
-        sRawV <= '0';
-        sGolV <= '0';
+        sAWe    <= '0';
+        sBpRawV <= '0';
+        sBpGolV <= '0';
       end if;
     end if;
 
   end process pipe_proc;
+
+  -- X0: one A.15/A.16 for all lanes, run state per lane. RUNcnt is the A.14
+  -- count; a lane's state clears after its last pixel.
+  sL     <= to_integer(r(0).lane);
+  sRun   <= r(0).valid and bool2sl(r(0).mode = "01" or r(0).mode = "10");
+  sHit   <= bool2sl(r(0).mode = "01");
+  sCont  <= sHit and not r(0).eol;
+  sEoi   <= r(0).valid and r(0).last;
+  sCntIn <= sRunCnt(sL) + 1 when sHit = '1' else
+            sRunCnt(sL);
+
+  p_run_state : process (iClk) is
+  begin
+
+    if rising_edge(iClk) then
+      if (sEoi = '1') then
+        sRunCnt(sL) <= (others => '0');
+        sRunIdx(sL) <= (others => '0');
+        sBound(sL)  <= to_unsigned(1, RUN_CNT + 1);
+      elsif (sRun = '1') then
+        if (sCont = '1') then
+          sRunCnt(sL) <= sCntIn;
+        else
+          sRunCnt(sL) <= (others => '0');
+        end if;
+        sRunIdx(sL) <= sIdxNext;
+        sBound(sL)  <= sBoundNext;
+      end if;
+      if (iRst = '1') then
+        sRunCnt <= (others => (others => '0'));
+        sRunIdx <= (others => (others => '0'));
+        sBound  <= (others => to_unsigned(1, RUN_CNT + 1));
+      end if;
+    end if;
+
+  end process p_run_state;
+
+  u_a15_16 : entity work.a15_a16_nl_encode_run(behavioral)
+    generic map (
+      BITNESS        => BITNESS,
+      RUN_CNT_WIDTH  => RUN_CNT
+    )
+    port map (
+      iRst           => iRst,
+      iRunIndex      => sRunIdx(sL),
+      iNextBound     => sBound(sL),
+      iInRun         => '0',
+      oRunIndexNext  => sIdxNext,
+      oNextBoundNext => sBoundNext,
+      iRunCnt        => sCntIn,
+      iRunHit        => sHit,
+      iRunContinue   => sCont,
+      iModeIsRun     => sRun,
+      iIx            => (others => '0'),
+      iRa            => (others => '0'),
+      iRb            => (others => '0'),
+      oRawValid      => sRawV,
+      oRawSuffixLen  => sRawLen,
+      oRawSuffixVal  => sRawVal,
+      oRiValid       => open,
+      oRiIx          => open,
+      oRiRa          => open,
+      oRiRb          => open,
+      oRiRunIndex    => sRunIdxOut,
+      oInRunNext     => open
+    );
+
+  -- X2: A RAM word {A, N, Nn}; regular N is the loop's pre-update N
+  sWord   <= sRd(to_integer(r(2).lane));
+  sAq     <= unsigned(sWord(WORD_W - 1 downto 2 * NWID));
+  sNq     <= unsigned(sWord(2 * NWID - 1 downto NWID));
+  sNn     <= unsigned(sWord(NWID - 1 downto 0));
+  sN2     <= r(2).npre when r(2).mode = "00" else
+             sNq;
+  sRiType <= r(2).valid and r(2).ritype and bool2sl(r(2).mode = "10");
+
+  -- A.23 is combinational and r(2) settles deltas before the RAM word, so mixed
+  -- old/new inputs can drive A + |Errval| - RItype to -1. Its inputs are built in
+  -- one process (one delta) and RItype is dropped when A = Errval = 0, which a
+  -- real RItype=1 token never has (Errval /= 0): no-op on settled values.
+  p_ri_in : process (all) is
+  begin
+
+    sRiErr  <= r(2).errval;
+    sRiAqIn <= sAq;
+    sRiNqIn <= sNq;
+    sRiNnIn <= sNn;
+    sRiRt   <= sRiType;
+
+    if (sAq = 0 and r(2).errval = 0) then
+      sRiRt <= '0';
+    end if;
+
+  end process p_ri_in;
+
+
+  u_a12 : entity work.a12_variables_update(rtl)
+    generic map (
+      ERROR_WIDTH => BITNESS + 1,
+      A_WIDTH     => AWID,
+      B_WIDTH     => 7,
+      N_WIDTH     => NWID,
+      RESET       => RESET
+    )
+    port map (
+      iErrorVal   => r(2).errval,
+      iAq         => sAq,
+      iBq         => r(2).bpre,
+      iNq         => r(2).npre,
+      oAq         => sRegAq,
+      oBq         => sRegBq,
+      oNq         => sRegNq
+    );
+
+  u_a23 : entity work.a23_run_interruption_update(behavioral)
+    generic map (
+      A_WIDTH     => AWID,
+      N_WIDTH     => NWID,
+      NN_WIDTH    => NWID,
+      ERROR_WIDTH => BITNESS + 1,
+      RESET       => RESET
+    )
+    port map (
+      iErrVal     => sRiErr,
+      iRiType     => sRiRt,
+      iAq         => sRiAqIn,
+      iNq         => sRiNqIn,
+      iNn         => sRiNnIn,
+      oAq         => sRiAq,
+      oNq         => sRiNq,
+      oNn         => sRiNn
+    );
+
+  u_a20 : entity work.a20_compute_temp(behavioral)
+    generic map (
+      A_WIDTH => AWID,
+      N_WIDTH => NWID
+    )
+    port map (
+      iRItype => sRiType,
+      iAq     => sAq,
+      iNq     => sN2,
+      oTemp   => sTemp
+    );
+
+  -- X3
+  u_a10 : entity work.a10_compute_k(behavioral)
+    generic map (
+      A_WIDTH => AWID,
+      K_WIDTH => KWID,
+      N_WIDTH => NWID
+    )
+    port map (
+      iNq     => r(3).n,
+      iAq     => r(3).temp,
+      oK      => sK
+    );
+
+  -- X4: the A.11 special mapping is lossless only; B = 0 disables it (2B <= -N needs N <= 0)
+  sBqMap <= r(4).bpre when iNear = 0 else
+            (others => '0');
+
+  u_a11 : entity work.a11_error_mapping(behavioral)
+    generic map (
+      N_WIDTH                => NWID,
+      B_WIDTH                => 7,
+      K_WIDTH                => KWID,
+      ERROR_WIDTH            => BITNESS + 1,
+      MAPPED_ERROR_VAL_WIDTH => MW
+    )
+    port map (
+      iK                     => r(4).k,
+      iBq                    => sBqMap,
+      iNq                    => r(4).n,
+      iErrorVal              => r(4).errval,
+      oMappedErrorVal        => sRegMerr
+    );
+
+  u_a21 : entity work.a21_compute_map(behavioral)
+    generic map (
+      K_WIDTH     => KWID,
+      N_WIDTH     => NWID,
+      ERROR_WIDTH => BITNESS + 1
+    )
+    port map (
+      iK          => r(4).k,
+      iErrval     => r(4).errval,
+      iNn         => r(4).nn,
+      iNq         => r(4).n,
+      oMap        => sRiMap
+    );
+
+  u_a22 : entity work.a22_errval_mapping(behavioral)
+    generic map (
+      ERROR_WIDTH         => BITNESS + 1,
+      MAPPED_ERRVAL_WIDTH => MW
+    )
+    port map (
+      iErrval             => r(4).errval,
+      iRiType             => r(4).ritype,
+      iMap                => sRiMap,
+      oEmErrVal           => sRiMerr
+    );
+
+  -- X5
+  u_a11_1 : entity work.a11_1_nl_golomb_encoder(behavioral)
+    generic map (
+      K_WIDTH                => KWID,
+      LIMIT                  => LIMIT,
+      UNARY_WIDTH            => UW,
+      SUFFIX_WIDTH           => SUFW,
+      SUFFIXLEN_WIDTH        => 5,
+      MAPPED_ERROR_VAL_WIDTH => MW
+    )
+    port map (
+      iK                     => r(5).k,
+      iQbpp                  => iQbpp,
+      iMappedErrorVal        => r(5).merr,
+      iRiMode                => bool2sl(r(5).mode = "10"),
+      iRunIndex              => r(5).runidx,
+      oUnaryZeros            => sUnary,
+      oSuffixLen             => sSufLen,
+      oSuffixVal             => sSufVal
+    );
 
   -- A RAMs: clear sweep writes {Ainit, N = 1, Nn = 0}
   sRdAddr <= std_logic_vector(r(0).ctx) when r(0).mode = "00" else
              (0 => r(0).ritype, others => '0');
   sWrAddr <= std_logic_vector(iClrAddr) when iClr = '1' else
              std_logic_vector(sAWrAddr);
-  sWrData <= std_logic_vector(resize(iAinit, AWID)) & "0000001" & "0000000" when iClr = '1' else
+  sWrData <= std_logic_vector(resize(iAinit, AWID)) & std_logic_vector(to_unsigned(1, NWID)) &
+             std_logic_vector(to_unsigned(0, NWID)) when iClr = '1' else
              sAWrData;
 
   gen_aram : for l in 0 to 3 generate
@@ -391,13 +545,13 @@ begin
       iClk         => iClk,
       iRst         => iRst,
       iStall       => '0',
-      iRawValid    => sRawV,
-      iRawLen      => sRawLen,
-      iRawVal      => sRawVal,
-      iGolombValid => sGolV,
-      iUnaryZeros  => sUnary,
-      iSuffixLen   => sSufLen,
-      iSuffixVal   => sSufVal,
+      iRawValid    => sBpRawV,
+      iRawLen      => sBpRawLen,
+      iRawVal      => sBpRawVal,
+      iGolombValid => sBpGolV,
+      iUnaryZeros  => sBpUnary,
+      iSuffixLen   => sBpSufLen,
+      iSuffixVal   => sBpSufVal,
       oWord        => oWord,
       oWordValid   => oValid,
       oValidLen    => oLen

@@ -103,6 +103,14 @@ picked. **Picked** marks the choice; everything here is open for review.
 - Verification/ref/nl_charls.cpp: CharLS per stripe at the same NEAR. Gated
   on T16E3.JLS byte-exact. nl_top output is compared byte-exact per lane.
 
+## D18. Back end reuses OpenJLS blocks
+- A10, A11, A12, A15/A16, A20-A23 and A11_2 are used unchanged. NEAR-only
+  changes go in `Sources/A<n>_nl_*.vhd` overrides, changed lines marked `-- NL`:
+  A11_1_nl (QBPP is a runtime port).
+- A11's special map (k=0, 2B <= -N) is off when NEAR /= 0 by driving iBq = 0.
+- A23 is combinational, and the A RAM word settles deltas after r(2). Its inputs
+  are built in one process (one delta), and RItype is dropped when A = Errval = 0.
+  That is a sim-only guard: real RItype=1 tokens have Errval /= 0.
 ## Status (nl_top, xczu7eg-1, OOC, Vivado 2025.2)
 | BITNESS | est. fmax | LUT | FF | BRAM | DSP |
 |---|---|---|---|---|---|

@@ -22,6 +22,9 @@ nvc --std=2008 -a --relaxed --psl "$OLO/olo_base_pkg_array.vhd" "$OLO/olo_base_p
   "$OLO/olo_base_pkg_string.vhd" "$OLO/olo_base_pkg_logic.vhd" "$OLO/olo_base_pkg_attribute.vhd" \
   "$OLO/olo_base_ram_sdp.vhd" "$OLO/olo_base_fifo_sync.vhd" \
   "$OJ/openjls_pkg.vhd" "$OJ/A11_2_bit_packer.vhd" "$OJ/byte_stuffer.vhd" \
+  "$OJ"/{A10_compute_k,A11_error_mapping,A12_variables_update}.vhd \
+  "$OJ"/{A20_compute_temp,A21_compute_map,A22_errval_mapping,A23_run_interruption_update}.vhd \
+  "$SRC"/{A11_1_nl_golomb_encoder,A15_A16_nl_encode_run}.vhd \
   "$SRC/nl_pkg.vhd" "$SRC/nl_loop.vhd" "$SRC/nl_config.vhd" "$SRC/nl_frontend.vhd" "$SRC/nl_backend.vhd" \
   "$SRC/nl_framer.vhd" "$SRC/nl_top.vhd" "$HERE/tb_nl_top.vhd"
 
