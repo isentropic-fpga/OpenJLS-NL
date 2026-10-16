@@ -16,8 +16,10 @@ file mkdir $OUT
 read_vhdl -vhdl2008 [concat \
   [lmap f {olo_base_pkg_array olo_base_pkg_math olo_base_pkg_string olo_base_pkg_logic olo_base_pkg_attribute \
            olo_base_ram_sdp olo_base_fifo_sync} {file join $OLO $f.vhd}] \
-  [lmap f {openjls_pkg A11_2_bit_packer byte_stuffer} {file join $OJ $f.vhd}] \
-  [lmap f {nl_pkg nl_loop nl_config nl_frontend nl_backend nl_framer nl_top} {file join $SRC $f.vhd}]]
+  [lmap f {openjls_pkg A11_2_bit_packer A10_compute_k A11_error_mapping A12_variables_update \
+    A20_compute_temp A21_compute_map A22_errval_mapping A23_run_interruption_update} \
+    {file join $OJ $f.vhd}] \
+  [lmap f {A11_1_nl_golomb_encoder A15_A16_nl_encode_run nl_pkg nl_loop nl_config nl_frontend nl_backend byte_stuffer_nl nl_framer nl_top} {file join $SRC $f.vhd}]]
 set fp [open $OUT/clk.xdc w]; puts $fp "create_clock -period $PERIOD -name iClk \[get_ports iClk\]"; close $fp
 read_xdc -mode out_of_context $OUT/clk.xdc
 synth_design -top nl_top -part xczu7eg-fbvb900-1-e -mode out_of_context -retiming \
