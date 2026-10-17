@@ -107,3 +107,5 @@ foreach bitness {8 12 16} {
   Test Modules/tb_nl_frontend_osvvm.vhd [generic BITNESS $bitness]
   Test Modules/tb_nl_backend_osvvm.vhd [generic BITNESS $bitness]
 }
+# OUT_WIDTH 200: 25-byte beats, the header ends on a full beat (nl_top allows 48..1024).
+Test Modules/tb_nl_framer_osvvm.vhd [generic BITNESS 12] [generic OUT_WIDTH 200]

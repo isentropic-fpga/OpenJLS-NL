@@ -24,6 +24,13 @@
 --              taking turns (lane sSlot this cycle), so the whole core emits
 --              at most 4 payload bytes per clock.
 --
+-- Assumptions:
+--              iImageWidth multiple of 4 in [32, MAX_IMAGE_WIDTH], iImageHeight in
+--              [1, MAX_IMAGE_HEIGHT], iNear <= min(255, MAXVAL/2): sampled in reset,
+--              checked by nl_frontend / nl_config. A lane line is <= 16383 pixels
+--              (nl_backend run contract). iReady per lane is free (AXI-Stream).
+--              The ASSERTIONS block checks the lane slot hand-off and the streams.
+--
 ----------------------------------------------------------------------------------
 
 library ieee;
@@ -73,7 +80,7 @@ architecture rtl of nl_top is
 
   signal sWidth     : unsigned(15 downto 0);
   signal sHeight    : unsigned(15 downto 0);
-  signal sHold      : std_logic;
+  signal sHold      : std_logic;                                      -- any skid FIFO almost full
 
   -- Config
   signal sCfgDone   : std_logic;
@@ -137,13 +144,13 @@ architecture rtl of nl_top is
   -- Shared stuffer + framer, lane sSlot this cycle
   constant OB_W     : natural := log2ceil(OUT_WIDTH / 8 + 1);
   constant OUTF_W   : natural := 1 + OB_W + OUT_WIDTH;
-  signal sSlot      : unsigned(1 downto 0);
+  signal sSlot      : unsigned(1 downto 0);                           -- [0, 3], lane served this cycle
   signal sSkidOut   : t_slv_array(0 to 3)(SKID_W - 1 downto 0);
   signal sSkidValid : std_logic_vector(3 downto 0);
   signal sPop       : std_logic_vector(3 downto 0);
   signal sBsAlm     : std_logic_vector(3 downto 0);
   signal sBsAlmReg  : std_logic_vector(3 downto 0);
-  signal sStartPend : std_logic_vector(3 downto 0);
+  signal sStartPend : std_logic_vector(3 downto 0);                  -- per lane: image start not yet framed
   signal sBsIn      : std_logic_vector(SKID_W - 1 downto 0);
   signal sBsWord    : std_logic_vector(BS_OUT_W - 1 downto 0);
   signal sBsValid   : std_logic;
@@ -155,6 +162,7 @@ architecture rtl of nl_top is
   signal sFrBytes   : unsigned(OB_W - 1 downto 0);
   signal sFrLast    : std_logic;
   signal sOutRdy    : std_logic_vector(3 downto 0);
+  signal sImgOpen   : std_logic_vector(3 downto 0) := (others => '0');  -- ASSERTIONS only: lane between start and last word
 
   function bool2sl (
     b : boolean
@@ -479,5 +487,45 @@ begin
     end generate gen_keep;
 
   end generate gen_out;
+
+  -- ASSERTIONS -------------------------------------------------------------------------------
+  -- Lane hand-off: one start per lane image, framed before the next; the back end
+  -- emits words of a lane only inside its image, and the last one once.
+  assert_proc : process (iClk) is
+  begin
+
+    if rising_edge(iClk) then
+      if (iRst = '1') then
+        sImgOpen <= (others => '0');
+      else
+        for l in 0 to 3 loop
+          if (xValid = '1' and xFirstPix = '1' and xLane = l) then
+            assert sStartPend(l) = '0'
+              report "nl_top: lane " & integer'image(l) & " restarted before its start was framed" severity failure;
+            assert sImgOpen(l) = '0'
+              report "nl_top: lane " & integer'image(l) & " restarted before its last word" severity failure;
+            sImgOpen(l) <= '1';
+          end if;
+          if (bValid = '1' and bLane = l) then
+            assert sImgOpen(l) = '1' or (xValid = '1' and xFirstPix = '1' and xLane = l)
+              report "nl_top: lane " & integer'image(l) & " word outside an image" severity failure;
+            if (bLast = '1') then
+              sImgOpen(l) <= '0';
+            end if;
+          end if;
+        end loop;
+      end if;
+    end if;
+
+  end process assert_proc;
+
+  gen_psl : for l in 0 to 3 generate
+  begin
+
+    -- psl default clock is rising_edge(iClk);
+    -- psl assert always (((iRst = '0' and oValid(l) = '1' and iReady(l) = '0') -> next (oValid(l) = '1')) abort (iRst = '1')) report "nl_top: oValid must hold until the beat is accepted (AXIS)";
+    -- psl assert always (iRst = '1' -> next (oValid(l) = '0')) report "nl_top: reset must clear the output streams";
+
+  end generate gen_psl;
 
 end architecture rtl;

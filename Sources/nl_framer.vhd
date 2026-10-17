@@ -352,9 +352,13 @@ architecture behavioral of nl_framer is
 
         return x"00";
 
+      -- Unreachable: idx < HEADER_LEN at every call site. Kept for case
+      -- completeness, excluded from code coverage.
+      -- coverage off
       when others =>
 
         return x"00";
+      -- coverage on
 
     end case;
 

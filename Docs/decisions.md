@@ -125,6 +125,27 @@ picked. **Picked** marks the choice; everything here is open for review.
 - Limit: 4 payload bytes per clock for the whole core (1 per lane).
 - Saves ~10k LUT and ~750 FF at 12 bits; fmax unchanged.
 
+## D20. Lane line <= 16383 pixels
+- MAX_IMAGE_WIDTH <= 65532, so one lane line is at most 16383 pixels.
+- So RUNcnt <= 16383 and RUNindex <= 30 (a J=14 segment needs 16384).
+- nl_backend keeps the full A.14 run count per lane (not the remainder of
+  the segment) and asserts RUNcnt <= 16383. tb_nl_backend reaches
+  RUNindex 30.
+
+## D21. Stale loop exits dropped (OSVVM finding)
+- After a reset, nl_loop can still deliver exits for pixels issued before
+  it. nl_frontend now gates every use of iExValid with p(E).valid (a slot
+  issued since reset): forwarding, line-buffer write, context write back,
+  and oExValid to the back end.
+- Found by tb_nl_frontend (reset in every phase, G5).
+
+## D22. Golomb encoder asserts qualified by valid
+- The range assertions in A11_1_nl_golomb_encoder hold only for valid
+  tokens.
+- nl_backend drives its iValid from a registered sGolV (valid and not a
+  run-segment token), aligned with the registered k / MErrval. A
+  combinational valid glitched in delta time and fired the k assert.
+
 ## Status (nl_top, xczu7eg-1, OOC, Vivado 2025.2)
 | BITNESS | est. fmax | LUT | FF | BRAM | DSP |
 |---|---|---|---|---|---|

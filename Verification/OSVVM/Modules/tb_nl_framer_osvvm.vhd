@@ -399,11 +399,18 @@ begin
 
     -- Phase of lane l as seen at its ports (header bytes counted from the
     -- last oLast; a chained image's header queues behind the open one).
+    -- With BYTES_OUT >= HDR_LEN the header leaves in one beat, so the header
+    -- phase is "iStart seen, header not yet out".
     impure function phase_hit (p : integer) return boolean is
     begin
       for l in 0 to LANES - 1 loop
         case p is
-          when RP_HEADER => if (outst(l) = 0 and outBytes(l) > 0 and outBytes(l) < HDR_LEN) then return true; end if;
+          when RP_HEADER =>
+            if (outst(l) = 0 and outBytes(l) > 0 and outBytes(l) < HDR_LEN) then return true; end if;
+            if (BYTES_OUT >= HDR_LEN and outst(l) = 0 and outBytes(l) = 0 and imgIdx(l) > imgsDone(l)
+                and (startSent(l) or not firstWord(l))) then
+              return true;
+            end if;
           when RP_DATA   => if (outst(l) = 0 and outBytes(l) >= HDR_LEN and wordsLeft(l) > 0) then return true; end if;
           when RP_EOI    => if (outst(l) > 0) then return true; end if;
           when RP_HOLD   => if (held(l)) then return true; end if;
