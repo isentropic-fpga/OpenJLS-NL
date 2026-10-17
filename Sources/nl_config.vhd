@@ -54,13 +54,13 @@ architecture behavioral of nl_config is
 
   signal sState : t_state := S_DIV_RECIP;
   signal sNear  : unsigned(7 downto 0) := (others => '0');
-  signal sD     : unsigned(DW - 1 downto 0);
-  signal sNum   : unsigned(DW - 1 downto 0);
-  signal sRem   : unsigned(DW - 1 downto 0);
-  signal sQuo   : unsigned(DW - 1 downto 0);
+  signal sD     : unsigned(DW - 1 downto 0);                  -- [1 .. 2*NMAX+1]
+  signal sNum   : unsigned(DW - 1 downto 0);                  -- [MAXVAL .. 2^(BITNESS+10)+2*NMAX] < 2^DW
+  signal sRem   : unsigned(DW - 1 downto 0);                  -- [0 .. sD-1]
+  signal sQuo   : unsigned(DW - 1 downto 0);                  -- [0 .. 2^(BITNESS+10)] (RECIP), [0 .. MAXVAL] (RANGE-1)
   signal sCnt   : natural range 0 to DW;
-  signal sRange   : unsigned(BITNESS downto 0);
-  signal sRangeM1 : unsigned(BITNESS downto 0);
+  signal sRange   : unsigned(BITNESS downto 0);               -- [2 .. MAXVAL+1] (A.2.1, NEAR <= MAXVAL/2)
+  signal sRangeM1 : unsigned(BITNESS downto 0);               -- [1 .. MAXVAL]
 
   function clamp_t (
     t, lo : natural
@@ -78,12 +78,12 @@ begin
 
   proc : process (iClk) is
 
-    variable vRem : unsigned(DW - 1 downto 0);
-    variable vN   : natural;
-    variable vT1  : natural;
-    variable vT2  : natural;
-    variable vT3  : natural;
-    variable vQ   : natural;
+    variable vRem : unsigned(DW - 1 downto 0);                -- [0 .. 2*sD-1] before subtract, [0 .. sD-1] after
+    variable vN   : natural;                                  -- [0 .. NMAX]
+    variable vT1  : natural;                                  -- [NEAR+1 .. MAXVAL] (C.2.4.1.1 CLAMP)
+    variable vT2  : natural;                                  -- [T1 .. MAXVAL]
+    variable vT3  : natural;                                  -- [T2 .. MAXVAL]
+    variable vQ   : natural;                                  -- [1 .. BITNESS] (qbpp, RANGE >= 2)
 
   begin
 
@@ -153,11 +153,17 @@ begin
               vQ := i + 1;
             end if;
           end loop;
+          -- Assertions ----------------------------------------------------------------
+          assert (vN <= NMAX and vQ >= 1 and vQ <= BITNESS)
+            report "nl_config: NEAR or qbpp out of range" severity failure;
+          ------------------------------------------------------------------------------
           oQbpp   <= to_unsigned(vQ, 5);
           oAinit  <= to_unsigned(maximum(2, (to_integer(sRange) + 32) / 64), BITNESS);
           vT1     := clamp_t(FACTOR + 2 + 3 * vN, vN + 1);
           vT2     := clamp_t(4 * FACTOR + 3 + 5 * vN, vT1);
           vT3     := clamp_t(17 * FACTOR + 4 + 7 * vN, vT2);
+          assert (vT1 >= vN + 1 and vT1 <= vT2 and vT2 <= vT3 and vT3 <= MAXVAL)
+            report "nl_config: thresholds out of NEAR+1 <= T1 <= T2 <= T3 <= MAXVAL" severity failure;
           oT1     <= to_unsigned(vT1, BITNESS);
           oT2     <= to_unsigned(vT2, BITNESS);
           oT3     <= to_unsigned(vT3, BITNESS);
@@ -168,5 +174,13 @@ begin
     end if;
 
   end process proc;
+
+  -- Assertions --------------------------------------------------------------------
+  -- psl default clock is rising_edge(iClk);
+  -- psl assert always (iRst = '1' -> next (oDone = '0')) report "nl_config: reset must clear oDone";
+  -- psl assert never (sState = S_DONE and (sRange < 2 or sRange > MAXVAL + 1)) report "nl_config: RANGE out of [2 .. MAXVAL+1]";
+  -- psl assert never (sState = S_DONE and sD > 2 * NMAX + 1) report "nl_config: 2*NEAR+1 out of range";
+  -- psl assert never (iRst = '0' and (sState = S_DIV_RECIP or sState = S_DIV_RANGE) and sCnt /= DW and sRem >= sD) report "nl_config: division remainder >= divisor";
+  -----------------------------------------------------------------------------------
 
 end architecture behavioral;

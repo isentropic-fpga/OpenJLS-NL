@@ -35,6 +35,15 @@
 --              then H rows. Ws = W/4 must be >= 8 so that Rx is written back
 --              before the next row reads it.
 --
+-- Assumptions:
+--              iWidth multiple of 4, 32 <= iWidth <= MAX_IMAGE_WIDTH, iHeight >= 1.
+--              NEAR + 1 <= T1 <= T2 <= T3 <= MAXVAL (T.87 C.2.4.1.1).
+--              The loop exits every slot exactly E - L = 7 cycles after L; a
+--              regular exit (mode 00) carries one of the slot's candidate ctx.
+--              The loop has no reset: exits of slots issued before iRst are
+--              dropped here (oExValid low) for the write back and the back end.
+--              The ASSERTIONS block checks them.
+--
 ----------------------------------------------------------------------------------
 
 library ieee;
@@ -93,6 +102,7 @@ entity nl_frontend is
     iExBq     : in    signed(6 downto 0);
     iExNq     : in    unsigned(6 downto 0);
     -- Tags aligned with the loop exit
+    oExValid  : out   std_logic;                                          -- iExValid of a slot issued since reset
     oExLane   : out   unsigned(1 downto 0);
     oExFirstPix : out std_logic;                                          -- first pixel of the lane image
     oExLastPix  : out std_logic;                                          -- last pixel of the lane image
@@ -127,21 +137,21 @@ architecture behavioral of nl_frontend is
     rc       : unsigned(BITNESS - 1 downto 0);
     rd       : unsigned(BITNESS - 1 downto 0);
     -- I4
-    d1       : signed(SW - 1 downto 0);
-    d2       : signed(SW - 1 downto 0);
-    bound    : t_signed_array(0 to 7)(SW - 1 downto 0);
+    d1       : signed(SW - 1 downto 0);                                 -- [-MAXVAL, MAXVAL]
+    d2       : signed(SW - 1 downto 0);                                 -- [-MAXVAL, MAXVAL]
+    bound    : t_signed_array(0 to 7)(SW - 1 downto 0);                 -- [1-MAXVAL, 2*MAXVAL]
     -- I5
     q1       : integer range -4 to 4;
     q2       : integer range -4 to 4;
     -- I6
     neg      : std_logic;
-    row      : unsigned(5 downto 0);
-    row9     : unsigned(CO_CTX_WIDTH - 1 downto 0);
+    row      : unsigned(5 downto 0);                                    -- [0, 40]
+    row9     : unsigned(CO_CTX_WIDTH - 1 downto 0);                     -- [0, 360]
     q12Zero  : std_logic;
     -- I7
     rev      : std_logic_vector(0 to 8);
-    bank     : t_bank_array;
-    ctx      : t_unsigned_array(0 to 8)(CO_CTX_WIDTH - 1 downto 0);
+    bank     : t_bank_array;                                            -- [0, 8]
+    ctx      : t_unsigned_array(0 to 8)(CO_CTX_WIDTH - 1 downto 0);     -- [4, 368]
     sign     : std_logic_vector(0 to 8);
     -- I8
     fw       : std_logic_vector(0 to 8);
@@ -183,7 +193,7 @@ architecture behavioral of nl_frontend is
   signal sPosT     : t_signed_array(0 to 2)(SW - 1 downto 0);            -- T1, T2, T3
   signal sNegN     : signed(SW - 1 downto 0);
   signal sPosN     : signed(SW - 1 downto 0);
-  signal sBoundK   : t_signed_array(0 to 7)(SW - 1 downto 0);
+  signal sBoundK   : t_signed_array(0 to 7)(SW - 1 downto 0);            -- [1-MAXVAL, MAXVAL]
 
   -- Pipeline
   signal sIss      : t_slot;
@@ -204,7 +214,7 @@ architecture behavioral of nl_frontend is
   signal sCtxWrAddr : unsigned(7 downto 0);
   signal sCtxWrData : std_logic_vector(WORD_W - 1 downto 0);
   signal sWbValid   : std_logic;
-  signal sWbBank    : unsigned(3 downto 0);
+  signal sWbBank    : unsigned(3 downto 0);                             -- [0, 8] when sWbValid
   signal sWbAddr    : unsigned(7 downto 0);
   signal sWbData    : std_logic_vector(WORD_W - 1 downto 0);
 
@@ -504,7 +514,7 @@ begin
       -- I7: forward flags against the slot leaving the loop now (same lane, 8 slots earlier) -----
       v := p(7);
       for t in 0 to 8 loop
-        v.fw(t) := iExValid and bool2sl(iExMode = "00" and iExCtx = v.ctx(t));
+        v.fw(t) := iExValid and p(E).valid and bool2sl(iExMode = "00" and iExCtx = v.ctx(t));
       end loop;
       p(8) <= v;
 
@@ -513,10 +523,10 @@ begin
       end loop;
 
       -- E: write back -----------------------------------------------------------------------------
-      sLbWe     <= iExValid;
+      sLbWe     <= iExValid and p(E).valid;
       sLbWrAddr <= p(E).x;
       sLbWrData <= iExRx;
-      sWbValid  <= iExValid and bool2sl(iExMode = "00");
+      sWbValid  <= iExValid and p(E).valid and bool2sl(iExMode = "00");
       sWbAddr   <= p(E).lane & p(E).row;
       sWbBank   <= resize(iExCtx - p(E).row9, 4);
       sWbData   <= std_logic_vector(iExCq) & std_logic_vector(iExBq) & std_logic_vector(iExNq);
@@ -560,6 +570,7 @@ begin
 
   end generate gen_cand;
 
+  oExValid    <= iExValid and p(E).valid;
   oExLane     <= p(E).lane;
   oExFirstPix <= p(E).firstPix;
   oExLastPix  <= p(E).lastPix;
@@ -623,5 +634,55 @@ begin
       );
 
   end generate gen_bank;
+
+  -- ASSERTIONS -------------------------------------------------------------------------------
+  -- Config assumptions when the image starts, G2 ranges of the registered pipeline nodes on
+  -- valid slots, and the loop contract at E.
+  assert_proc : process (iClk) is
+    constant MAXVAL : integer := 2 ** BITNESS - 1;
+  begin
+    if rising_edge(iClk) then
+      if (iRst = '0' and sState = S_CFG and iCfgDone = '1') then
+        assert sWm1(1 downto 0) = "11" and sWsM1 >= 7 and to_integer(sWm1) < MAX_IMAGE_WIDTH and
+               sWsM1 = shift_right(resize(sWm1, 16), 2)
+          report "nl_frontend: width not a multiple of 4 in [32, MAX_IMAGE_WIDTH]" severity failure;
+        assert sHm1 /= x"FFFF"
+          report "nl_frontend: height 0" severity failure;
+        assert iNear < iT1 and iT1 <= iT2 and iT2 <= iT3
+          report "nl_frontend: thresholds not NEAR < T1 <= T2 <= T3" severity failure;
+      end if;
+      if (sState = S_DRAIN) then
+        assert sCnt <= 31 report "nl_frontend: drain counter overrun" severity failure;
+      end if;
+      if (sState = S_RUN and sGo = '1') then
+        assert sJ <= sWsM1 and sRow <= sHm1
+          report "nl_frontend: issue column / row outside the image" severity failure;
+      end if;
+      if (p(4).valid = '1') then
+        assert abs(p(4).d1) <= MAXVAL and abs(p(4).d2) <= MAXVAL
+          report "nl_frontend: D1 / D2 outside [-MAXVAL, MAXVAL]" severity failure;
+        for k in 0 to 7 loop
+          assert p(4).bound(k) >= 1 - MAXVAL and p(4).bound(k) <= 2 * MAXVAL
+            report "nl_frontend: Q3 bound outside [1-MAXVAL, 2*MAXVAL]" severity failure;
+        end loop;
+      end if;
+      if (p(7).valid = '1') then
+        assert p(7).row <= 40 report "nl_frontend: context row above 40" severity failure;
+        for t in 0 to 8 loop
+          assert p(7).ctx(t) >= 4 and p(7).ctx(t) <= 368
+            report "nl_frontend: candidate ctx outside [4, 368]" severity failure;
+        end loop;
+      end if;
+      assert p(E).valid /= '1' or iExValid = '1'
+        report "nl_frontend: loop exit not E - L cycles after the loop input" severity failure;
+      if (p(E).valid = '1' and iExMode = "00") then
+        assert iExCtx >= p(E).row9 and iExCtx <= p(E).row9 + 8
+          report "nl_frontend: regular exit ctx not a candidate of the slot" severity failure;
+      end if;
+      if (sWbValid = '1') then
+        assert sWbBank <= 8 report "nl_frontend: write-back bank above 8" severity failure;
+      end if;
+    end if;
+  end process assert_proc;
 
 end architecture behavioral;

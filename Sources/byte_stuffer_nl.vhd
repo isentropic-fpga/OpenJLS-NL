@@ -294,6 +294,21 @@ begin
   -- psl assert always (oWordValid = '1' -> oValidBytes <= OUT_BYTES_PER_CYCLE) report "byte_stuffer: oValidBytes exceeds the per-cycle output cap";
   ---------------------------------------------------------------------------------
 
+  -- NL: the lane ring rotates one slot per clock, so iSlot must count
+  -- 0,1,2,3 (mod 4) every clock out of reset, else lane state is crossed.
+  slot_assert_proc : process (iClk) is
+    variable vPrevSlot : unsigned(1 downto 0) := (others => '0');
+    variable vPrevRun  : boolean := false;                         -- previous clock out of reset
+  begin
+    if rising_edge(iClk) then
+      assert not vPrevRun or iRst = '1' or Is_X(iSlot) or iSlot = vPrevSlot + 1
+        report "byte_stuffer_nl: iSlot must advance by one lane per clock"
+        severity failure;
+      vPrevSlot := iSlot;
+      vPrevRun  := iRst = '0';
+    end if;
+  end process slot_assert_proc;
+
   oWord       <= sOutWordReg;
   oWordValid  <= sOutValidReg;
   oValidBytes <= sOutBytesValidReg;

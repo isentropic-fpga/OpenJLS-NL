@@ -113,10 +113,10 @@ begin
                     iRunCnt, iRunHit, iRunContinue, iModeIsRun, iRst,          -- NL: no iEoi
                     iIx, iRa, iRb) is
 
-    variable vJ        : natural;
-    variable vJNext    : natural;
-    variable vStep     : unsigned(C_BOUND_WIDTH - 1 downto 0);
-    variable vStepNext : unsigned(C_BOUND_WIDTH - 1 downto 0);
+    variable vJ        : natural;                                      -- [0 .. 15] (J table)
+    variable vJNext    : natural;                                      -- [0 .. 15]
+    variable vStep     : unsigned(C_BOUND_WIDTH - 1 downto 0);         -- [1 .. 2^15]
+    variable vStepNext : unsigned(C_BOUND_WIDTH - 1 downto 0);         -- [1 .. 2^15]
     variable vBoundHit : boolean;
     variable vNewIndex : unsigned(4 downto 0);
 
@@ -206,6 +206,18 @@ begin
     end if;
 
   end process p_comb;
+
+  -- Assertions --------------------------------------------------------------------
+  -- A.16 break: residual = RUNcnt - (NextBound - 2^J) in [0 .. 2^J-1] (J[RUNindex]
+  -- bits). Postponed: the inputs settle over several deltas in the caller.
+  postponed assert (iModeIsRun /= '1' or iRst /= '0' or iRunHit /= '0' or
+                    Is_X(iRunCnt) or Is_X(iNextBound) or Is_X(iRunIndex) or
+                    (iNextBound >= shift_left(to_unsigned(1, C_BOUND_WIDTH), CO_J_TABLE(to_integer(iRunIndex))) and
+                     resize(iRunCnt, C_BOUND_WIDTH) + shift_left(to_unsigned(1, C_BOUND_WIDTH),
+                                                                 CO_J_TABLE(to_integer(iRunIndex))) >= iNextBound and
+                     resize(iRunCnt, C_BOUND_WIDTH) < iNextBound))
+    report "a15_a16_nl: A.16 residual out of [0 .. 2^J[RUNindex]-1]" severity failure;
+  -----------------------------------------------------------------------------------
 
   oInRunNext     <= sInRunNext;
   oRunIndexNext  <= sRunIndexNext;                                     -- NL

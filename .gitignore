@@ -4,3 +4,14 @@ Verification/Golden model/Output/
 clockInfo.txt
 cong/
 iter_*_CongestedCLBsAndNets.txt
+
+# OSVVM script-flow outputs (Verification/OSVVM/build_run.sh)
+Verification/OSVVM/VHDL_LIBS/
+Verification/OSVVM/OSVVM_OpenJlsNl/
+Verification/OSVVM/OsvvmTemp_NVC/
+Verification/OSVVM/*_build/
+Verification/OSVVM/NVC_CodeCoverage/
+Verification/OSVVM/*.html
+Verification/OSVVM/*.yml
+__pycache__/
+Verification/OSVVM/osvvm/

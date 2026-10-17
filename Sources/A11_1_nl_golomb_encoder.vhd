@@ -39,6 +39,7 @@ entity a11_1_nl_golomb_encoder is
     MAPPED_ERROR_VAL_WIDTH : natural := CO_MAPPED_ERROR_VAL_WIDTH_STD
   );
   port (
+    iValid                 : in    std_logic := '1';                            -- NL: qualifies the assertions only
     iK                     : in    unsigned (K_WIDTH - 1 downto 0);
     iQbpp                  : in    unsigned (4 downto 0);                       -- NL
     iMappedErrorVal        : in    unsigned (MAPPED_ERROR_VAL_WIDTH - 1 downto 0);
@@ -60,19 +61,19 @@ begin
   -- L=glimit=LIMIT-J[iRunIndex]-1 in RI mode (A.22.1). Non-escape if
   -- high_order < L - QBPP - 1. Escape emits (L - QBPP - 1) zeros + '1' + QBPP
   -- bits of (MErrval - 1); total escape length = L, so RI prefix + code = LIMIT.
-  p_golomb_encode : process (iK, iQbpp, iMappedErrorVal, iRiMode, iRunIndex) is
+  p_golomb_encode : process (iValid, iK, iQbpp, iMappedErrorVal, iRiMode, iRunIndex) is
 
-    variable vKInt           : integer;
-    variable vHighOrder      : unsigned(iMappedErrorVal'range);
-    variable vLowOrder       : unsigned(iMappedErrorVal'range);
-    variable vMappedErrorDec : unsigned(iMappedErrorVal'range);
+    variable vKInt           : integer;                                         -- [0 .. min(SUFFIX_WIDTH, MAPPED_ERROR_VAL_WIDTH)], assumption (1)
+    variable vHighOrder      : unsigned(iMappedErrorVal'range);                 -- [0 .. 2^MAPPED-1] >> k
+    variable vLowOrder       : unsigned(iMappedErrorVal'range);                 -- [0 .. 2^k-1]
+    variable vMappedErrorDec : unsigned(iMappedErrorVal'range);                 -- [0 .. 2^MAPPED-2], escape implies MErrval >= 1
     variable vUnaryZeros     : unsigned(oUnaryZeros'range);
     variable vSuffixLen      : unsigned(oSuffixLen'range);
     variable vIsEscape       : boolean;
     variable vSuffixVal      : unsigned(oSuffixVal'range);
-    variable vJ              : natural;
-    variable vThreshold      : natural;
-    variable vQbpp           : natural;                                         -- NL
+    variable vJ              : natural;                                         -- [0 .. 15] (J table)
+    variable vThreshold      : integer;                                         -- [1 .. LIMIT-1]: LIMIT-J-QBPP-2 >= 1 for QBPP <= BITNESS
+    variable vQbpp           : natural;                                         -- NL [1 .. 16] (A.2.1, RANGE >= 2)
 
   begin
 
@@ -84,6 +85,20 @@ begin
     else
       vThreshold := LIMIT - vQbpp - 1;                                          -- NL
     end if;
+
+    -- Assertions ----------------------------------------------------------------
+    -- iQbpp is U until nl_config finishes its first image; X is not a range violation.
+    -- Inputs of idle / run-hit cycles are junk: checked only with iValid = '1'.
+    assert iValid /= '1' or Is_X(iQbpp) or (vQbpp >= 1 and vQbpp <= SUFFIX_WIDTH and vQbpp <= MAPPED_ERROR_VAL_WIDTH)
+      report "a11_1_nl: qbpp out of [1 .. min(SUFFIX_WIDTH, MAPPED_ERROR_VAL_WIDTH)]"
+      severity failure;
+    assert iValid /= '1' or Is_X(iQbpp) or (vThreshold >= 1 and vThreshold < 2 ** oUnaryZeros'length)
+      report "a11_1_nl: escape threshold out of [1 .. 2^UNARY_WIDTH-1]"
+      severity failure;
+    assert iValid /= '1' or Is_X(iK) or (to_integer(iK) <= SUFFIX_WIDTH and to_integer(iK) <= MAPPED_ERROR_VAL_WIDTH)
+      report "a11_1_nl: k out of [0 .. min(SUFFIX_WIDTH, MAPPED_ERROR_VAL_WIDTH)]"
+      severity failure;
+    ------------------------------------------------------------------------------
 
     vKInt := to_integer(iK);
     -- q = high-order bits of MErrval = floor(MErrval / 2^k)

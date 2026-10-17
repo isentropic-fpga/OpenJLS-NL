@@ -37,6 +37,12 @@
 -- Assumptions:
 --              NEAR <= min(255, MAXVAL/2), RESET is even.
 --              iRecip = ceil(2^(BITNESS+10) / (2*NEAR+1)).
+--              Context candidates hold T.87 values: C in [-128, 127],
+--              N in [1, RESET], B in [1-N, 0].
+--
+--              Ranges below are for worst-case generics (BITNESS 16, NEAR 255,
+--              RESET 64); D = 2*NEAR+1, RANGE as in A.2. The ASSERTIONS block
+--              checks them on every valid slot.
 --
 ----------------------------------------------------------------------------------
 
@@ -85,7 +91,9 @@ entity nl_loop is
     oNq       : out   unsigned;
     oBpre     : out   signed;                                         -- before the update (A.10, A.11)
     oNpre     : out   unsigned;
-    oNRes     : out   std_logic                                       -- N = RESET before the update
+    oNRes     : out   std_logic;                                      -- N = RESET before the update
+    -- Verification observation (Px of A.6 / A.18); left open in nl_top, pruned
+    oPx       : out   unsigned(BITNESS - 1 downto 0)
   );
 end entity nl_loop;
 
@@ -114,73 +122,73 @@ architecture behavioral of nl_loop is
     firstCol  : std_logic;
     eol       : std_logic;
     q12Zero   : std_logic;
-    ix        : signed(W - 1 downto 0);
-    rb        : signed(W - 1 downto 0);
-    rc        : signed(W - 1 downto 0);
-    rbRc      : signed(W - 1 downto 0);
-    ixN       : signed(W - 1 downto 0);
-    ixM       : signed(W - 1 downto 0);
-    rbN       : signed(W - 1 downto 0);
-    rbM       : signed(W - 1 downto 0);
-    magMax    : signed(W - 1 downto 0);
+    ix        : signed(W - 1 downto 0);                       -- [0, MAXVAL]
+    rb        : signed(W - 1 downto 0);                       -- [0, MAXVAL]
+    rc        : signed(W - 1 downto 0);                       -- [0, MAXVAL]
+    rbRc      : signed(W - 1 downto 0);                       -- [-MAXVAL, MAXVAL]
+    ixN       : signed(W - 1 downto 0);                       -- [NEAR, MAXVAL+NEAR]
+    ixM       : signed(W - 1 downto 0);                       -- [-NEAR, MAXVAL-NEAR]
+    rbN       : signed(W - 1 downto 0);                       -- [NEAR, MAXVAL+NEAR]
+    rbM       : signed(W - 1 downto 0);                       -- [-NEAR, MAXVAL-NEAR]
+    magMax    : signed(W - 1 downto 0);                       -- [NEAR, MAXVAL+NEAR]
     rcGeRb    : std_logic;
     rcLeRb    : std_logic;
-    bound     : t_signed_array(0 to 7)(BITNESS + 1 downto 0);
+    bound     : t_signed_array(0 to 7)(BITNESS + 1 downto 0); -- [1-MAXVAL, 2*MAXVAL]
     cCtx      : t_unsigned_array(0 to 8)(CO_CTX_WIDTH - 1 downto 0);
     cSign     : std_logic_vector(0 to 8);
-    cCs       : t_signed_array(0 to 8)(CW - 1 downto 0);
-    cC        : t_signed_array(0 to 8)(CO_C_WIDTH - 1 downto 0);
-    cB        : t_signed_array(0 to 8)(BW - 1 downto 0);
-    cN        : t_unsigned_array(0 to 8)(NW - 1 downto 0);
+    cCs       : t_signed_array(0 to 8)(CW - 1 downto 0);      -- [-127, 128]
+    cC        : t_signed_array(0 to 8)(CO_C_WIDTH - 1 downto 0); -- [-128, 127]
+    cB        : t_signed_array(0 to 8)(BW - 1 downto 0);      -- [1-RESET, 0]
+    cN        : t_unsigned_array(0 to 8)(NW - 1 downto 0);    -- [1, RESET]
     -- S1
     st        : t_early;
-    ra        : unsigned(BITNESS - 1 downto 0);
+    ra        : unsigned(BITNESS - 1 downto 0);               -- [0, MAXVAL]
     run       : std_logic;
     hit       : std_logic;
     riType    : std_logic;
     match     : std_logic;
     ctx       : unsigned(CO_CTX_WIDTH - 1 downto 0);
     sign      : std_logic;
-    cs        : signed(CW - 1 downto 0);
-    c         : signed(CO_C_WIDTH - 1 downto 0);
-    b         : signed(BW - 1 downto 0);
-    n         : unsigned(NW - 1 downto 0);
-    pbase     : signed(W - 1 downto 0);
+    cs        : signed(CW - 1 downto 0);                      -- [-127, 128]
+    c         : signed(CO_C_WIDTH - 1 downto 0);              -- [-128, 127]
+    b         : signed(BW - 1 downto 0);                      -- [1-N, 0]
+    n         : unsigned(NW - 1 downto 0);                    -- [1, RESET]
+    pbase     : signed(W - 1 downto 0);                       -- [0, MAXVAL]
     -- S2
-    lastC     : signed(CO_C_WIDTH - 1 downto 0);
-    lastCn    : signed(CW - 1 downto 0);
-    px        : signed(W - 1 downto 0);
-    m         : unsigned(BITNESS downto 0);
+    lastC     : signed(CO_C_WIDTH - 1 downto 0);              -- [-128, 127]
+    lastCn    : signed(CW - 1 downto 0);                      -- [-127, 128]
+    px        : signed(W - 1 downto 0);                       -- [0, MAXVAL]
+    m         : unsigned(BITNESS downto 0);                   -- |Errval|+NEAR: [0, MAXVAL+NEAR]
     dirPos    : std_logic;
     ePos      : std_logic;
     -- S3
-    q         : unsigned(BITNESS downto 0);
-    dS        : signed(DW - 1 downto 0);
-    dE        : signed(DW - 1 downto 0);
-    pxOv      : signed(W - 1 downto 0);
-    cP1       : signed(CO_C_WIDTH - 1 downto 0);
-    cM1       : signed(CO_C_WIDTH - 1 downto 0);
-    cNeg      : signed(CW - 1 downto 0);
-    cP1Neg    : signed(CW - 1 downto 0);
-    cM1Neg    : signed(CW - 1 downto 0);
-    lastB     : signed(BW - 1 downto 0);
-    lastN     : unsigned(NW - 1 downto 0);
+    q         : unsigned(BITNESS downto 0);                   -- m/D: [0, (MAXVAL+NEAR)/D]
+    dS        : signed(DW - 1 downto 0);                      -- +-D
+    dE        : signed(DW - 1 downto 0);                      -- +-D
+    pxOv      : signed(W - 1 downto 0);                       -- Px-MAXVAL-1: [-MAXVAL-1, -1]
+    cP1       : signed(CO_C_WIDTH - 1 downto 0);              -- [-127, 127]
+    cM1       : signed(CO_C_WIDTH - 1 downto 0);              -- [-128, 126]
+    cNeg      : signed(CW - 1 downto 0);                      -- [-127, 128]
+    cP1Neg    : signed(CW - 1 downto 0);                      -- [-127, 127]
+    cM1Neg    : signed(CW - 1 downto 0);                      -- [-126, 128]
+    lastB     : signed(BW - 1 downto 0);                      -- [1-RESET, 0]
+    lastN     : unsigned(NW - 1 downto 0);                    -- [2, RESET]
     nRes      : std_logic;
-    n1        : unsigned(NW - 1 downto 0);
+    n1        : unsigned(NW - 1 downto 0);                    -- [2, RESET]
     -- S4
-    rx        : unsigned(BITNESS - 1 downto 0);
-    qdE       : signed(W - 1 downto 0);
+    rx        : unsigned(BITNESS - 1 downto 0);               -- [0, MAXVAL]
+    qdE       : signed(W - 1 downto 0);                       -- +-(MAXVAL+NEAR)
     wrapDn    : std_logic;
     wrapUp    : std_logic;
-    x         : signed(W - 1 downto 0);
+    x         : signed(W - 1 downto 0);                       -- B+-RANGE*D: [1-RESET-RANGE*D, RANGE*D]
     -- S5
-    t         : signed(W - 1 downto 0);
+    t         : signed(W - 1 downto 0);                       -- B+Errval*D (halved): [1-RESET-RANGE/2*D, RANGE/2*D]
     dec       : std_logic;
     inc       : std_logic;
-    errq      : signed(BITNESS downto 0);
-    c1        : signed(CO_C_WIDTH - 1 downto 0);
+    errq      : signed(BITNESS downto 0);                     -- [-floor(RANGE/2), ceil(RANGE/2)-1]
+    c1        : signed(CO_C_WIDTH - 1 downto 0);              -- [-128, 127]
     -- S6
-    b1        : signed(BW - 1 downto 0);
+    b1        : signed(BW - 1 downto 0);                      -- [1-N, 0]
   end record t_pipe;
 
   type t_pipe_array is array (0 to STAGES) of t_pipe;
@@ -227,6 +235,7 @@ begin
     variable vDiff  : signed(W - 1 downto 0);
     variable vMA    : signed(W - 1 downto 0);
     variable vMB    : signed(W - 1 downto 0);
+    variable vM     : signed(W - 1 downto 0);                         -- [0, MAXVAL+NEAR]
     variable vDd    : signed(DW - 1 downto 0);
     variable vQs    : signed(BITNESS + 1 downto 0);
     variable vRxRaw : signed(W - 1 downto 0);
@@ -382,22 +391,25 @@ begin
       vMB   := v.pbase + vCs - v.ixM;
       if (v.pbase + vCs < 0) then
         v.px     := (others => '0');
-        v.m      := unsigned(v.ixN(BITNESS downto 0));
+        vM       := v.ixN;
         v.dirPos := '1';
       elsif (v.pbase + vCs - sMaxP1 >= 0) then
         v.px     := sMaxVal;
-        v.m      := unsigned(v.magMax(BITNESS downto 0));
+        vM       := v.magMax;
         v.dirPos := '0';
       else
         v.px := v.pbase + vCs;
         if (vDiff >= 0) then
-          v.m      := unsigned(vMA(BITNESS downto 0));
+          vM       := vMA;
           v.dirPos := '1';
         else
-          v.m      := unsigned(vMB(BITNESS downto 0));
+          vM       := vMB;
           v.dirPos := '0';
         end if;
       end if;
+      assert sValid(1) /= '1' or (vM >= 0 and vM <= sMaxVal + sNear)
+        report "nl_loop: |Errval|+NEAR outside [0, MAXVAL+NEAR]" severity failure;
+      v.m := unsigned(vM(BITNESS downto 0));
       v.ePos := v.dirPos xor v.sign;
       r(2) <= v;
 
@@ -534,6 +546,8 @@ begin
       else
         vB1 := v.t;
       end if;
+      assert sValid(5) /= '1' or (vB1 <= 0 and vB1 + vN1 > 0)
+        report "nl_loop: updated B outside [1-N, 0]" severity failure;
       v.b1 := resize(vB1, BW);
       if (sValid(5) = '1' and v.run = '0') then
         v.lastB := v.b1;
@@ -559,5 +573,52 @@ begin
   oBpre   <= r(STAGES).b;
   oNpre   <= r(STAGES).n;
   oNRes   <= r(STAGES).nRes;
+  oPx     <= unsigned(r(STAGES).px(BITNESS - 1 downto 0));
+
+  -- ASSERTIONS -------------------------------------------------------------------------------
+  -- G2 ranges of the registered pipeline nodes, on valid slots only (idle slots carry
+  -- whatever the input held, U before the first pixel).
+  range_assert_proc : process (iClk) is
+    variable vD   : integer;
+    variable vSum : integer;
+  begin
+    if rising_edge(iClk) then
+      vD := to_integer(sD);
+      if (sValid(1) = '1') then
+        assert r(1).ra <= unsigned(sMaxVal(BITNESS - 1 downto 0))
+          report "nl_loop: Ra above MAXVAL" severity failure;
+        assert r(1).pbase >= 0 and r(1).pbase <= sMaxVal
+          report "nl_loop: MED / run Px outside [0, MAXVAL]" severity failure;
+      end if;
+      if (sValid(2) = '1') then
+        assert r(2).px >= 0 and r(2).px <= sMaxVal
+          report "nl_loop: Px outside [0, MAXVAL]" severity failure;
+      end if;
+      if (sValid(3) = '1') then
+        assert to_integer(r(3).q) * vD <= to_integer(r(3).m) and
+               to_integer(r(3).m) < (to_integer(r(3).q) + 1) * vD
+          report "nl_loop: reciprocal quotient q /= m / (2*NEAR+1)" severity failure;
+        assert r(3).n >= 1 and r(3).n <= RESET and r(3).n1 >= 2 and r(3).n1 <= RESET
+          report "nl_loop: N outside [1, RESET]" severity failure;
+        assert r(3).b <= 0 and to_integer(r(3).b) + to_integer(r(3).n) > 0
+          report "nl_loop: B outside [1-N, 0]" severity failure;
+      end if;
+      if (sValid(4) = '1') then
+        assert r(4).rx <= unsigned(sMaxVal(BITNESS - 1 downto 0))
+          report "nl_loop: Rx above MAXVAL" severity failure;
+      end if;
+      if (sValid(5) = '1') then
+        assert r(5).errq >= -signed(resize(sRangeMHalf, BITNESS + 1)) and
+               r(5).errq < signed(resize(sHalf, BITNESS + 1))
+          report "nl_loop: Errval outside the A.9 range" severity failure;
+        vSum := to_integer(r(5).b) + to_integer(r(5).errq) * vD;
+        if (r(5).nRes = '1') then
+          vSum := (vSum - (vSum mod 2)) / 2;
+        end if;
+        assert to_integer(r(5).t) = vSum
+          report "nl_loop: B + Errval*(2*NEAR+1) does not match the modulo-reduced Errval" severity failure;
+      end if;
+    end if;
+  end process range_assert_proc;
 
 end architecture behavioral;

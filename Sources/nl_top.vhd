@@ -106,6 +106,7 @@ architecture rtl of nl_top is
   signal fCandN     : t_unsigned_array(0 to 8)(6 downto 0);
 
   -- Loop exit
+  signal xLoopValid : std_logic;                                     -- includes exits from before iRst
   signal xValid     : std_logic;
   signal xMode      : std_logic_vector(1 downto 0);
   signal xRiType    : std_logic;
@@ -244,7 +245,7 @@ begin
       oCandC      => fCandC,
       oCandB      => fCandB,
       oCandN      => fCandN,
-      iExValid    => xValid,
+      iExValid    => xLoopValid,
       iExMode     => xMode,
       iExRx       => xRx,
       iExCtx      => xCtx,
@@ -252,6 +253,7 @@ begin
       iExBq       => xBq,
       iExNq       => xNq,
       oExLane     => xLane,
+      oExValid    => xValid,
       oExFirstPix => xFirstPix,
       oExLastPix  => xLastPix,
       oExEol      => xEol
@@ -283,7 +285,7 @@ begin
       iCandC    => fCandC,
       iCandB    => fCandB,
       iCandN    => fCandN,
-      oValid    => xValid,
+      oValid    => xLoopValid,
       oMode     => xMode,
       oRiType   => xRiType,
       oRx       => xRx,
@@ -294,7 +296,8 @@ begin
       oNq       => xNq,
       oBpre     => xBpre,
       oNpre     => xNpre,
-      oNRes     => xNRes
+      oNRes     => xNRes,
+      oPx       => open
     );
 
   u_be : entity work.nl_backend

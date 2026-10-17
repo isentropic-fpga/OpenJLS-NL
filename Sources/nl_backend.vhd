@@ -23,6 +23,16 @@
 --              from the loop), RI contexts live at address RItype.
 --              A.14 (|Ix - Ra| <= NEAR) is in the loop, iMode carries the result.
 --
+-- Assumptions:
+--              iMode /= "11"; no token while iClr = '1'; a lane's tokens >= 4 cycles
+--              apart; the next clear sweep starts >= 6 cycles after the last token.
+--              Regular: iCtx in [4, 368], iNpre in [1, RESET], iBpre in [1-iNpre, 0].
+--              Errval in [-2^(BITNESS-1), 2^(BITNESS-1)-1] (A.9 reduced), /= 0 for
+--              RItype = 1. A lane in a run (RUNcnt > 0) gets only run tokens.
+--              A lane line has <= 16383 pixels (nl_top: width <= 65532, 4 lanes), so
+--              RUNcnt <= 16383 and RUNindex <= 30 (a J = 15 segment needs 32768).
+--              The ASSERTIONS block checks them.
+--
 ----------------------------------------------------------------------------------
 
 library ieee;
@@ -118,13 +128,14 @@ architecture behavioral of nl_backend is
   signal sHit       : std_logic;
   signal sCont      : std_logic;
   signal sEoi       : std_logic;
-  signal sRunCnt    : t_cnt_array;                                        -- per lane: A.14 RUNcnt
-  signal sRunIdx    : t_idx_array;                                        --   RUNindex
+  signal sRunCnt    : t_cnt_array;                                        -- per lane: A.14 RUNcnt [0, 16383]
+  signal sRunIdx    : t_idx_array;                                        --   RUNindex [0, 30] (line <= 16383)
   signal sBound     : t_bound_array;                                      --   A.15 next boundary
   signal sCntIn     : unsigned(RUN_CNT - 1 downto 0);
   signal sIdxNext   : unsigned(4 downto 0);
   signal sBoundNext : unsigned(RUN_CNT downto 0);
   signal sRawV      : std_logic;
+  signal sGolV      : std_logic := '0';                                   -- a11_1 iValid, registered with r(5)
   signal sRawLen    : unsigned(4 downto 0);
   signal sRawVal    : unsigned(RUN_CNT - 1 downto 0);
   signal sRunIdxOut : unsigned(4 downto 0);
@@ -133,14 +144,14 @@ architecture behavioral of nl_backend is
   signal sRdAddr   : std_logic_vector(8 downto 0);
   signal sRd       : t_word_array;
   signal sWord     : std_logic_vector(WORD_W - 1 downto 0);
-  signal sAq       : unsigned(AWID - 1 downto 0);
+  signal sAq       : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
   signal sRiErr    : signed(BITNESS downto 0);                          -- A.23 inputs, one snapshot
   signal sRiRt     : std_logic;
   signal sRiAqIn   : unsigned(AWID - 1 downto 0);
   signal sRiNqIn   : unsigned(NWID - 1 downto 0);
   signal sRiNnIn   : unsigned(NWID - 1 downto 0);
-  signal sNq       : unsigned(NWID - 1 downto 0);
-  signal sNn       : unsigned(NWID - 1 downto 0);
+  signal sNq       : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
+  signal sNn       : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
   signal sN2       : unsigned(NWID - 1 downto 0);
   signal sRiType   : std_logic;                                         -- RItype of valid RI tokens, else 0 (A.23 sees all cycles)
   signal sTemp     : unsigned(AWID - 1 downto 0);
@@ -159,7 +170,7 @@ architecture behavioral of nl_backend is
   signal sAWrLane  : unsigned(1 downto 0);
 
   -- X3 .. X5
-  signal sK        : unsigned(KWID - 1 downto 0);
+  signal sK        : unsigned(KWID - 1 downto 0);                       -- [0, BITNESS] on valid tokens
   signal sBqMap    : signed(6 downto 0);
   signal sRegMerr  : unsigned(MW - 1 downto 0);
   signal sRiMap    : std_logic;
@@ -252,6 +263,7 @@ begin
         vS.merr := sRiMerr;
       end if;
       r(5) <= vS;
+      sGolV <= vS.valid and bool2sl(vS.mode /= "01");                     -- same delta as r(5)
 
       -- X5: limited Golomb (A.11.1) -> bit packer -------------------------------------------------
       sBpRawV   <= r(5).valid and r(5).rawv;
@@ -274,6 +286,7 @@ begin
         sAWe    <= '0';
         sBpRawV <= '0';
         sBpGolV <= '0';
+        sGolV   <= '0';
       end if;
     end if;
 
@@ -493,6 +506,7 @@ begin
       MAPPED_ERROR_VAL_WIDTH => MW
     )
     port map (
+      iValid                 => sGolV,
       iK                     => r(5).k,
       iQbpp                  => iQbpp,
       iMappedErrorVal        => r(5).merr,
@@ -556,5 +570,47 @@ begin
       oWordValid   => oValid,
       oValidLen    => oLen
     );
+
+  -- ASSERTIONS -------------------------------------------------------------------------------
+  -- Input contract on valid tokens, A RAM ranges on the tokens that use them.
+  assert_proc : process (iClk) is
+    constant EMAX : integer := 2 ** (BITNESS - 1);
+    variable vA   : integer;
+  begin
+    if rising_edge(iClk) then
+      if (iRst = '0' and iValid = '1') then
+        assert iMode /= "11" report "nl_backend: token mode 11" severity failure;
+        assert iClr = '0' report "nl_backend: token during the clear sweep" severity failure;
+        assert not ((r(0).valid = '1' and r(0).lane = iLane) or (r(1).valid = '1' and r(1).lane = iLane) or
+                    (r(2).valid = '1' and r(2).lane = iLane))
+          report "nl_backend: same-lane tokens less than 4 cycles apart" severity failure;
+        assert to_integer(iErrval) >= -EMAX and to_integer(iErrval) < EMAX
+          report "nl_backend: Errval outside [-2^(BITNESS-1), 2^(BITNESS-1)-1]" severity failure;
+        if (iMode = "00") then
+          assert iCtx >= 4 and iCtx <= 368 report "nl_backend: regular ctx outside [4, 368]" severity failure;
+          assert iNpre >= 1 and iNpre <= RESET report "nl_backend: N outside [1, RESET]" severity failure;
+          assert to_integer(iBpre) >= 1 - to_integer(iNpre) and iBpre <= 0
+            report "nl_backend: B outside [1-N, 0]" severity failure;
+        end if;
+        if (iMode = "10" and iRiType = '1') then
+          assert iErrval /= 0 report "nl_backend: RItype 1 with Errval 0" severity failure;
+        end if;
+      end if;
+      if (iRst = '0' and r(0).valid = '1') then
+        assert r(0).mode /= "00" or sRunCnt(sL) = 0
+          report "nl_backend: regular token inside a run" severity failure;
+        assert sRunCnt(sL) <= 16383 report "nl_backend: run longer than a 16383-pixel lane line" severity failure;
+      end if;
+      if (iRst = '0' and r(2).valid = '1' and r(2).mode /= "01") then
+        vA := to_integer(sAq);
+        assert vA <= RESET * EMAX and sNq >= 1 and sNq <= RESET and sNn < RESET
+          report "nl_backend: A RAM word outside A [0, RESET*2^(BITNESS-1)], N [1, RESET], Nn [0, RESET-1]"
+          severity failure;
+      end if;
+      if (iRst = '0' and r(3).valid = '1' and r(3).mode /= "01") then
+        assert sK <= BITNESS report "nl_backend: k above BITNESS" severity failure;
+      end if;
+    end if;
+  end process assert_proc;
 
 end architecture behavioral;

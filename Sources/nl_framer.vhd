@@ -438,7 +438,7 @@ begin
   -- plain comments to synthesis).
   -- psl default clock is rising_edge(iClk);
   -- psl assert always (iRst = '1' -> next (oValid = '0' and oLast = '0')) report "nl_framer: reset must clear the output stream";
-  -- psl assert always ((iRst = '0' and oValid = '1' and iReady = '0') -> next[4] (oValid = '1')) report "nl_framer: oValid must hold until the beat is accepted (AXIS)";
+  -- psl assert always (((iRst = '0' and oValid = '1' and iReady = '0') -> next[4] (oValid = '1')) abort (iRst = '1')) report "nl_framer: oValid must hold until the beat is accepted (AXIS)";
   -- psl assert never (oLast = '1' and oValid = '0') report "nl_framer: oLast is only meaningful on a valid beat";
 
   oWord       <= sOutWord;
