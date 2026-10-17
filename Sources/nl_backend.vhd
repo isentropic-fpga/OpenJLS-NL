@@ -4,36 +4,12 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- nl_backend: entropy coding of the loop exit stream, one OpenJLS pipeline shared by 4 lanes
 --
--- Module Name: nl_backend - Behavioral
---
--- Notes:
---              Entropy coding of the loop exit stream (4 lanes, same-lane pixels
---              at least 4 cycles apart), one shared pipeline of OpenJLS blocks:
---                X0  run coding (A.15/A.16 NL copy, state per lane), A RAM read
---                X2  A RAM data, A/N/Nn update (A.12, A.23), TEMP (A.20)
---                X3  A RAM write, k (A.10)
---                X4  mapping (A.11, A.21, A.22)
---                X5  limited Golomb (A.11.1, NL copy: runtime QBPP)
---                X6  bit packer -> oWord (lane tagged)
---              A RAM per lane: {A, N, Nn}; regular contexts use A only (B, N come
---              from the loop), RI contexts live at address RItype.
---              A.14 (|Ix - Ra| <= NEAR) is in the loop, iMode carries the result.
---
--- Assumptions:
---              iMode /= "11"; no token while iClr = '1'; a lane's tokens >= 4 cycles
---              apart; the next clear sweep starts >= 6 cycles after the last token.
---              Regular: iCtx in [4, 368], iNpre in [1, RESET], iBpre in [1-iNpre, 0].
---              Errval in [-2^(BITNESS-1), 2^(BITNESS-1)-1] (A.9 reduced), /= 0 for
---              RItype = 1. A lane in a run (RUNcnt > 0) gets only run tokens.
---              A lane line has <= 16383 pixels (nl_top: width <= 65532, 4 lanes), so
---              RUNcnt <= 16383 and RUNindex <= 30 (a J = 15 segment needs 32768).
---              The ASSERTIONS block checks them.
---
-----------------------------------------------------------------------------------
+-- X0 run coding and A RAM read, X2 A / N / Nn update and TEMP, X3 k, X4 mapping,
+-- X5 limited Golomb, X6 bit packer. A RAM per lane holds {A, N, Nn}: regular contexts use only A
+-- (B, N come from the loop), RI contexts sit at address RItype.
+-- A lane line is <= 16383 pixels (width <= 65532), so RUNindex <= 30.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -131,14 +107,14 @@ architecture behavioral of nl_backend is
   signal sRunCnt    : t_cnt_array;                                        -- per lane: A.14 RUNcnt [0, 16383]
   signal sRunIdx    : t_idx_array;                                        --   RUNindex [0, 30] (line <= 16383)
   signal sBound     : t_bound_array;                                      --   A.15 next boundary
-  signal sCntIn     : unsigned(RUN_CNT - 1 downto 0);
-  signal sIdxNext   : unsigned(4 downto 0);
-  signal sBoundNext : unsigned(RUN_CNT downto 0);
+  signal sCntIn     : unsigned(RUN_CNT - 1 downto 0);                   -- [0, 16383]
+  signal sIdxNext   : unsigned(4 downto 0);                             -- [0, 30]
+  signal sBoundNext : unsigned(RUN_CNT downto 0);                       -- A.15 boundary, [1, 2^16]
   signal sRawV      : std_logic;
   signal sGolV      : std_logic := '0';                                   -- a11_1 iValid, registered with r(5)
-  signal sRawLen    : unsigned(4 downto 0);
-  signal sRawVal    : unsigned(RUN_CNT - 1 downto 0);
-  signal sRunIdxOut : unsigned(4 downto 0);
+  signal sRawLen    : unsigned(4 downto 0);                             -- [1, 16]
+  signal sRawVal    : unsigned(RUN_CNT - 1 downto 0);                   -- full type
+  signal sRunIdxOut : unsigned(4 downto 0);                             -- [0, 30]
 
   -- X2 context update
   signal sRdAddr   : std_logic_vector(8 downto 0);
@@ -147,20 +123,20 @@ architecture behavioral of nl_backend is
   signal sAq       : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
   signal sRiErr    : signed(BITNESS downto 0);                          -- A.23 inputs, one snapshot
   signal sRiRt     : std_logic;
-  signal sRiAqIn   : unsigned(AWID - 1 downto 0);
-  signal sRiNqIn   : unsigned(NWID - 1 downto 0);
-  signal sRiNnIn   : unsigned(NWID - 1 downto 0);
+  signal sRiAqIn   : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
+  signal sRiNqIn   : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
+  signal sRiNnIn   : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
   signal sNq       : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
   signal sNn       : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
-  signal sN2       : unsigned(NWID - 1 downto 0);
-  signal sRiType   : std_logic;                                         -- RItype of valid RI tokens, else 0 (A.23 sees all cycles)
-  signal sTemp     : unsigned(AWID - 1 downto 0);
-  signal sRegAq    : unsigned(AWID - 1 downto 0);
-  signal sRegNq    : unsigned(NWID - 1 downto 0);
-  signal sRegBq    : signed(6 downto 0);
-  signal sRiAq     : unsigned(AWID - 1 downto 0);
-  signal sRiNq     : unsigned(NWID - 1 downto 0);
-  signal sRiNn     : unsigned(NWID - 1 downto 0);
+  signal sN2       : unsigned(NWID - 1 downto 0);                       -- [1, RESET] on valid tokens
+  signal sRiType   : std_logic;                                         -- 0 outside valid RI tokens
+  signal sTemp     : unsigned(AWID - 1 downto 0);                       -- A.12 temp, [0, 2*RESET*2^(BITNESS-1)]
+  signal sRegAq    : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
+  signal sRegNq    : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
+  signal sRegBq    : signed(6 downto 0);                                -- [1-N, 0]
+  signal sRiAq     : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
+  signal sRiNq     : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
+  signal sRiNn     : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
   signal sWe       : std_logic_vector(0 to 3);
   signal sWrAddr   : std_logic_vector(8 downto 0);
   signal sWrData   : std_logic_vector(WORD_W - 1 downto 0);
@@ -171,22 +147,22 @@ architecture behavioral of nl_backend is
 
   -- X3 .. X5
   signal sK        : unsigned(KWID - 1 downto 0);                       -- [0, BITNESS] on valid tokens
-  signal sBqMap    : signed(6 downto 0);
-  signal sRegMerr  : unsigned(MW - 1 downto 0);
+  signal sBqMap    : signed(6 downto 0);                                -- [1-N, 0] (NEAR = 0), else 0
+  signal sRegMerr  : unsigned(MW - 1 downto 0);                         -- [0, 2^BITNESS - 1]
   signal sRiMap    : std_logic;
-  signal sRiMerr   : unsigned(MW - 1 downto 0);
-  signal sUnary    : unsigned(UW - 1 downto 0);
-  signal sSufLen   : unsigned(4 downto 0);
-  signal sSufVal   : unsigned(SUFW - 1 downto 0);
+  signal sRiMerr   : unsigned(MW - 1 downto 0);                         -- [0, 2^BITNESS - 1]
+  signal sUnary    : unsigned(UW - 1 downto 0);                         -- [0, LIMIT-2]
+  signal sSufLen   : unsigned(4 downto 0);                              -- [0, max(k, QBPP)]
+  signal sSufVal   : unsigned(SUFW - 1 downto 0);                       -- full type
 
   -- X6 bit packer inputs
   signal sBpRawV   : std_logic;
-  signal sBpRawLen : unsigned(4 downto 0);
-  signal sBpRawVal : unsigned(SUFW - 1 downto 0);
+  signal sBpRawLen : unsigned(4 downto 0);                              -- [0, 16]
+  signal sBpRawVal : unsigned(SUFW - 1 downto 0);                       -- full type
   signal sBpGolV   : std_logic;
-  signal sBpUnary  : unsigned(UW - 1 downto 0);
-  signal sBpSufLen : unsigned(4 downto 0);
-  signal sBpSufVal : unsigned(SUFW - 1 downto 0);
+  signal sBpUnary  : unsigned(UW - 1 downto 0);                         -- [0, LIMIT-2]
+  signal sBpSufLen : unsigned(4 downto 0);                              -- [0, max(k, QBPP)]
+  signal sBpSufVal : unsigned(SUFW - 1 downto 0);                       -- full type
   signal sTagLane  : unsigned(1 downto 0);
   signal sTagLast  : std_logic;
 
@@ -212,7 +188,7 @@ begin
   begin
 
     if rising_edge(iClk) then
-      -- Input register ------------------------------------------------------------------------
+      -- Input register
       r(0).valid  <= iValid;
       r(0).mode   <= iMode;
       r(0).ritype <= iRiType;
@@ -224,7 +200,7 @@ begin
       r(0).last   <= iLastPix;
       r(0).eol    <= iEol;
 
-      -- X0: run coding tokens of the current lane ---------------------------------------------
+      -- X0: run coding tokens of the current lane
       vS        := r(0);
       vS.rawv   := sRawV;
       vS.rawlen := sRawLen;
@@ -234,7 +210,7 @@ begin
 
       r(2) <= r(1);
 
-      -- X2: context update (A.12 regular A, A.23 RI), TEMP (A.20) ------------------------------
+      -- X2: context update (A.12 regular A, A.23 RI), TEMP (A.20)
       vS       := r(2);
       vS.n     := sN2;
       vS.nn    := sNn;
@@ -250,12 +226,12 @@ begin
       end if;
       r(3) <= vS;
 
-      -- X3: k (A.10) ----------------------------------------------------------------------------
+      -- X3: k (A.10)
       vS   := r(3);
       vS.k := sK;
       r(4) <= vS;
 
-      -- X4: mapped error (A.11 regular, A.21/A.22 RI) --------------------------------------------
+      -- X4: mapped error (A.11 regular, A.21/A.22 RI)
       vS := r(4);
       if (r(4).mode = "00") then
         vS.merr := sRegMerr;
@@ -265,7 +241,7 @@ begin
       r(5) <= vS;
       sGolV <= vS.valid and bool2sl(vS.mode /= "01");                     -- same delta as r(5)
 
-      -- X5: limited Golomb (A.11.1) -> bit packer -------------------------------------------------
+      -- X5: limited Golomb (A.11.1) -> bit packer
       sBpRawV   <= r(5).valid and r(5).rawv;
       sBpRawLen <= r(5).rawlen;
       sBpRawVal <= resize(r(5).rawval, SUFW);
@@ -367,10 +343,9 @@ begin
              sNq;
   sRiType <= r(2).valid and r(2).ritype and bool2sl(r(2).mode = "10");
 
-  -- A.23 is combinational and r(2) settles deltas before the RAM word, so mixed
-  -- old/new inputs can drive A + |Errval| - RItype to -1. Its inputs are built in
-  -- one process (one delta) and RItype is dropped when A = Errval = 0, which a
-  -- real RItype=1 token never has (Errval /= 0): no-op on settled values.
+  -- A.23 inputs come from one process so they settle in the same delta; mixed old / new values
+  -- could take A + |Errval| - RItype to -1. RItype is dropped when A = Errval = 0, which no real
+  -- RItype = 1 token has.
   p_ri_in : process (all) is
   begin
 
@@ -571,8 +546,7 @@ begin
       oValidLen    => oLen
     );
 
-  -- ASSERTIONS -------------------------------------------------------------------------------
-  -- Input contract on valid tokens, A RAM ranges on the tokens that use them.
+  -- Input contract on valid tokens, A RAM ranges on the tokens that use them
   assert_proc : process (iClk) is
     constant EMAX : integer := 2 ** (BITNESS - 1);
     variable vA   : integer;
@@ -612,5 +586,10 @@ begin
       end if;
     end if;
   end process assert_proc;
+
+  postponed assert r(2).valid /= '1' or is_x(sN2) or (sN2 >= 1 and sN2 <= RESET)
+    report "nl_backend: X2 N outside [1, RESET]" severity error;
+  postponed assert is_x(sCntIn) or sCntIn <= 16383
+    report "nl_backend: RUNcnt above 16383" severity error;
 
 end architecture behavioral;

@@ -4,14 +4,7 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
---
--- Module Name: nl_loop_wrap
--- Description: Flat-port wrapper of nl_loop for out-of-context fmax sweeps.
---
-----------------------------------------------------------------------------------
+-- nl_loop_wrap: flat-port wrapper of nl_loop for out-of-context fmax sweeps
 
 library ieee;
   use ieee.std_logic_1164.all;

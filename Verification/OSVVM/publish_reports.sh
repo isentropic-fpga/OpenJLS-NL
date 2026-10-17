@@ -14,7 +14,7 @@
 # Page chrome (stylesheet, theme switch, Isentropic marks) is shared with
 # OpenJLS (submodule).
 #
-# Typical flow — run the suites you want reflected, then publish:
+# Typical flow - run the suites you want reflected, then publish:
 #   ./build_run.sh                         # OSVVM regression + coverage
 #   ( cd Golden    && ./build_run.sh )     # RTL golden vs CharLS
 #   ( cd PostSynth && ./build_run.sh )     # gate-level golden (needs Vivado)
@@ -63,7 +63,7 @@ page_head() {
 <script src="${p}assets/theme.js"></script>
 </head><body>
 <nav class="site-nav">
-  <a class="brand" href="https://isentropic.com.br" aria-label="Isentropic — home"><img class="wm-light" src="${p}assets/isentropic-wordmark.svg" alt="Isentropic"><img class="wm-dark" src="${p}assets/isentropic-wordmark-dark.svg" alt="Isentropic"></a>
+  <a class="brand" href="https://isentropic.com.br" aria-label="Isentropic - home"><img class="wm-light" src="${p}assets/isentropic-wordmark.svg" alt="Isentropic"><img class="wm-dark" src="${p}assets/isentropic-wordmark-dark.svg" alt="Isentropic"></a>
   <a class="nlink" href="https://github.com/isentropic-fpga/OpenJLS-NL">GitHub</a>
   <button type="button" class="theme-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
     <svg class="ico-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -87,6 +87,7 @@ page_foot() {
 FTR
 }
 
+MATRIX="$(python3 "$HERE/matrix_html.py" "$ROOT/Docs/verification_requirements.md")"
 ROWS=""
 NOTES=""
 # emit_row <name> <note> <status> <pct> <summary> <report-link-or-empty> <date-or-empty>
@@ -107,7 +108,7 @@ emit_row() {
   return 0
 }
 
-# --- NVC code coverage (HTML tree) ----------------------------------------
+# NVC code coverage (HTML tree)
 if [ -d "$COV_DIR/html" ]; then
   cp -r "$COV_DIR/html" "$DEST/coverage"
   pct=""
@@ -122,7 +123,7 @@ else
   emit_row "NVC code coverage" "" "NA" "" "run ./build_run.sh to populate" "" ""
 fi
 
-# --- OSVVM regression (HTML tree) -----------------------------------------
+# OSVVM regression (HTML tree)
 if [ -f "$HERE/index.html" ] && [ -f "$OSVVM_YML" ]; then
   mkdir -p "$DEST/osvvm"
   cp -r "$HERE/index.html" "$HERE/OSVVM_OpenJlsNl" "$HERE/osvvm" "$DEST/osvvm/"
@@ -140,7 +141,7 @@ else
   emit_row "OSVVM suite" "" "NA" "" "run ./build_run.sh to populate" "" ""
 fi
 
-# --- text-only suites: read their report_status.env ------------------------
+# text-only suites: read their report_status.env
 # fields: NAME, NOTE, STATUS, PCT, SUMMARY, DATE  (shell key=value, quoted)
 env_row() {
   local f="$1" fb_name="$2" fb_note="$3" link="$4"
@@ -210,11 +211,11 @@ HDR
 }
 
 golden_link=""
-[ -f "$GOLDEN_ENV" ] && golden_link="$(render_tsv_page "$GOLDEN_TSV" golden "Golden suite — processed images")"
+[ -f "$GOLDEN_ENV" ] && golden_link="$(render_tsv_page "$GOLDEN_TSV" golden "Golden suite - processed images")"
 ps_osvvm_link=""
-[ -f "$PS_OSVVM_ENV" ] && ps_osvvm_link="$(render_log_page "$PS_OSVVM_LOG" post-synth-osvvm "Post-synth OSVVM — simulation log")"
+[ -f "$PS_OSVVM_ENV" ] && ps_osvvm_link="$(render_log_page "$PS_OSVVM_LOG" post-synth-osvvm "Post-synth OSVVM - simulation log")"
 ps_link=""
-[ -f "$PS_ENV" ] && ps_link="$(render_tsv_page "$PS_TSV" post-synth "Post-synth golden — processed images")"
+[ -f "$PS_ENV" ] && ps_link="$(render_tsv_page "$PS_TSV" post-synth "Post-synth golden - processed images")"
 
 env_row "$GOLDEN_ENV" "Golden suite" \
   "RTL encode of the OpenJLS corpus and the NL corpus (images up to 0.5&nbsp;MP, depths 8&ndash;16, NEAR sweep), each of the 4 stripes compared byte-for-byte with CharLS." \
@@ -226,10 +227,10 @@ env_row "$PS_ENV" "Post-synth golden" \
   "Smoke test: 8-bit images up to 0.01&nbsp;MP encoded on the synthesized gate-level netlist (BITNESS 8, 4096x4096, OUT_WIDTH 64) and compared per stripe with CharLS; the cap keeps gate-level simulation time bounded." \
   "$ps_link"
 
-# --- landing page ----------------------------------------------------------
+# landing page
 GEN_DATE="$(date -u '+%Y-%m-%d %H:%M UTC')"
 {
-  page_head "OpenJLS-NL — verification report" ""
+  page_head "OpenJLS-NL - verification report" ""
   cat <<EOF
 <div class="hero">
   <span class="kicker">Verification report</span>
@@ -242,6 +243,9 @@ GEN_DATE="$(date -u '+%Y-%m-%d %H:%M UTC')"
 $ROWS  </tbody>
 </table></div>
 <p class="notes">$NOTES The OSVVM and coverage reports are full HTML; the golden and post-synthesis pages list every image. Generated $GEN_DATE by <code>Verification/OSVVM/publish_reports.sh</code>.</p>
+<h2 class="section">Verification matrix</h2>
+<p class="notes">Every requirement the OSVVM suite tracks, with the RTL and testbench that cover it, the guaranteed minimum check count per run (Goal) and its status against verification rules G1&ndash;G6: &check; met, N/A not applicable, gap open. Source: <a href="https://github.com/isentropic-fpga/OpenJLS-NL/blob/main/Docs/verification_requirements.md"><code>Docs/verification_requirements.md</code></a>; rules in <a href="https://github.com/isentropic-fpga/OpenJLS-NL/blob/main/Docs/verification_guidelines.md"><code>Docs/verification_guidelines.md</code></a>.</p>
+$MATRIX
 EOF
   page_foot ""
 } > "$DEST/index.html"

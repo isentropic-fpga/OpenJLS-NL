@@ -5,7 +5,7 @@ picked. **Picked** marks the choice; everything here is open for review.
 
 ## D1. Lane = stripe = independent JPEG-LS image
 - A: each of the 4 vertical stripes is its own Ws x H image with its own
-  header/scan (4 output streams). **Picked** — compliant with zero decoder
+  header/scan (4 output streams). **Picked** - compliant with zero decoder
   tricks; matches "4 parallel outputs like OpenJLS".
 - B: one image, 4 scans/restart intervals. Needs DRI-like structure that
   JPEG-LS does not have for vertical stripes. Rejected.

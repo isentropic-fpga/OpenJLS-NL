@@ -5,7 +5,7 @@
 # commercial license. See LICENSE and README for details.
 #
 
-#  OpenJLS-NL OSVVM regression — script-flow entry point.
+#  OpenJLS-NL OSVVM regression - script-flow entry point.
 #
 #  Run via ./build_reports.sh (or ./build_run.sh for code coverage). Same flow
 #  as OpenJLS/Verification/OSVVM/OpenJls.pro; OSVVM, its scripts and the shared

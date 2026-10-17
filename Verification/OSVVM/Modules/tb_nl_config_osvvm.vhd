@@ -4,40 +4,33 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: nl_config (per-image constants from NEAR).
+-- tb_nl_config_osvvm: nl_config, every NEAR code 0..255 applied through iRst and checked after oDone
 --
--- Every NEAR code 0..255 is applied through iRst; after oDone every output is
--- compared with the T.87 formulas:
---   T87.A2.1       RANGE = (MAXVAL+2*NEAR)/(2*NEAR+1)+1, qbpp = ceil(log2 RANGE),
---                  A init = max(2, (RANGE+32)/64)               (T.87 A.2.1)
---   T87.C2.4.1.1   default T1/T2/T3 with FACTOR and CLAMP        (T.87 C.2.4.1.1)
---   NL.NearClamp   NEAR > min(255, MAXVAL/2) clamped (non-spec saturation)
---   NL.Config      RECIP = ceil(2^(BITNESS+10)/(2*NEAR+1)), RANGE*(2*NEAR+1),
---                  oDone timing, outputs hold after done.
---   NL.Reset       oDone low in reset; reset in every FSM phase (RECIP divide,
---                  RANGE divide, POST, DONE), then the next NEAR matches golden.
--- A.2.1 and C.2.4.1.1 are spec clauses outside Docs/Requirements.md (it lists
--- only the per-sample procedure); they get T87 IDs since they are T.87 text.
+-- A.2.1 and C.2.4.1.1 are outside Docs/Requirements.md (per-sample procedure only) but are T.87
+-- text, so they get T87 IDs.
+--
+-- Requirements:
+--   T87.A2.1       RANGE, qbpp, A init
+--   T87.C2.4.1.1   default T1 / T2 / T3
+--   NL.NearClamp   NEAR above min(255, MAXVAL/2) clamped
+--   NL.Config      RECIP, RANGE*(2*NEAR+1), oDone timing, outputs hold
+--   NL.Reset       oDone low in reset, reset in every phase, recovery
 --
 -- Guidelines:
---   G1  Golden is the A.2.1 / C.2.4.1.1 text in integers (no C code in T.87
---       for these). The NEAR clamp is NL.NearClamp, never counted as T.87.
---   G2  RTL: range comments, asserts on NEAR/qbpp/T1..T3, PSL never on RANGE,
---       2*NEAR+1 and the divider remainder. Every NEAR code 0..255 is applied,
---       so every node hits its min and max (covNear 0 / NMAX, covQbpp min/max,
---       covRange T1/T3 CLAMP-above-MAXVAL bins where the BITNESS reaches
---       them, i.e. 8-bit only). No accumulators.
---   G3  NEAR MSB set (code >= 128) is a covRange bin. No signed nodes.
---   G4  Config: NEAR 0 and max (covNear), BITNESS min/max (suite generic).
---       NEAR change between images: every run_near re-resets with a new NEAR.
---       Edges, run mode, coding, lanes: N/A (per-image constants only).
---   G5  covReset: reset in each phase. Only oDone is reset; the data outputs
---       are not (valid only with oDone, documented contract), so after reset
---       only oDone = 0 is checked, then the full golden compare after done.
---   G6  Code coverage: every branch reached (both divisions, clamp/no clamp).
---------------------------------------------------------------------------------
+--   G1.Req      T87.A2.1, T87.C2.4.1.1
+--   G1.Property A.2.1 / C.2.4.1.1 text in integers (no C code in T.87)
+--   G1.Nl       NL.NearClamp, NL.Config, NL.Reset
+--   G2.Range    nl_config.vhd range comments and asserts
+--   G2.MinMax   every NEAR code: G4.Config NEAR, G4.Config qbpp, G2.MinMax node (T1 / T3 CLAMP)
+--   G2.Clamp    NL.NearClamp (in range / clamped); no accumulator
+--   G2.Checked  checked_* on all outputs
+--   G3.Stim     G2.MinMax node (NEAR code MSB set); no signed nodes
+--   G4.Config   G4.Config NEAR, G4.Config qbpp; NEAR change: every run_near re-resets with a new
+--               NEAR; BITNESS 8 / 12 / 16 by the suite generics
+--   G4 other    N/A: per-image constants only
+--   G5          G5.States resetPhase; only oDone is reset, data is valid with oDone; next NEAR
+--               replayed against golden
+--   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -225,13 +218,13 @@ begin
     reqCfg   := GetReqID("NL.Config", 4 * 256);
     reqRst   := GetReqID("NL.Reset", 256 + 4);
 
-    covRst := NewID("Reset phase");
+    covRst := NewID("G5.States resetPhase");
     SetFieldName(covRst, "phase");
     AddBins(covRst, "RECIP divide", GenBin(0));
     AddBins(covRst, "RANGE divide", GenBin(1));
     AddBins(covRst, "POST", GenBin(2));
     AddBins(covRst, "DONE", GenBin(3));
-    covRange := NewID("Ranges (G2/G3)");
+    covRange := NewID("G2.MinMax node");
     SetFieldName(covRange, "node");
     AddBins(covRange, "NEAR code MSB set", GenBin(0));
     -- CLAMP above MAXVAL only exists where some legal NEAR overflows it.
@@ -243,18 +236,18 @@ begin
     end if;
     AddBins(covRange, "T3 no clamp", GenBin(3));
 
-    covNear := NewID("NEAR");
+    covNear := NewID("G4.Config NEAR");
     SetFieldName(covNear, "NEAR");
     AddBins(covNear, "lossless", GenBin(0));
     AddBins(covNear, "NEAR=1..NMAX-1", GenBin(1, NMAX - 1, 1));
     AddBins(covNear, "NMAX", GenBin(NMAX));
-    covClamp := NewID("NEAR clamp");
+    covClamp := NewID("G1.Nl NEAR clamp");
     SetFieldName(covClamp, "clamped");
     AddBins(covClamp, "in range", GenBin(0));
     if (NMAX < 255) then
       AddBins(covClamp, "clamped", GenBin(1));
     end if;
-    covQbpp := NewID("qbpp");
+    covQbpp := NewID("G4.Config qbpp");
     SetFieldName(covQbpp, "qbpp");
     for qb in log2ceil((MAXVAL + 2 * NMAX) / (2 * NMAX + 1) + 1) to BITNESS loop
       AddBins(covQbpp, "qbpp=" & to_string(qb), GenBin(qb));

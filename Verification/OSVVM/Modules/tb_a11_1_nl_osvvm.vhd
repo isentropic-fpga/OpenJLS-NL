@@ -4,38 +4,31 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: a11_1_nl_golomb_encoder (combinational).
+-- tb_a11_1_nl_osvvm: a11_1_nl_golomb_encoder, LG(k, L) with qbpp as a port
 --
--- Near-lossless copy of OpenJLS a11_1_golomb_encoder: qbpp is a port, set per
--- image from RANGE (qbpp = ceil(log2(RANGE)), RANGE from NEAR, A.2.1).
--- Limited-length Golomb LG(k, L) per T.87 A.5.3 (regular, L = LIMIT) and
--- A.22.1 (run interruption, L = glimit = LIMIT - J[RUNindex] - 1):
---   high = MErrval >> k
---   non-escape (high < L-qbpp-1): unary=high, len=k,    val = low k bits
---   escape:                       unary=L-qbpp-1, len=qbpp, val = (MErrval-1) low qbpp bits
--- The NL suffix is not masked to qbpp (contract (3): the bit packer masks to
--- SuffixLen), so only the low SuffixLen bits are compared.
+-- L = LIMIT (regular, A.5.3) or glimit = LIMIT - J[RUNindex] - 1 (RI, A.22.1). The suffix is not
+-- masked to qbpp (the bit packer masks it), so only the low oSuffixLen bits are compared.
+-- Every qbpp of a legal NEAR is swept over both modes, every RUNindex, every k, the escape threshold
+-- +-1 and the MErrval extremes, then random.
 --
--- Every qbpp reachable from a legal NEAR (0 .. min(255, MAXVAL/2)) is swept:
--- both modes x every RUNindex x every k x the escape threshold +-1 and the
--- MErrval extremes, then random. Coverage crosses qbpp x mode x escape.
+-- Requirements:
+--   T87.A11.1   regular LG(k, LIMIT), per qbpp
+--   T87.A22.1   RI LG(k, glimit), per qbpp
 --
 -- Guidelines:
---   G1  T87.A11.1 (regular LG(k, LIMIT)), T87.A22.1 (RI LG(k, glimit)); golden
---       is the A.5.3 / A.22.1 text (no C code for LG), transcribed with
---       integers. NL difference: qbpp from runtime NEAR (covered per qbpp).
---   G2  RTL asserts qbpp, k and the escape threshold ranges. covRange bins:
---       MErrval 0 / max, k 0 / max, qbpp min / max, threshold min (RUNindex 31).
---       No accumulators (combinational).
---   G3  MErrval MSB set is a covRange bin. No signed nodes.
---   G4  Coding: k = 0 and max, escape (cov cross). RUNindex 0..31 (covJ).
---       Config: qbpp of NEAR 0 and NEAR max per BITNESS (suite generic).
---       Edges, run mode, lanes: N/A (combinational, single datapath).
---   G5  N/A: combinational, no state.
---   G6  Code coverage: every branch reached by the sweep.
---------------------------------------------------------------------------------
+--   G1.Req      T87.A11.1, T87.A22.1
+--   G1.Property A.5.3 / A.22.1 text in integers (no C code for LG)
+--   G2.Range    A11_1_nl_golomb_encoder.vhd range comments and asserts
+--   G2.MinMax   G2.MinMax node
+--   G2.Clamp    N/A: combinational, no accumulator
+--   G2.Checked  checked_* on all outputs
+--   G3.Stim     G2.MinMax node (MErrval MSB set); no signed nodes
+--   G4.Coding   G4.Coding k, G4.Coding qbpp x riMode x escape
+--   G4.Run      G4.Run RUNindex
+--   G4.Config   G4.Coding qbpp x riMode x escape (NEAR 0 / max); BITNESS by the suite generics
+--   G4 other    N/A: combinational, single datapath
+--   G5          N/A: combinational
+--   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -230,17 +223,17 @@ begin
     req   := GetReqID("T87.A11.1", (QBPP_HI - QBPP_LO + 1) * 32 * (K_HI + 1) * 2 * 3);
     reqRi := GetReqID("T87.A22.1", (QBPP_HI - QBPP_LO + 1) * 32 * 2 * 3);
 
-    covK := NewID("Golomb k");
+    covK := NewID("G4.Coding k");
     SetFieldName(covK, "k");
     for kval in 0 to K_HI loop
       AddBins(covK, "k=" & to_string(kval), GenBin(kval));
     end loop;
-    covJ := NewID("Run interruption J table");
+    covJ := NewID("G4.Run RUNindex");
     SetFieldName(covJ, "RUNindex");
     for index in 0 to 31 loop
       AddBins(covJ, "RUNindex=" & to_string(index) & " J=" & to_string(TB_J_TABLE(index)), GenBin(index));
     end loop;
-    covRng := NewID("Ranges (G2/G3)");
+    covRng := NewID("G2.MinMax node");
     SetFieldName(covRng, "node");
     AddBins(covRng, "MErrval=0", GenBin(0));
     AddBins(covRng, "MErrval=max", GenBin(1));
@@ -248,7 +241,7 @@ begin
     AddBins(covRng, "qbpp min (NEAR max)", GenBin(3));
     AddBins(covRng, "qbpp max (lossless)", GenBin(4));
     AddBins(covRng, "threshold min (RI, RUNindex 31, qbpp max)", GenBin(5));
-    cov := NewID("qbpp x riMode x escape");
+    cov := NewID("G4.Coding qbpp x riMode x escape");
     SetFieldName(cov, "qbpp", "riMode", "escape");
     for qb in QBPP_LO to QBPP_HI loop
       for ri in 0 to 1 loop

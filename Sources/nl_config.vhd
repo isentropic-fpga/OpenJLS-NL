@@ -4,19 +4,10 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- nl_config: T.87 A.2.1 and C.2.4.1.1, per-image constants from NEAR
 --
--- Module Name: nl_config - Behavioral
---
--- Notes:
---              Per-image constants derived from NEAR (C.2.4.1.1, A.2.1).
---              iNear is latched while iRst = '1'. After reset a serial divider
---              computes RECIP and RANGE (~2*(BITNESS+11) cycles), then oDone rises.
---              MAXVAL = 2^BITNESS-1, default thresholds (BITNESS >= 8).
---
-----------------------------------------------------------------------------------
+-- iNear is sampled in reset. A serial divider then takes ~2*(BITNESS + 11) cycles for RECIP and
+-- RANGE before oDone rises.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -34,9 +25,9 @@ entity nl_config is
     oNear   : out   unsigned(7 downto 0);
     oRecip  : out   unsigned(BITNESS + 10 downto 0);              -- ceil(2^(BITNESS+10)/(2*NEAR+1))
     oRange  : out   unsigned(BITNESS downto 0);
-    oRangeD : out   unsigned(BITNESS + 1 downto 0);               -- RANGE*(2*NEAR+1)
-    oQbpp   : out   unsigned(4 downto 0);
-    oAinit  : out   unsigned(BITNESS - 1 downto 0);
+    oRangeD : out   unsigned(BITNESS + 1 downto 0);               -- RANGE*(2*NEAR+1), [MAXVAL+1 .. MAXVAL+4*NEAR+1]
+    oQbpp   : out   unsigned(4 downto 0);                         -- [1 .. BITNESS]
+    oAinit  : out   unsigned(BITNESS - 1 downto 0);               -- [2 .. (MAXVAL+33)/64]
     oT1     : out   unsigned(BITNESS - 1 downto 0);
     oT2     : out   unsigned(BITNESS - 1 downto 0);
     oT3     : out   unsigned(BITNESS - 1 downto 0)
@@ -53,7 +44,7 @@ architecture behavioral of nl_config is
   type t_state is (S_DIV_RECIP, S_DIV_RANGE, S_POST, S_DONE);
 
   signal sState : t_state := S_DIV_RECIP;
-  signal sNear  : unsigned(7 downto 0) := (others => '0');
+  signal sNear  : unsigned(7 downto 0) := (others => '0');   -- [0 .. NMAX] (clamped in reset)
   signal sD     : unsigned(DW - 1 downto 0);                  -- [1 .. 2*NMAX+1]
   signal sNum   : unsigned(DW - 1 downto 0);                  -- [MAXVAL .. 2^(BITNESS+10)+2*NMAX] < 2^DW
   signal sRem   : unsigned(DW - 1 downto 0);                  -- [0 .. sD-1]
@@ -153,10 +144,8 @@ begin
               vQ := i + 1;
             end if;
           end loop;
-          -- Assertions ----------------------------------------------------------------
           assert (vN <= NMAX and vQ >= 1 and vQ <= BITNESS)
             report "nl_config: NEAR or qbpp out of range" severity failure;
-          ------------------------------------------------------------------------------
           oQbpp   <= to_unsigned(vQ, 5);
           oAinit  <= to_unsigned(maximum(2, (to_integer(sRange) + 32) / 64), BITNESS);
           vT1     := clamp_t(FACTOR + 2 + 3 * vN, vN + 1);
@@ -175,12 +164,14 @@ begin
 
   end process proc;
 
-  -- Assertions --------------------------------------------------------------------
+  -- Contracts (PSL, simulation only)
   -- psl default clock is rising_edge(iClk);
   -- psl assert always (iRst = '1' -> next (oDone = '0')) report "nl_config: reset must clear oDone";
   -- psl assert never (sState = S_DONE and (sRange < 2 or sRange > MAXVAL + 1)) report "nl_config: RANGE out of [2 .. MAXVAL+1]";
   -- psl assert never (sState = S_DONE and sD > 2 * NMAX + 1) report "nl_config: 2*NEAR+1 out of range";
+  -- psl assert never (sNear > NMAX) report "nl_config: NEAR above NMAX";
+  -- psl assert never (oDone = '1' and (oRangeD < MAXVAL + 1 or oRangeD > MAXVAL + 4 * to_integer(oNear) + 1)) report "nl_config: RANGE*(2*NEAR+1) out of range";
+  -- psl assert never (oDone = '1' and (oAinit < 2 or oQbpp < 1 or oQbpp > BITNESS)) report "nl_config: Ainit or qbpp out of range";
   -- psl assert never (iRst = '0' and (sState = S_DIV_RECIP or sState = S_DIV_RANGE) and sCnt /= DW and sRem >= sD) report "nl_config: division remainder >= divisor";
-  -----------------------------------------------------------------------------------
 
 end architecture behavioral;

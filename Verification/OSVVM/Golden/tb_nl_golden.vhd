@@ -4,16 +4,9 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- tb_nl_golden: codes one PGM with nl_top at NEAR, the 4 lane streams go to OUT_PREFIX<l>.jls
 --
--- Testbench: tb_nl_golden
---
--- Encodes one PGM with nl_top at NEAR and writes the 4 lane streams to
--- OUT_PREFIX<l>.jls. build_run.sh compares them against CharLS per stripe.
--- Width must be a multiple of 4 (build_run.sh crops).
-----------------------------------------------------------------------------------
+-- build_run.sh crops the width to a multiple of 4 and compares the streams with CharLS per stripe.
 
 library ieee;
   use ieee.std_logic_1164.all;

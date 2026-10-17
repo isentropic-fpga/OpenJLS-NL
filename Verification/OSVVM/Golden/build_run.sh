@@ -107,7 +107,7 @@ add_jobs() { # stem nears...
   read -r W H MX B < <(python3 "$PGM_INFO" "$p")
   mp=$(awk -v w="$W" -v h="$H" 'BEGIN{printf "%.3f", w*h/1e6}')
   if [ "$W" -lt 32 ] || awk -v mp="$mp" -v cap="$MAX_MP" 'BEGIN{exit !(mp>cap)}'; then
-    printf '%s\t%sx%s\t%s\t—\t—\tSKIP\t—\t—\n' "$stem" "$W" "$H" "$B" >>"$SKIPS"; return
+    printf '%s\t%sx%s\t%s\t-\t-\tSKIP\t-\t-\n' "$stem" "$W" "$H" "$B" >>"$SKIPS"; return
   fi
   c="$CROP/$stem.pgm"
   { [ -f "$c" ] && [ ! "$p" -nt "$c" ]; } || python3 "$HERE/crop4.py" "$p" "$c"

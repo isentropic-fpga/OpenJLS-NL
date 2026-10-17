@@ -4,47 +4,16 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- nl_frontend: raster input to 4 vertical stripes (lanes), everything in front of nl_loop
 --
--- Module Name: nl_frontend - Behavioral
---
--- Notes:
---              Everything in front of nl_loop for 4 vertical stripes (lanes).
---              Raster rows are stored in a double-buffered row RAM and issued as
---              column groups: column j of lanes 0..3 in 4 consecutive slots,
---              starting on a fixed phase, so the lane of a slot is (cycle mod 4).
---
---              Stages (In = n cycles after issue):
---                I0  issue, row RAM / Rx line buffer read
---                I2  read data, neighbour ring  -> Rb, Rc, Rd
---                I3  D1, D2, Q3 bounds
---                I4  Q1, Q2
---                I5  sign merge, context row    -> context RAM read
---                I6  candidate contexts
---                I8  = L, loop input (candidates muxed from the RAM banks)
---                I15 = E, loop exit             -> Rx and context write back
---
---              Context RAM: one bank per Q3 candidate, address lane*64 + row,
---              ctx = 9*row + bank (row = 9*|Q1|+Q2 after sign merge). The write
---              of the slot that left the loop at L-1 is forwarded at L; the loop
---              forwards the newest one itself.
---
---              Per image: clear sweep of the context RAM (and oClr for the A RAMs),
---              then H rows. Ws = W/4 must be >= 8 so that Rx is written back
---              before the next row reads it.
---
--- Assumptions:
---              iWidth multiple of 4, 32 <= iWidth <= MAX_IMAGE_WIDTH, iHeight >= 1.
---              NEAR + 1 <= T1 <= T2 <= T3 <= MAXVAL (T.87 C.2.4.1.1).
---              The loop exits every slot exactly E - L = 7 cycles after L; a
---              regular exit (mode 00) carries one of the slot's candidate ctx.
---              The loop has no reset: exits of slots issued before iRst are
---              dropped here (oExValid low) for the write back and the back end.
---              The ASSERTIONS block checks them.
---
-----------------------------------------------------------------------------------
+-- Rows go through a double-buffered row RAM and are issued as column groups: column j of lanes
+-- 0..3 in 4 consecutive slots, so the lane of a slot is cycle mod 4. Stages, n cycles after issue:
+--   I2 Rb, Rc, Rd   I3 D1, D2, Q3 bounds   I4 Q1, Q2   I5 sign merge, context RAM read
+--   I8 = L loop input   I15 = E loop exit, Rx and context write back
+-- Context RAM: one bank per Q3 candidate at lane*64 + row, ctx = 9*row + bank. The write of the
+-- slot that left the loop at L-1 is forwarded here; the loop forwards the newest itself.
+-- Ws = W/4 >= 8 so Rx is written back before the next row reads it. The loop has no reset:
+-- exits of slots issued before iRst are dropped (oExValid low).
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -171,19 +140,19 @@ architecture behavioral of nl_frontend is
 
   -- Control
   signal sState    : t_state := S_CFG;
-  signal sCnt      : unsigned(8 downto 0);
-  signal sCyc      : unsigned(1 downto 0) := (others => '0');
-  signal sWm1      : unsigned(AW - 1 downto 0);
-  signal sWsM1     : unsigned(15 downto 0);
-  signal sHm1      : unsigned(15 downto 0);
-  signal sBase     : t_base_array;
+  signal sCnt      : unsigned(8 downto 0);                             -- [0, 511], full type (drain [0, 31])
+  signal sCyc      : unsigned(1 downto 0) := (others => '0');          -- lane slot, full type
+  signal sWm1      : unsigned(AW - 1 downto 0);                        -- W-1: [31, MAX_IMAGE_WIDTH-1]
+  signal sWsM1     : unsigned(15 downto 0);                            -- W/4-1: [7, MAX_IMAGE_WIDTH/4-1]
+  signal sHm1      : unsigned(15 downto 0);                            -- H-1: [0, 65534]
+  signal sBase     : t_base_array;                                     -- lane*W/4: [0, 3*W/4]
   signal sFull     : std_logic_vector(0 to 1) := "00";
   signal sWrBuf    : std_logic;
-  signal sWrCol    : unsigned(AW - 1 downto 0);
+  signal sWrCol    : unsigned(AW - 1 downto 0);                        -- [0, W-1]
   signal sRdBuf    : std_logic;
-  signal sJ        : unsigned(15 downto 0);
-  signal sJp1      : unsigned(15 downto 0);
-  signal sRow      : unsigned(15 downto 0);
+  signal sJ        : unsigned(15 downto 0);                            -- stripe column: [0, W/4-1]
+  signal sJp1      : unsigned(15 downto 0);                            -- [1, W/4]
+  signal sRow      : unsigned(15 downto 0);                            -- [0, H-1]
   signal sGo       : std_logic;
   signal sReady    : std_logic;
   signal sAccept   : std_logic;
@@ -191,8 +160,8 @@ architecture behavioral of nl_frontend is
   -- Per image constants
   signal sNegT     : t_signed_array(0 to 2)(SW - 1 downto 0);            -- -T1, -T2, -T3
   signal sPosT     : t_signed_array(0 to 2)(SW - 1 downto 0);            -- T1, T2, T3
-  signal sNegN     : signed(SW - 1 downto 0);
-  signal sPosN     : signed(SW - 1 downto 0);
+  signal sNegN     : signed(SW - 1 downto 0);                          -- [-NMAX, 0]
+  signal sPosN     : signed(SW - 1 downto 0);                          -- [0, NMAX]
   signal sBoundK   : t_signed_array(0 to 7)(SW - 1 downto 0);            -- [1-MAXVAL, MAXVAL]
 
   -- Pipeline
@@ -211,11 +180,11 @@ architecture behavioral of nl_frontend is
   signal sLbWrData  : unsigned(BITNESS - 1 downto 0);
   signal sCtxRd     : t_word_array;
   signal sCtxWe     : std_logic_vector(0 to 8);
-  signal sCtxWrAddr : unsigned(7 downto 0);
+  signal sCtxWrAddr : unsigned(7 downto 0);                          -- lane & row: row [0, 40]
   signal sCtxWrData : std_logic_vector(WORD_W - 1 downto 0);
   signal sWbValid   : std_logic;
   signal sWbBank    : unsigned(3 downto 0);                             -- [0, 8] when sWbValid
-  signal sWbAddr    : unsigned(7 downto 0);
+  signal sWbAddr    : unsigned(7 downto 0);                            -- lane & row: row [0, 40]
   signal sWbData    : std_logic_vector(WORD_W - 1 downto 0);
 
   function bool2sl (
@@ -270,8 +239,8 @@ begin
     variable vFull : std_logic_vector(0 to 1);
     variable vGo   : std_logic;
     variable v     : t_slot;
-    variable vX    : unsigned(AW - 1 downto 0);
-    variable vN    : signed(SW - 1 downto 0);
+    variable vX    : unsigned(AW - 1 downto 0);                        -- [0, W-1]
+    variable vN    : signed(SW - 1 downto 0);                          -- [0, NMAX]
 
   begin
 
@@ -279,7 +248,7 @@ begin
       sCyc <= sCyc + 1;
       vFull := sFull;
 
-      -- Per image constants -----------------------------------------------------------------
+      -- Per image constants
       vN       := signed(resize(iNear, SW));
       sPosN    <= vN;
       sNegN    <= -vN;
@@ -293,7 +262,7 @@ begin
                    vN + 1, -vN, 1 - signed(resize(iT1, SW)), 1 - signed(resize(iT2, SW)),
                    1 - signed(resize(iT3, SW)));
 
-      -- Raster write side ---------------------------------------------------------------------
+      -- Raster write side
       if (sAccept = '1') then
         if (sWrCol = sWm1) then
           sWrCol <= (others => '0');
@@ -308,7 +277,7 @@ begin
         end if;
       end if;
 
-      -- Issue -----------------------------------------------------------------------------------
+      -- Issue
       v       := sIss;
       v.valid := '0';
       vGo     := '0';
@@ -428,7 +397,7 @@ begin
       p(1) <= sIss;
       p(2) <= p(1);
 
-      -- I2: neighbour ring, one entry per lane, rotating with the slot phase ----------------------
+      -- I2: neighbour ring, one entry per lane, rotating with the slot phase
       v   := p(2);
       vR  := sRing(0);
       vRd := unsigned(sLbRd);
@@ -460,7 +429,7 @@ begin
       sRing(3)      <= vR;
       p(3)          <= v;
 
-      -- I3: gradients, Q3 bounds --------------------------------------------------------------
+      -- I3: gradients, Q3 bounds
       v    := p(3);
       v.d1 := signed(resize(v.rd, SW)) - signed(resize(v.rb, SW));
       v.d2 := signed(resize(v.rb, SW)) - signed(resize(v.rc, SW));
@@ -469,13 +438,13 @@ begin
       end loop;
       p(4) <= v;
 
-      -- I4: quantization ------------------------------------------------------------------------
+      -- I4: quantization
       v    := p(4);
       v.q1 := quant(v.d1, sNegT, sPosT, sNegN, sPosN);
       v.q2 := quant(v.d2, sNegT, sPosT, sNegN, sPosN);
       p(5) <= v;
 
-      -- I5: sign merge, context row -------------------------------------------------------------
+      -- I5: sign merge, context row
       v     := p(5);
       v.neg := bool2sl(v.q1 < 0 or (v.q1 = 0 and v.q2 < 0));
       if (v.neg = '1') then
@@ -491,7 +460,7 @@ begin
       v.q12Zero := bool2sl(v.q1 = 0 and v.q2 = 0);
       p(6)      <= v;
 
-      -- I6: candidates (Q3 = t-4) ----------------------------------------------------------------
+      -- I6: candidates (Q3 = t-4)
       v := p(6);
       for t in 0 to 8 loop
         if (v.q12Zero = '1') then
@@ -511,7 +480,7 @@ begin
       end loop;
       p(7) <= v;
 
-      -- I7: forward flags against the slot leaving the loop now (same lane, 8 slots earlier) -----
+      -- I7: forward flags against the slot leaving the loop now (same lane, 8 slots earlier)
       v := p(7);
       for t in 0 to 8 loop
         v.fw(t) := iExValid and p(E).valid and bool2sl(iExMode = "00" and iExCtx = v.ctx(t));
@@ -522,7 +491,7 @@ begin
         p(k) <= p(k - 1);
       end loop;
 
-      -- E: write back -----------------------------------------------------------------------------
+      -- E: write back
       sLbWe     <= iExValid and p(E).valid;
       sLbWrAddr <= p(E).x;
       sLbWrData <= iExRx;
@@ -542,7 +511,7 @@ begin
 
   end process pipe_proc;
 
-  -- L: loop inputs ----------------------------------------------------------------------------------
+  -- L: loop inputs
   oValid    <= p(L).valid;
   oFirstPix <= p(L).firstPix;
   oFirstCol <= p(L).firstCol;
@@ -576,7 +545,7 @@ begin
   oExLastPix  <= p(E).lastPix;
   oExEol      <= p(E).eol;
 
-  -- RAMs --------------------------------------------------------------------------------------------
+  -- RAMs
   sRowWrAddr <= sWrBuf & std_logic_vector(sWrCol);
 
   u_row_ram : entity work.olo_base_ram_sdp
@@ -635,9 +604,7 @@ begin
 
   end generate gen_bank;
 
-  -- ASSERTIONS -------------------------------------------------------------------------------
-  -- Config assumptions when the image starts, G2 ranges of the registered pipeline nodes on
-  -- valid slots, and the loop contract at E.
+  -- Config at image start, pipeline ranges on valid slots, loop contract at E
   assert_proc : process (iClk) is
     constant MAXVAL : integer := 2 ** BITNESS - 1;
   begin
@@ -684,5 +651,14 @@ begin
       end if;
     end if;
   end process assert_proc;
+
+  -- A cleared word is N = 1, B = 0
+  gen_cand_assert : for t in 0 to 8 generate
+    postponed assert oValid /= '1' or is_x(oCandN(t)) or (oCandN(t) >= 1 and oCandN(t) <= 64)
+      report "nl_frontend: candidate N outside [1, RESET]" severity error;
+    postponed assert oValid /= '1' or is_x(oCandB(t)) or is_x(oCandN(t)) or
+                     (oCandB(t) <= 0 and to_integer(oCandB(t)) + to_integer(oCandN(t)) > 0)
+      report "nl_frontend: candidate B outside [1-N, 0]" severity error;
+  end generate gen_cand_assert;
 
 end architecture behavioral;

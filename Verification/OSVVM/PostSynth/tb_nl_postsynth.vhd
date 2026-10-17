@@ -4,18 +4,10 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- tb_nl_postsynth: nl_top funcsim netlist, every image of a manifest in one elaboration
 --
--- Testbench: tb_nl_postsynth
---
--- Drives the nl_top funcsim netlist (fixed BITNESS / OUT_WIDTH, no generics)
--- through every image of a manifest in one elaboration. Each manifest line is
--- "<pgm> <near> <out_prefix>": nl_top is reset with that size and NEAR, the
--- image is streamed and the 4 lane streams go to <out_prefix><l>.jls.
--- build_run.sh compares them against CharLS per stripe.
-----------------------------------------------------------------------------------
+-- Manifest line: "<pgm> <near> <out_prefix>". nl_top is reset with that size and NEAR and the 4
+-- lane streams go to <out_prefix><l>.jls. build_run.sh compares them with CharLS per stripe.
 
 library ieee;
   use ieee.std_logic_1164.all;

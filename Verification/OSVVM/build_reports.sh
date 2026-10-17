@@ -23,9 +23,9 @@ cd "$HERE"
 TP="$HERE/../../OpenJLS/ThirdParty"
 
 command -v nvc >/dev/null || { echo "nvc not found" >&2; exit 1; }
-command -v tclsh >/dev/null || { echo "tclsh not found — install tcl" >&2; exit 1; }
+command -v tclsh >/dev/null || { echo "tclsh not found - install tcl" >&2; exit 1; }
 [ -d "$TP/osvvm" ] && [ -d "$TP/osvvm-scripts" ] && [ -d "$TP/tcllib" ] || {
-  echo "OSVVM not fetched — run: (cd $TP && ./fetch_third_party.sh osvvm osvvm-scripts tcllib)" >&2
+  echo "OSVVM not fetched - run: (cd $TP && ./fetch_third_party.sh osvvm osvvm-scripts tcllib)" >&2
   exit 1
 }
 

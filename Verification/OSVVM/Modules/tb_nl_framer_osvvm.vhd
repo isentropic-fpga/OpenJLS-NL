@@ -4,45 +4,33 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: nl_framer (OpenJLS jls_framer shared by 4 lanes, + NEAR).
+-- tb_nl_framer_osvvm: nl_framer, tb_jls_framer_osvvm ported to the lane ring, plus NEAR
 --
--- Port of OpenJLS tb_jls_framer_osvvm to the lane ring: one clock = one
--- lane's turn (lane = cycles since reset mod 4), every port belongs to that
--- lane. Each lane frames its own image stream with its own dimensions and
--- NEAR, driven on its turn; the reference per lane is the T.87 frame
---   header(P, Y, X, NEAR) ++ payload ++ FF D9
--- in a per-lane scoreboard, oLast on the D9. A byte or header field landing
--- on the wrong lane fails the check.
+-- One clock is one lane's turn. Each lane frames its own images (own size and NEAR) against
+-- header(P, Y, X, NEAR) ++ payload ++ FF D9 in its own scoreboard, oLast on the D9. Input honours
+-- oReady; per-lane iReady bursts are random, and a held beat must survive until the lane's next
+-- turn. Images: a minimal back-to-back pair (FF D9 only), random images, some chained before the
+-- previous oLast, then N_RST reset rounds with a scored recovery image per lane.
 --
--- Input side honours oReady (as byte_stuffer_nl in nl_top). iReady is random
--- per lane with not-ready bursts; a lane's pending beat must hold until its
--- next turn (4 clocks) across backpressure. Images: a back-to-back minimal
--- pair (FF D9 only, both EoIs queued), then random images, some chained
--- (next image starts before the previous one's oLast, EoI FIFO full), then
--- N_RST reset rounds, each hitting one phase (idle / header out / payload /
--- EoI pending / output held by backpressure), each followed by a scored
--- recovery image per lane.
+-- Requirements:
+--   NL.LaneFrame   per-lane T.87 C.2.2 / C.2.3 header with NEAR, payload, FF D9, oLast
+--   NL.Reset       reset in any phase, next image per lane matches
 --
--- Requirements: NL.LaneFrame (per-lane T.87 C.2.2/C.2.3 header with NEAR,
--- payload, FF D9, oLast), NL.Reset (reset in any phase clears the stream,
--- next image per lane matches the reference).
---
--- Guideline notes:
---   G1  Reference header is written from T.87 C.2.2/C.2.3 field by field,
---       independent of the RTL ROM.
---   G2  covRange: X, Y at 1 and at their max, NEAR at 0 and 255 (min/max of
---       every header field). Internal counters are range-constrained
---       naturals with upstream overflow asserts (EoI FIFO, start queue,
---       buffer bytes).
---   G3  N/A: no signed arithmetic.
---   G4  covBeat (partial/full), covChain (serial / 2 EoI queued), covHold,
---       crossed with lane; minimal (FF D9 only) images.
---   G5  covRst: reset per phase, aborted output ignored (scoreboards
---       drained), recovery image scored.
---   G6  see the code coverage report.
---------------------------------------------------------------------------------
+-- Guidelines:
+--   G1.Req      N/A: no per-sample T.87 clause (framing is NL.LaneFrame)
+--   G1.Golden   header from T.87 C.2.2 / C.2.3 field by field, not the RTL ROM
+--   G1.Nl       NL.LaneFrame, NL.Reset
+--   G2.Range    nl_framer.vhd range comments and asserts
+--   G2.MinMax   G2.MinMax field x value
+--   G2.Clamp    N/A: no accumulator
+--   G2.Checked  checked_* on byte counts, bytes scoreboarded
+--   G3.Stim     G2.MinMax field x value (NEAR = 255); no signed nodes
+--   G4.Stream   G4.Stream lane x beat, lane x chained, lane backpressure hold
+--   G4.Lane     every G4 bin crossed with the lane
+--   G4.Config   G2.MinMax field x value
+--   G4 other    N/A: no Edge / Run / Coding / Branch logic
+--   G5          G5.States resetPhase; aborted output discarded, recovery image scored
+--   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -451,14 +439,14 @@ begin
     req    := GetReqID("NL.LaneFrame", 2 * LANES * N_IMAGES);
     reqRst := GetReqID("NL.Reset", 2 * N_RST);
 
-    covRst := NewID("reset phase");
+    covRst := NewID("G5.States resetPhase");
     AddBins(covRst, "reset while idle", 3, GenBin(RP_IDLE));
     AddBins(covRst, "reset during header", 3, GenBin(RP_HEADER));
     AddBins(covRst, "reset during payload", 3, GenBin(RP_DATA));
     AddBins(covRst, "reset with EoI pending", 3, GenBin(RP_EOI));
     AddBins(covRst, "reset with output held", 3, GenBin(RP_HOLD));
 
-    covRange := NewID("header field ranges");
+    covRange := NewID("G2.MinMax field x value");
     SetFieldName(covRange, "field", "value");
     AddCross(covRange, "X = 1", GenBin(0), GenBin(1));
     AddCross(covRange, "X = max", GenBin(0), GenBin(MAX_W));
@@ -467,11 +455,11 @@ begin
     AddCross(covRange, "NEAR = 0", GenBin(2), GenBin(0));
     AddCross(covRange, "NEAR = 255 (MSB set)", GenBin(2), GenBin(255));
 
-    covBeat := NewID("lane x beat");
+    covBeat := NewID("G4.Stream lane x beat");
     SetFieldName(covBeat, "lane", "fullBeat");
-    covChain := NewID("lane x chained");
+    covChain := NewID("G4.Stream lane x chained");
     SetFieldName(covChain, "lane", "chained");
-    covHold := NewID("lane backpressure hold");
+    covHold := NewID("G4.Stream lane backpressure hold");
     SetFieldName(covHold, "lane");
     for l in 0 to LANES - 1 loop
       AddCross(covBeat, "lane=" & to_string(l) & " / partial beat", GenBin(l), GenBin(0));

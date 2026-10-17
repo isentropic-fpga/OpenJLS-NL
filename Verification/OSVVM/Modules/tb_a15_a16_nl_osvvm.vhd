@@ -4,43 +4,35 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: a15_a16_nl_encode_run (combinational, lane state outside).
+-- tb_a15_a16_nl_osvvm: a15_a16_nl_encode_run, with the TB owning the per-lane run state
 --
--- NL copy of OpenJLS a15_a16_encode_run with RUNindex / next bound / in-run
--- moved to ports so one instance serves 4 lanes. The TB is the state owner,
--- as nl_backend is: one state per lane, latched from o*Next on the lane's
--- slot and cleared after the lane's last pixel (end of image).
+-- Slot k belongs to lane k mod 4, as in nl_backend. The TB latches each lane's o*Next on its slot
+-- and clears it after the lane's last pixel. Each lane plays its own runs, interleaved slot by slot,
+-- and its bits are compared run by run with an A.15 / A.16 reference using that lane's RUNindex, so
+-- state leaking between lanes shows up as a wrong bitstream. Lane 0 plays the OpenJLS directed
+-- script (climb to 31, boundary at 31, break from 31); the others are random.
 --
--- Slot k belongs to lane k mod 4 (as in nl_backend). Every lane plays its own
--- sequence of runs (M matches + a terminal), interleaved slot by slot; the
--- emitted bits are collected per lane and compared, run by run, with the
--- T.87 A.15/A.16 burst reference computed with that lane's carried RUNindex.
--- Any state leaking between lanes shows up as a wrong bitstream. Lane 0 plays
--- the OpenJLS directed script (RUNindex climb, saturation at 31, boundary at
--- 31, break from 31); the others are random. iRst must silence the outputs
--- and hold the state.
---
--- Requirements: T87.A15 (the A.15 '1' bits, the run prefix), T87.A16 (the
--- terminal: EOL '1' or '0' + J[RUNindex] residual bits, RI fields),
--- NL.RunLaneState (per-lane state ports, idle/reset slots hold state).
+-- Requirements:
+--   T87.A15          A.15 '1' bits
+--   T87.A16          terminal: EOL '1', or '0' + J[RUNindex] bits; RI fields
+--   NL.RunLaneState  per-lane state ports, idle / reset slots hold state
 --
 -- Guidelines:
---   G1  Golden is a transcription of the A.15/A.16 C code (gen_expected).
---   G2  RTL asserts the residual range [0 .. 2^J-1] and NextBound >= 2^J.
---       RUNindex (accumulator): covAcc drives it to its clamps (31 on an
---       A.15 boundary, 0 on an A.16 break) and one step past (it holds).
---       RUNcnt up to 40000 (> 2^15 = largest J segment).
---   G3  N/A: no signed nodes; RUNindex/RUNcnt are unsigned end to end.
---   G4  Run: run ending at EOL and on interruption (covTerm), RUNindex 0 and
---       31 (covIdx), immediate break (covImm). RItype is decided in A.17 /
---       A.18 (nl_loop / nl_backend), not here. Lanes: every lane x every bin.
---   G5  N/A as FSM: the module is combinational, the state lives in the
---       instantiating block (nl_backend). iRst slots check no tokens and
---       state held; end of image clears the lane state (covEoi).
---   G6  Code coverage: every branch reached (hit/no hit, EOL, break, 31).
---------------------------------------------------------------------------------
+--   G1.Req      T87.A15, T87.A16
+--   G1.Golden   A.15 / A.16 C code as a bit-string reference (gen_expected)
+--   G1.Nl       NL.RunLaneState
+--   G2.Range    A15_A16_nl_encode_run.vhd range comments and asserts
+--   G2.MinMax   G4.Run startIdx (RUNindex 0..30), G2.Clamp RUNindex (31); RUNcnt up to 40000
+--   G2.Clamp    G2.Clamp RUNindex
+--   G2.Checked  checked_* on all outputs
+--   G3.Stim     N/A: run events, no signed node
+--   G4.Run      G4.Run lane x terminal, lane x immediateBreak, startIdx; RItype is A.17 (nl_loop)
+--   G4.Lane     every G4.Run bin crossed with the lane, G4.Stream lane x eoiReset
+--   G4.Stream   G4.Stream lane x eoiReset
+--   G4.Config   BITNESS 8 / 12 / 16 by the suite generics
+--   G4 other    N/A: no Edge / Coding / Branch logic
+--   G5          N/A: combinational, the state lives in nl_backend; reset slots hold state
+--   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -324,11 +316,11 @@ begin
     req16   := GetReqID("T87.A16", 400);
     reqLane := GetReqID("NL.RunLaneState", 400);
 
-    covTerm := NewID("lane x terminal");
+    covTerm := NewID("G4.Run lane x terminal");
     SetFieldName(covTerm, "lane", "terminal");
-    covImm  := NewID("lane x immediateBreak");
+    covImm  := NewID("G4.Run lane x immediateBreak");
     SetFieldName(covImm, "lane", "immediateBreak");
-    covEoi  := NewID("lane x eoiReset");
+    covEoi  := NewID("G4.Stream lane x eoiReset");
     SetFieldName(covEoi, "lane", "eoiReset");
     for l in 0 to LANES - 1 loop
       AddCross(covTerm, "lane=" & to_string(l) & " / interruption", GenBin(l), GenBin(T_BREAK));
@@ -338,11 +330,11 @@ begin
       AddCross(covEoi, "lane=" & to_string(l) & " / within image", GenBin(l), GenBin(0));
       AddCross(covEoi, "lane=" & to_string(l) & " / end of image", GenBin(l), GenBin(1));
     end loop;
-    covAcc := NewID("RUNindex clamp");
+    covAcc := NewID("G2.Clamp RUNindex");
     SetFieldName(covAcc, "clamp");
     AddBins(covAcc, "A.15 boundary at RUNindex 31 (holds 31)", GenBin(0));
     AddBins(covAcc, "A.16 break at RUNindex 0 (holds 0)", GenBin(1));
-    covIdx := NewID("startIdx");
+    covIdx := NewID("G4.Run startIdx");
     SetFieldName(covIdx, "startIdx");
     AddBins(covIdx, "startIdx0", GenBin(0, 0));
     AddBins(covIdx, "startIdxLo", GenBin(1, 3, 1));

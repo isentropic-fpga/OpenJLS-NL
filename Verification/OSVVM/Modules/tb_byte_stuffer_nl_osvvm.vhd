@@ -4,45 +4,34 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: byte_stuffer_nl (OpenJLS byte_stuffer shared by 4 lanes).
+-- tb_byte_stuffer_nl_osvvm: byte_stuffer_nl, tb_byte_stuffer_osvvm ported to the lane ring
 --
--- Port of OpenJLS tb_byte_stuffer_osvvm to the lane ring: one clock = one
--- lane's turn (iSlot counts 0,1,2,3 from reset, as nl_top's sSlot), every
--- port belongs to that lane except the per-lane oAlmostFull. Each lane runs
--- its own image stream with its own bit-stream FF-stuffer reference (a '0'
--- stuffed after every 0xFF, residue padded after stuffing) and its own
--- scoreboard, so a byte landing on the wrong lane or lane state leaking into
--- another lane fails the check.
+-- One clock is one lane's turn (iSlot counts 0..3 from reset, as nl_top's sSlot). Each lane has its
+-- own image stream, bit-level FF-stuffing reference and scoreboard, so a byte on the wrong lane
+-- fails. A lane presents a word on its turn only while its registered oAlmostFull is low, as in
+-- nl_top; iStall pulses and per-lane iReady bursts are random. Each lane plays the OpenJLS directed
+-- corners, then random images, then N_RST reset rounds with a scored recovery image per lane.
 --
--- Input side mirrors nl_top: a lane only presents a word on its turn when its
--- registered oAlmostFull is low; iStall is additionally pulsed at random.
--- iReady is random per lane with not-ready bursts. Each lane plays the
--- OpenJLS directed corners (rotated per lane), then random images; then
--- N_RST reset rounds, each reset hitting one phase (all idle / mid-image /
--- lane awaiting oFlushDone / FIFO backed up past oAlmostFull), followed by a
--- scored recovery image per lane.
+-- Requirements:
+--   NL.LaneStuff   per-lane T.87 FF stuffing and flush
+--   NL.Reset       reset in any phase, next image per lane matches
 --
--- Requirements: NL.LaneStuff (per-lane T.87 FF stuffing + flush, owner of
--- the lane ring), NL.Reset (reset in any phase clears the outputs and the
--- next image per lane matches the reference).
---
--- Guideline notes:
---   G1  Reference is a bit-level transcription of the T.87 stuffing rule
---       (byte 0xFF -> next byte carries a '0' MSB), not of the RTL layouts.
---   G2  Widths are bounded by construction (natural range on every RTL
---       variable, upstream accumulator/FIFO asserts); emitBytes 0..4 and
---       every vlen 1..IN_WIDTH (all-ones/all-zeros sweep) are the min/max
---       bins. NL contract iSlot +1/clock asserted in the RTL.
---   G3  N/A: no signed arithmetic.
---   G4  covFlush (clean / residue / dangling FF), covStuff (first / run),
---       covCross (data beat vs almostFull), all crossed with lane.
---   G5  covRst: reset per phase, aborted output ignored (scoreboards
---       drained), recovery image scored.
---   G6  Statements not hit: stage1 "FIFO full" assert branch (protected by
---       the AlmFull cushion, unreachable in a legal stream).
---------------------------------------------------------------------------------
+-- Guidelines:
+--   G1.Req      N/A: no T.87 clause (stuffing is NL.LaneStuff)
+--   G1.Golden   bit-level T.87 stuffing rule, not the RTL layouts
+--   G1.Nl       NL.LaneStuff, NL.Reset
+--   G2.Range    byte_stuffer_nl.vhd range comments and asserts
+--   G2.MinMax   N/A: no arithmetic node (emitBytes 0..4 in G4.Stream lane x emitBytes)
+--   G2.Clamp    N/A: no accumulator
+--   G2.Checked  checked_integer on oValidBytes, bytes scoreboarded
+--   G3.Stim     N/A: random payload, FF runs in G4.Branch lane x stuffEvent
+--   G4.Branch   G4.Branch lane x stuffEvent
+--   G4.Stream   G4.Stream lane x emitBytes, lane x flushType, lane x data x almostFull
+--   G4.Lane     every G4 bin crossed with the lane
+--   G4.Config   N/A: IN_WIDTH / OUT_WIDTH fixed by nl_top
+--   G4 other    N/A: no Edge / Run / Coding logic
+--   G5          G5.States resetPhase; aborted output discarded, recovery image scored
+--   G6.Code     covered except the stage 1 "FIFO full" assert, unreachable behind AlmFull
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -470,19 +459,19 @@ begin
     req    := GetReqID("NL.LaneStuff", 2 * LANES * (N_IMAGES + 1));
     reqRst := GetReqID("NL.Reset", 2 * N_RST);
 
-    covRst := NewID("reset phase");
+    covRst := NewID("G5.States resetPhase");
     AddBins(covRst, "reset while idle", 3, GenBin(RP_IDLE));
     AddBins(covRst, "reset mid-image", 3, GenBin(RP_DATA));
     AddBins(covRst, "reset awaiting oFlushDone", 3, GenBin(RP_FLUSH));
     AddBins(covRst, "reset with FIFO backed up (almostFull)", 3, GenBin(RP_BACKUP));
 
-    covEmit := NewID("lane x emitBytes");
+    covEmit := NewID("G4.Stream lane x emitBytes");
     SetFieldName(covEmit, "lane", "emitBytes");
-    covFlush := NewID("lane x flushType");
+    covFlush := NewID("G4.Stream lane x flushType");
     SetFieldName(covFlush, "lane", "flushType");
-    covCross := NewID("lane x data x almostFull");
+    covCross := NewID("G4.Stream lane x data x almostFull");
     SetFieldName(covCross, "lane", "almostFull");
-    covStuff := NewID("lane x stuffEvent");
+    covStuff := NewID("G4.Branch lane x stuffEvent");
     SetFieldName(covStuff, "lane", "stuffEvent");
     for l in 0 to LANES - 1 loop
       for c in 0 to OUT_BYTES loop

@@ -4,56 +4,48 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: nl_backend (loop exit tokens -> 4 lane bit streams).
+-- tb_nl_backend_osvvm: nl_backend against a per-lane transcription of T.87 A.10-A.23
 --
--- Sessions: reset with a random NEAR (RANGE, qbpp, Ainit derived here), then
--- 1..3 images. Each image is a clear sweep followed by the 4 lanes' token
--- streams, interleaved at random with same-lane tokens >= 4 cycles apart.
--- Per lane, a token sequence is legal T.87: regular, run hit, run hit at the
--- end of the line, run interruption (RItype 0 / 1). Regular contexts draw
--- errors from a per-context magnitude so k sweeps its range; the TB owns N and
--- B for regular contexts (they come from the loop). A long-run session (three
--- 16383-pixel lines of hits) takes RUNindex to its reachable max, 30.
+-- Each session resets with a random NEAR and runs 1..3 images: a clear sweep, then legal per-lane
+-- token sequences interleaved at random, same-lane tokens >= 4 cycles apart. The TB plays the loop
+-- (N, B of regular contexts). RI uses RUNindex before the decrement (CharLS order). A long-run
+-- session (three 16383-pixel lines of hits) takes RUNindex to its reachable max, 30. Each word is
+-- one token: length, lane, last flag and bits are checked in order.
 --
--- The golden is a per-lane T.87 transcription: A.10, A.11 (with the lossless
--- special mapping), A.11.1 LG(k, LIMIT) with the runtime qbpp, A.12 (A only),
--- A.14 / A.15 / A.16 run coding (CharLS order: RI uses RUNindex before the
--- decrement), A.20 - A.23. Every word is one token: its length, lane, last
--- flag and bits are checked in order against that token's expected code.
+-- Requirements:
+--   T87.A10        k, regular and RI
+--   T87.A11        regular mapping, NEAR = 0 special case
+--   T87.A11.1      LG(k, LIMIT / glimit) with qbpp, escape codes
+--   T87.A12        regular A update and halving
+--   T87.A15        run hits, RUNindex up to 30
+--   T87.A16        run end: EOL '1', interruption '0' + J bits
+--   T87.A20        TEMP, both RItypes
+--   T87.A21        map bit
+--   T87.A22        EMErrval
+--   T87.A23        RI A / N / Nn update and halving
+--   NL.LaneState   A RAM and run state per lane, cleared by the sweep / last pixel
+--   NL.WordTags    oLane / oLast / oLen, one word per token, in order
+--   NL.Reset       reset in any phase, in-flight words dropped
 --
--- Requirements (IDs as in the README registry):
---   T87.A10          k for regular and RI tokens (through the code)
---   T87.A11          regular mapping, incl. the NEAR = 0 special case
---   T87.A11.1        LG(k, LIMIT / glimit) with qbpp, escape codes
---   T87.A12          regular A update and halving at N = RESET
---   T87.A15          run hits: '1' per completed segment, RUNindex up to 31
---   T87.A16          run end: EOL '1', interruption '0' + J bits, RUNindex - 1
---   T87.A20          TEMP for both RItypes
---   T87.A21          map bit
---   T87.A22          EMErrval
---   T87.A23          RI A / N / Nn update and halving
---   NL.LaneState     A RAM and run state per lane, cleared by the sweep / last pixel
---   NL.WordTags      oLane / oLast / oLen: one word per coded token, in order
---   NL.Reset         reset in any phase: in-flight words dropped, next session scored
---
--- Guideline notes:
---   G1  the golden is the T.87 C code in VHDL with the TB's own RANGE, qbpp,
---       Ainit, J table and LIMIT; no RTL constant or entity is used.
---   G2  covRange: NEAR 0 / max, Ainit 2 / max, Errval min / max (regular, RI),
---       N 1 / RESET, B 1-N / 0, ctx 4 / 368, k 0 / BITNESS-1, word = LIMIT,
---       RUNindex 30, RUNcnt = 2^J - 1. RTL asserts: input contract, A / N / Nn,
---       RUNcnt, k ranges. RUNindex 31 is unreachable: a lane line is <= 16383
---       pixels and the J = 14 segment of RUNindex 30 needs 16384.
---   G3  Errval at -2^(BITNESS-1); B at 1-N; A.21 for Errval < 0.
---   G4  covTok (lane x token kind), covK (k x regular / RI), covCode (escape,
---       special mapping, map bit x RItype, halving, run segment / EOL / RI
---       boundaries), covSpace (lane x same-lane distance).
---   G5  covRst: reset before the sweep / in the sweep / mid-image / mid-run /
---       with words in flight, then a scored session.
---   G6  see the code coverage report.
---------------------------------------------------------------------------------
+-- Guidelines:
+--   G1.Req      T87.A10-A23 above
+--   G1.Golden   T.87 C code with the TB's own RANGE, qbpp, Ainit, J and LIMIT
+--   G1.Nl       NL.LaneState, NL.WordTags, NL.Reset
+--   G2.Range    nl_backend.vhd range comments and asserts
+--   G2.MinMax   G2.MinMax node
+--   G2.Clamp    G2.MinMax node (N, B, RUNindex 30), G4.Coding corners (halving). RUNindex 31
+--               unreachable: its J = 14 segment needs 16384 pixels, a lane line is <= 16383
+--   G2.Checked  checked_integer / checked_bit on oLane / oLen / oLast / oBits
+--   G3.Stim     G2.MinMax node (Errval at -2^(BITNESS-1), B at 1-N), G4.Coding corners (map)
+--   G4.Run      G4.Coding corners, G2.MinMax node (RUNindex max)
+--   G4.Coding   G4.Coding k x token, G4.Coding corners
+--   G4.Branch   G4.Coding corners (map bit x RItype)
+--   G4.Config   G2.MinMax node (NEAR 0 / max)
+--   G4.Lane     G4.Lane lane x token kind, G4.Stream lane x same-lane distance
+--   G4.Stream   G4.Stream lane x same-lane distance
+--   G4 other    N/A: Edge belongs to tb_nl_frontend_osvvm
+--   G5          G5.States resetPhase, then a scored session; in-flight words discarded
+--   G6.Code     reviewed in the suite report
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -715,8 +707,8 @@ begin
       if (oValid /= '1') then
         return;
       end if;
-      l   := to_integer(oLane);
-      len := to_integer(oLen);
+      l   := checked_integer(oLane);
+      len := checked_integer(oLen);
       if (tRd(l) = tWr(l)) then
         AffirmIf(reqTag, false, "word on lane " & to_string(l) & " with no coded token pending");
         return;
@@ -919,7 +911,7 @@ begin
     reqRst  := GetReqID("NL.Reset", N_RST);
     reqs    := (reqA10, reqA11, reqA111, reqA12, reqA15, reqA16, reqA20, reqA21, reqA22, reqA23);
 
-    covTok := NewID("lane x token kind");
+    covTok := NewID("G4.Lane lane x token kind");
     SetFieldName(covTok, "lane", "kind");
     for l in 0 to 3 loop
       AddCross(covTok, "lane=" & to_string(l) & " / regular", GenBin(l), GenBin(K_REG));
@@ -929,14 +921,14 @@ begin
       AddCross(covTok, "lane=" & to_string(l) & " / RI, RItype 1", GenBin(l), GenBin(K_RI1));
     end loop;
 
-    covK := NewID("k x token");
+    covK := NewID("G4.Coding k x token");
     SetFieldName(covK, "k", "token");
     for k in 0 to BITNESS - 1 loop
       AddCross(covK, "k=" & to_string(k) & " / regular", GenBin(k), GenBin(0));
       AddCross(covK, "k=" & to_string(k) & " / RI", GenBin(k), GenBin(1));
     end loop;
 
-    covCode := NewID("coding corners");
+    covCode := NewID("G4.Coding corners");
     AddBins(covCode, "regular escape", GenBin(C_ESC_REG));
     AddBins(covCode, "RI escape (glimit)", GenBin(C_ESC_RI));
     AddBins(covCode, "A.11 lossless special mapping", GenBin(C_SPECIAL));
@@ -952,7 +944,7 @@ begin
     AddBins(covCode, "RI with RUNcnt 0", GenBin(C_RI_RC0));
     AddBins(covCode, "RI after a partial run", GenBin(C_RI_RCP));
 
-    covSpace := NewID("lane x same-lane distance");
+    covSpace := NewID("G4.Stream lane x same-lane distance");
     SetFieldName(covSpace, "lane", "distance");
     for l in 0 to 3 loop
       AddCross(covSpace, "lane=" & to_string(l) & " / 4 cycles (min)", GenBin(l), GenBin(0));
@@ -960,14 +952,14 @@ begin
       AddCross(covSpace, "lane=" & to_string(l) & " / > 8 cycles", GenBin(l), GenBin(2));
     end loop;
 
-    covRst := NewID("reset phase");
+    covRst := NewID("G5.States resetPhase");
     AddBins(covRst, "reset before the sweep", 3, GenBin(RP_IDLE));
     AddBins(covRst, "reset during the sweep", 3, GenBin(RP_CLEAR));
     AddBins(covRst, "reset mid-image, no run open", 3, GenBin(RP_BUSY));
     AddBins(covRst, "reset mid-run", 3, GenBin(RP_RUN));
     AddBins(covRst, "reset with words in flight", 3, GenBin(RP_DRAIN));
 
-    covRange := NewID("value ranges");
+    covRange := NewID("G2.MinMax node");
     AddBins(covRange, "NEAR = 0", GenBin(R_NEAR0));
     AddBins(covRange, "NEAR = max", GenBin(R_NEARMAX));
     AddBins(covRange, "Ainit = 2", GenBin(R_AINIT2));

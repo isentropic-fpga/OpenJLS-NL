@@ -4,50 +4,46 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: nl_top (4 vertical stripes, 4 output streams).
+-- tb_nl_top_osvvm: nl_top, tb_openjls_top_osvvm ported to the 4 stripe lanes
 --
--- Port of OpenJLS tb_openjls_top_osvvm to the 4-lane core. The golden suite
--- (Verification/OSVVM/Golden) owns payload correctness on real images; here
--- the payload oracle is small seeded images encoded per stripe by CharLS
--- (tb_nl_top_golden_pkg, from gen_golden.py), and the TB proves the 4 streams
--- stay byte-exact under stress:
---   A  every image alone, clean (all iReady high, no input gaps)
---   B  back to back: 4 images, no reset between them (context clear sweep
---      and per-lane framer start in between)
---   C  every image under output backpressure (random per-lane iReady with
---      not-ready bursts), input gaps, and both
+-- Payload correctness on real images is the golden suite's job. Here the oracle is small seeded
+-- images coded per stripe by CharLS (tb_nl_top_golden_pkg), and the TB checks the 4 streams stay
+-- byte-exact under stress:
+--   A  every image alone, clean
+--   B  4 images back to back, no reset between them
+--   C  every image under random per-lane iReady, input gaps, and both
 --   D  back to back under both
---   E  stall propagation: a long iReady hold on one lane (each lane in
---      turn) and on all 4 must drop oReady (skid FIFO almost full -> front
---      end hold) while pixels are offered; nothing is lost after release
---   F  reset rounds: reset while idle, in the config divider, in the clear
---      sweep, mid feed, while draining and with an output beat held. The
---      next config (NEAR, W, H) is drawn at random, so NEAR changes across
---      reset; the aborted images are not scored, the recovery image is.
+--   E  long iReady hold on each lane and on all 4: oReady must drop, nothing is lost
+--   F  reset while idle, in the config divider, in the clear sweep, mid feed, while draining and
+--      with a beat held; the recovery image uses a random NEAR / W / H and is scored
+-- Every lane also checks oKeep (contiguous from the MSB, >= 1 byte), oLast on FF D9 and the AXIS
+-- hold.
 --
--- Every lane checks byte-exact data, oKeep contiguous from the MSB with
--- >= 1 byte, oLast on the FF D9 of each image, and the AXIS hold (valid,
--- data, keep, last stable while iReady is low).
+-- Requirements:
+--   NL.StripeGolden      every lane byte-exact against CharLS per stripe
+--   NL.BackToBack        images back to back without reset
+--   NL.AxisOut           AXIS keep / last / hold per lane
+--   NL.StallPropagation  output hold reaches oReady, nothing lost
+--   NL.NoStall           clean runs never drop oReady
+--   NL.ConfigInReset     NEAR / W / H sampled in reset
+--   NL.Reset             reset in any phase, recovery image scored
 --
--- Requirements: NL.StripeGolden, NL.BackToBack, NL.AxisOut,
--- NL.StallPropagation, NL.NoStall, NL.ConfigInReset, NL.Reset (see
--- Verification/OSVVM/README.md).
---
--- Guideline notes:
---   G1  Reference bytes are CharLS (nl_charls.cpp) per stripe, generated
---       offline from the same pixels; nothing is derived from the RTL.
---   G2  covRange: W at 32 and at MAX_W, H at 1 and at MAX_H, NEAR at 0 and at
---       min(255, MAXVAL/2). nl_top asserts the config ranges and the lane
---       hand-off; its PSL checks the AXIS hold and reset per lane.
---   G3  N/A: no arithmetic in the TB beyond byte counts.
---   G4  covStress (image kind x stress mode), covB2B (clean / stressed),
---       covStall (hold per lane / all), covHold (per lane), covCfg (NEAR /
---       dims change across reset).
---   G5  covRst: reset per phase, aborted output dropped, recovery scored.
---   G6  see the code coverage report.
---------------------------------------------------------------------------------
+-- Guidelines:
+--   G1.Req      N/A: T.87 payload is owned by the module TBs and the golden suite
+--   G1.Golden   CharLS (nl_charls.cpp) per stripe, generated offline from the same pixels
+--   G1.Nl       see Requirements
+--   G2.Range    nl_top.vhd range comments, asserts and PSL
+--   G2.MinMax   G2.MinMax config ranges (W 32 / MAX_W, H 1 / MAX_H, NEAR 0 / min(255, MAXVAL/2))
+--   G2.Clamp    N/A: no accumulator at this level
+--   G2.Checked  N/A: bytes are scoreboarded against CharLS, X / U never matches
+--   G3.Stim     N/A: no arithmetic in the TB beyond byte counts
+--   G4.Config   G2.MinMax config ranges, G4.Config config across reset
+--   G4.Lane     G4.Stream lane backpressure hold; every image scored on all 4 lanes
+--   G4.Stream   G4.Stream image kind x stress mode, G4.Stream back to back,
+--               G4.Stream stall propagation, G4.Stream lane backpressure hold
+--   G4 other    N/A: owned by the module TBs
+--   G5          G5.States resetPhase; aborted output discarded, recovery image scored
+--   G6.Code     reviewed in the suite report
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -545,7 +541,7 @@ begin
     reqCfg   := GetReqID("NL.ConfigInReset", LANES * N_KIND);
     reqRst   := GetReqID("NL.Reset", 2 * N_RST);
 
-    covStress := NewID("image kind x stress mode");
+    covStress := NewID("G4.Stream image kind x stress mode");
     SetFieldName(covStress, "case", "mode");
     for k in 0 to N_KIND - 1 loop
       AddCross(covStress, "case " & to_string(k) & " / clean", GenBin(k), GenBin(M_CLEAN));
@@ -553,28 +549,28 @@ begin
       AddCross(covStress, "case " & to_string(k) & " / input gaps", GenBin(k), GenBin(M_GAP));
       AddCross(covStress, "case " & to_string(k) & " / both", GenBin(k), GenBin(M_BOTH));
     end loop;
-    covB2B := NewID("back to back");
+    covB2B := NewID("G4.Stream back to back");
     AddBins(covB2B, "clean", GenBin(0));
     AddBins(covB2B, "stressed", GenBin(1));
-    covStall := NewID("stall propagation");
-    covHold  := NewID("lane backpressure hold");
+    covStall := NewID("G4.Stream stall propagation");
+    covHold  := NewID("G4.Stream lane backpressure hold");
     for l in 0 to LANES - 1 loop
       AddBins(covStall, "hold lane " & to_string(l), GenBin(l));
       AddBins(covHold, "lane " & to_string(l), GenBin(l));
     end loop;
     AddBins(covStall, "hold all lanes", GenBin(LANES));
-    covRst := NewID("reset phase");
+    covRst := NewID("G5.States resetPhase");
     AddBins(covRst, "reset while idle", 2, GenBin(RP_IDLE));
     AddBins(covRst, "reset in the config divider", 2, GenBin(RP_CFG));
     AddBins(covRst, "reset in the clear sweep", 2, GenBin(RP_CLEAR));
     AddBins(covRst, "reset mid feed", 2, GenBin(RP_FEED));
     AddBins(covRst, "reset while draining", 2, GenBin(RP_DRAIN));
     AddBins(covRst, "reset with output held", 2, GenBin(RP_HOLD));
-    covCfg := NewID("config across reset");
+    covCfg := NewID("G4.Config config across reset");
     AddBins(covCfg, "NEAR changed", 3, GenBin(0));
     AddBins(covCfg, "W/H changed", 3, GenBin(1));
     AddBins(covCfg, "same config", 3, GenBin(2));
-    covRange := NewID("config ranges");
+    covRange := NewID("G2.MinMax config ranges");
     SetFieldName(covRange, "field", "value");
     AddCross(covRange, "W = 32", GenBin(0), GenBin(32));
     if (MAX_W = 64) then

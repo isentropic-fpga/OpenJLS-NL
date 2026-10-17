@@ -4,67 +4,50 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
---------------------------------------------------------------------------------
--- OSVVM testbench: nl_loop (near-lossless Ra -> Rx recurrence).
+-- tb_nl_loop_osvvm: nl_loop against a per-stripe transcription of the T.87 C code (A.2-A.19)
 --
--- Requirements (README owner table):
---   T87.A2 (NEAR > 0) / T87.A3 (NEAR = 0)  mode selection          oMode
---   T87.A4      Q3 from Ra, candidate select (Q1, Q2 come in)      oCtx
---   T87.A5      edge-detecting predictor                           oPx
---   T87.A6      bias correction and clamp                          oPx
---   T87.A7      prediction error, sign, through A.8/A.9            oErrval
---   T87.A8      error quantization, Rx (NEAR > 0)                  oRx
---   T87.A8.1    Rx = Ix (NEAR = 0), regular and RI                 oRx
---   T87.A9      modulo reduction, wrapped pixels                   oErrval
---   T87.A12     B, N update, N = RESET halving                     oNq oBpre oNpre oNRes
---   T87.A13     B, C bias update                                   oCq oBq
---   T87.A14     run hit, Rx = Ra                                   oRx
---   T87.A17     RItype                                             oRiType
---   T87.A18     RI Px and sign                                     oPx
---   T87.A19     RI error quantization and modulo, RI Rx            oErrval oRx
---   NL.CtxForward  pending update of the lane forwarded            all of the above
---   A.4.1 / A.4.2 (sign merge, context number) arrive precomputed in iCand*
---   and are owned by tb_nl_frontend_osvvm.
+-- The candidates fed to the DUT come from a context memory without each stripe's pending update,
+-- so the DUT must forward it. Slot k feeds lane k mod 4; STRIPES lanes carry pixels (1 = 3 empty
+-- slots between pixels). The random loop runs CYCLES slots, then until all coverage closes (cap
+-- 20 x CYCLES). A.4.1 / A.4.2 arrive precomputed in iCand* (tb_nl_frontend_osvvm).
 --
--- Golden: per-stripe sequential transcription of the T.87 C code for A.2-A.19
--- (integers, C statement order, literals -128 / 127, no RTL constants), full
--- context memory, independent of the RTL's reciprocal quantizer and 4-slot
--- pipeline. The context candidates fed to the DUT come from a memory lacking
--- each stripe's most recent regular update, which the DUT must forward. Slot k
--- feeds lane k mod 4; STRIPES lanes carry pixels (1 = one stalled stream, 3
--- empty slots between pixels).
---
--- Stimulus mixes smooth pixels (runs), uniform random pixels (all Q3, modulo
--- wrap), pixels at 0 / MAXVAL (reconstruction clamp) and a per-image hot
--- (Q1, Q2) pair so contexts reach N = RESET and C saturates. The random loop
--- runs at least CYCLES slots and then until every coverage model closes (cap
--- 20 x CYCLES).
+-- Requirements:
+--   T87.A2 / T87.A3  oMode (NEAR > 0 / NEAR = 0)
+--   T87.A4           oCtx
+--   T87.A5           oPx
+--   T87.A6           oPx
+--   T87.A7           oErrval
+--   T87.A8           oRx (NEAR > 0)
+--   T87.A8.1         oRx (NEAR = 0), regular and RI
+--   T87.A9           oErrval
+--   T87.A12          oNq oBpre oNpre oNRes
+--   T87.A13          oCq oBq
+--   T87.A14          oRx
+--   T87.A17          oRiType
+--   T87.A18          oPx
+--   T87.A19          oErrval oRx
+--   NL.CtxForward    all of the above
 --
 -- Guidelines:
---   G1  as above.
---   G2  RTL asserts every node range (nl_loop ASSERTIONS); covRange drives
---       Errval, Px, Rx to min/max, B to 1-RESET and 0, N to 1 and RESET, C to
---       -128 / 127 and one step past (held), both A.13 B clamps.
---   G3  oErrval / oCq / oBq signed, read with checked_integer; Errval most
---       negative value is a covRange bin; Ix MSB set comes with the edge pixels.
---   G4  first column, run ending at EOL, both RItype, N = RESET, C at both
---       ends, forwarding hit/miss per lane, back-to-back vs gapped slots,
---       new image with an update pending: covEdge / covFwd / covErr.
---       N/A here: first line, last column, 1-line images, Ws = 8 (Rb, Rc, Rd
---       come in, the loop has no edge logic: tb_nl_frontend_osvvm); RUNindex
---       (tb_a15_a16_nl_osvvm); k / escape / A.11 (tb_nl_backend_osvvm).
---       Lanes share one datapath (D19); only Ra, run state and the pending
---       update are per lane, so per-lane bins are covMode / covFwd and the
---       value bins are not crossed with the lane.
---       NEAR change between images: the loop holds no NEAR-dependent state
---       (config is re-registered every clock), so the NEAR sweep of the suite
---       covers it; runtime change is tb_nl_config_osvvm / tb_nl_top.
---   G5  N/A: nl_loop has no reset. Lane state is restarted by iFirstPix,
---       covered by "new image with update pending".
---   G6  zero errors, goals met, every model IsCovered; code coverage reviewed
---       in the suite report.
---------------------------------------------------------------------------------
+--   G1.Req      T87.A2-A19 above
+--   G1.Golden   per-stripe transcription above
+--   G1.Nl       NL.CtxForward
+--   G2.Range    nl_loop.vhd range comments and asserts
+--   G2.MinMax   G2.MinMax node
+--   G2.Clamp    G2.MinMax node (C, B, N = RESET), G2.Clamp mode x reconstruction
+--   G2.Checked  checked_integer / checked_bit on every compared output
+--   G3.Stim     G2.MinMax node (most negative Errval), 0 / MAXVAL pixels
+--   G4.Edge     G4.Edge stripe events; first line, last column, 1-line, Ws = 8 N/A: Rb, Rc, Rd
+--               come in (tb_nl_frontend_osvvm)
+--   G4.Run      G4.Edge stripe events, G4.Lane lane x mode; RUNindex N/A: tb_a15_a16_nl_osvvm
+--   G4.Coding   G2.MinMax node (N = RESET, C ends); k, escape, A.11 N/A: tb_nl_backend_osvvm
+--   G4.Branch   G4.Branch mode x errval sign, G4.Branch mode x modulo wrap
+--   G4.Config   NEAR swept by the generics; NEAR change N/A: no NEAR-dependent state
+--               (tb_nl_config_osvvm, tb_nl_top_osvvm)
+--   G4.Lane     G4.Lane lane x mode, G4.Stream lane x forward x gap
+--   G4.Stream   G4.Stream lane x forward x gap, G4.Edge stripe events
+--   G5          N/A: no reset; lane state restarts on iFirstPix (G4.Edge stripe events)
+--   G6.Code     reviewed in the suite report
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -96,7 +79,7 @@ architecture sim of tb_nl_loop_osvvm is
   constant RANGE_V : natural := (MAXVAL + 2 * NEAR) / D + 1;
   constant RECIP   : natural := (2 ** (BITNESS + 10) + D - 1) / D;
   constant MAX_CYC : natural := 20 * CYCLES;
-  -- Coverage at-least goals (requirement goals below follow from them).
+  -- Coverage at-least goals; the requirement goals follow from them
   constant MODE_AT : natural := 50;
   constant FWD_AT  : natural := 10;
   constant WRAP_AT : natural := 10;
@@ -630,10 +613,7 @@ begin
     protoId := GetAlertLogID("StreamProtocol");
     closeId := GetAlertLogID("CoverageClosure");
 
-    -- IDs follow OpenJLS Docs/Requirements.md (README owner table). Goals
-    -- are lower bounds implied by coverage closure (at-least counts). A.2 is
-    -- the near-lossless mode selection; at NEAR = 0 it is A.3, and A.8 is
-    -- replaced by A.8.1 (Rx = Ix, checked in addition to the reference Rx).
+    -- At NEAR = 0, A.2 becomes A.3 and A.8 becomes A.8.1 (Rx = Ix, on top of the reference Rx)
     if (NEAR = 0) then
       reqMode := GetReqID("T87.A3", 3 * MODE_AT * STRIPES);
       reqRx   := GetReqID("T87.A8.1", 3 * MODE_AT * STRIPES);
@@ -654,7 +634,7 @@ begin
     reqA19  := GetReqID("T87.A19", 2 * MODE_AT * STRIPES);
     reqFwd  := GetReqID("NL.CtxForward", 2 * FWD_AT * STRIPES);
 
-    covMode := NewID("lane x mode");
+    covMode := NewID("G4.Lane lane x mode");
     SetFieldName(covMode, "lane", "mode");
     for l in 0 to STRIPES - 1 loop
       AddCross(covMode, "lane=" & to_string(l) & " / regular", MODE_AT, GenBin(l), GenBin(M_REG));
@@ -665,7 +645,7 @@ begin
     -- Regular pixels whose context is the lane's pending (not yet written)
     -- update, back-to-back (4 slots after the previous lane pixel) or after
     -- empty slots.
-    covFwd := NewID("regular: lane x forward x gap");
+    covFwd := NewID("G4.Stream lane x forward x gap");
     SetFieldName(covFwd, "lane", "forward", "gap");
     for l in 0 to STRIPES - 1 loop
       for f in 0 to 1 loop
@@ -679,7 +659,7 @@ begin
 
     -- Sign of the quantized, modulo-reduced error. RANGE = 2 (NEAR at the
     -- ceiling, 8 bits) maps every positive error to -1.
-    covErr := NewID("mode x errval sign");
+    covErr := NewID("G4.Branch mode x errval sign");
     SetFieldName(covErr, "mode", "sign");
     for m in 0 to 1 loop
       for sgn in 0 to 2 loop
@@ -693,7 +673,7 @@ begin
     AddCross(covErr, "RI / RItype=0", GenBin(2), GenBin(0));
     AddCross(covErr, "RI / RItype=1", GenBin(2), GenBin(1));
 
-    covWrap := NewID("mode x modulo wrap");
+    covWrap := NewID("G4.Branch mode x modulo wrap");
     SetFieldName(covWrap, "mode", "wrapped");
     for m in 0 to 1 loop
       for w in 0 to 1 loop
@@ -704,7 +684,7 @@ begin
 
     -- Reconstruction Px + SIGN*Errval*(2*NEAR+1) outside [0, MAXVAL] needs
     -- NEAR > 0; lossless reconstructs Ix exactly.
-    covClamp := NewID("mode x reconstruction clamp");
+    covClamp := NewID("G2.Clamp mode x reconstruction");
     SetFieldName(covClamp, "mode", "clamp");
     for m in 0 to 1 loop
       for c in 0 to 2 loop
@@ -716,16 +696,14 @@ begin
       end loop;
     end loop;
 
-    covEdge := NewID("stripe events");
+    covEdge := NewID("G4.Edge stripe events");
     AddBins(covEdge, "new image with update pending", GenBin(0));
     AddBins(covEdge, "first regular of image on stale pending ctx", GenBin(1));
     AddBins(covEdge, "regular at first column", GenBin(2));
     AddBins(covEdge, "run hit ends at EOL", GenBin(3));
     AddBins(covEdge, "N = RESET rescale", GenBin(4));
 
-    -- G2 min / max of every arithmetic output, accumulators at their clamp
-    -- and one step past it.
-    covRange := NewID("value ranges");
+    covRange := NewID("G2.MinMax node");
     AddBins(covRange, "Errval = -floor(RANGE/2)", GenBin(R_EMIN));
     AddBins(covRange, "Errval = ceil(RANGE/2)-1", GenBin(R_EMAX));
     AddBins(covRange, "Px = 0", GenBin(R_PX0));

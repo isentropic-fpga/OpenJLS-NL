@@ -1,41 +1,54 @@
 # Verification guidelines
 
 Rules for every OSVVM TB in [`Verification/OSVVM`](../Verification/OSVVM).
-A rule that doesn't apply is marked N/A in the TB header.
+Each rule has a tag (`G<n>.<Name>`). TBs use it in their coverage IDs and header, so any report line traces back to a rule.
+A rule that doesn't apply is marked N/A in the TB header, with a reason.
+Adapted from the OpenJLS guidelines ([`OpenJLS/Docs/verification_guidelines.md`](../OpenJLS/Docs/verification_guidelines.md)); NL-only rules are `G1.Owner` and `G4.Lane`.
+
+## Naming
+- Requirement IDs: `T87.<clause>` for T.87 code segments and written requirements (`T87.A12`, `T87.A11.1`, `T87.A2.1`); `NL.<Name>` for NL-only behaviour (`NL.CtxForward`).
+- Coverage models: `NewID("<tag> <axes>")`, e.g. `NewID("G4.Coding k x token")`. A model that serves several rules takes the first tag and lists the rest in the header.
+- Bins: `axis=value` joined by ` / `; named corners use the rule's wording (`N=RESET`, `k=0`, `Ra=Rb`, `NEAR=max`).
+- TB header has a `Guidelines:` block, one line per rule: the coverage IDs that meet it, or `N/A: <reason>`. Rules not listed are N/A for the reason given on a group line (`G4 other  N/A: ...`).
+- TB header has a `Requirements:` block listing the IDs the TB registers with `GetReqID`, one line each.
 
 ## G1. Requirements and golden model
-- Every requirement in [`Requirements.md`](Requirements.md) implemented in `Sources/` has a `T87.<id>` requirement with a goal in an OSVVM TB.
-- NL-only behaviour (lanes, stripes, forwarding, runtime NEAR) uses `NL.<Name>` IDs.
-- Golden = sequential VHDL transcription of the T.87 C code: integers, same statements, order and names, no RTL packages.
-- Requirements without C code (e.g. A.4.2): check properties (range, one-to-one, totality).
-- Non-spec RTL behaviour (clamps, saturation) gets its own `NL.*` ID, never counted as T.87.
+- **G1.Req** Every requirement in [`Requirements.md`](Requirements.md) implemented in `Sources/` has a `T87.*` requirement with a goal in an OSVVM TB. NL implements the lossy paths (A.2, A.8), so nothing is excluded. Registry and status: [`verification_requirements.md`](verification_requirements.md).
+- **G1.Owner** Each ID has one owner TB, the one that checks it at the block that implements it. Other TBs may re-check it through their own golden (integration check); the matrix lists them.
+- **G1.Golden** Golden = sequential VHDL transcription of the T.87 C code with the runtime NEAR: integers, same statements, order and names, no RTL packages or constants.
+- **G1.Property** Written requirements without C code (A.2.1, A.4.1, A.4.2, A.11.1, A.22.1, C.2.4.1.1): check properties (range, one-to-one, totality) or a transcription of the text.
+- **G1.Nl** Non-spec RTL behaviour (lanes, stripes, forwarding, clamps, AXI, stall/flow control) gets its own `NL.*` ID, never counted as T.87.
 
 ## G2. Overflow / underflow
-- Every arithmetic signal/variable: legal range commented at its declaration, for worst-case generics.
-- RTL asserts that range (`assert` for variables, PSL `never` for signals).
-- TB drives each node to its min and max, as named coverage bins.
-- Accumulators (A, B, C, N, RUNindex) driven to their clamp/reset point and one step past.
-- Read outputs with `checked_integer` / `checked_bit` (X/U never passes).
+- **G2.Range** Every arithmetic signal/variable: legal range commented at its declaration, for worst-case generics (BITNESS = 16, NEAR = 255).
+- **G2.Assert** RTL asserts that range (`assert` for variables, PSL `never` for clocked signals); none where the legal range is the full type range.
+- **G2.Postponed** Combinational signals and outputs: `postponed assert is_x(x) or (<range>)`. Checked once per time step after deltas settle, so no glitch false alarms; synthesis ignores it.
+- **G2.MinMax** TB drives each node to its min and max, as named coverage bins.
+- **G2.Clamp** Accumulators (A, B, C, N, Nn, RUNindex) driven to their clamp/reset point and one step past.
+- **G2.Checked** Read outputs with `checked_integer` / `checked_bit` (X/U never passes).
 
 ## G3. Type conversions
-- unsigned → signed: `signed('0' & x)`, never `signed(x)`.
-- Widen with `resize`; narrow only with a proven range and an assert.
-- Stimulus includes source MSB set and most negative value, as coverage bins.
+- **G3.Signed** unsigned -> signed: `signed('0' & x)`, never `signed(x)`.
+- **G3.Resize** Widen with `resize`; narrow only with a proven range and an assert.
+- **G3.Stim** Stimulus includes source MSB set and most negative value, as coverage bins.
 
 ## G4. Corner cases
 Each one is a named coverage bin; TBs close on `IsCovered`.
-- Edges, per stripe (D1): first line (Rb = Rc = Rd = 0), first column (Ra = Rb), last column (Rd = Rb), 1-line image, Ws = 8.
-- Run mode: run ending at end of line, RUNindex 0 and 31, both RItype values.
-- Coding: k = 0 and max, escape code, A.11 special case, N = RESET, C at MIN_C/MAX_C.
-- Config: BITNESS min/max, NEAR = 0 and max, NEAR change between images.
-- Lanes: every lane hits every bin, forwarding hit/miss, back-to-back images, backpressure.
+- **G4.Edge** Per stripe (D1): first line (Rb = Rc = Rd = 0), first column (Ra = Rb), last column (Rd = Rb), 1-line image, Ws = 8.
+- **G4.Run** Run ending at end of line, RUNindex 0 and max, both RItype values.
+- **G4.Coding** k = 0 and max, escape code, A.11 special case, N = RESET, C at MIN_C/MAX_C.
+- **G4.Config** BITNESS 8, 12 and 16; NEAR = 0 and max, NEAR change between images; image width and height at their min and at `MAX_W`/`MAX_H`.
+- **G4.Branch** Every branch of the C code segment is a bin (sign, region, clause), when no corner above names it.
+- **G4.Lane** Per-lane state (Ra, run state, context store, A RAM, byte/frame buffers) is exercised on every lane: bins crossed with the lane. The shared datapath (D19) is not crossed: value bins count once.
+- **G4.Stream** Back-to-back images, output backpressure, input stall, context forwarding hit/miss, read on the EOI cycle.
 
 ## G5. Reset recovery (stateful modules)
-- Reset from any state returns the module to its initial condition: outputs, counters, FSMs, context memories.
-- Reset is asserted in every FSM state / pipeline phase, as coverage bins.
-- After reset, the next transaction matches a golden run from power-up.
-- Output of the aborted transaction is ignored, never pushed to the scoreboard.
+- **G5.Init** Reset from any state returns the module to its initial condition: outputs, counters, FSMs, context memories.
+- **G5.States** Reset is asserted in every FSM state / pipeline phase, as coverage bins.
+- **G5.Replay** After reset, the next transaction matches a golden run from power-up.
+- **G5.Discard** Output of the aborted transaction is ignored, never pushed to the scoreboard.
 
 ## G6. Done
-- Zero errors, all requirement goals met, all coverage `IsCovered`.
-- Code coverage reviewed; uncovered lines covered or justified in the TB header.
+- **G6.Clean** Zero errors, all requirement goals met, all coverage `IsCovered`.
+- **G6.Header** Every rule in the header is mapped to a coverage ID or marked N/A, and the requirement's row in [`verification_requirements.md`](verification_requirements.md) shows no gap.
+- **G6.Code** Code coverage reviewed; uncovered lines covered or justified in the TB header.

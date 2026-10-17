@@ -4,34 +4,13 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- nl_top: near-lossless JPEG-LS encoder, 4 vertical stripes coded as 4 images in parallel
 --
--- Module Name: nl_top - Behavioral
---
--- Notes:
---              Near-lossless JPEG-LS encoder, 4 vertical stripes in parallel.
---              The W x H raster input is split into 4 stripes of W/4 x H, each
---              coded as its own JPEG-LS image on its own output stream (lane l
---              is slice l of the output buses, OpenJLS-style AXI-Stream).
---              iNear, iImageWidth and iImageHeight are sampled while iRst = '1'.
---              W must be a multiple of 4 and W/4 >= 8.
---
---              nl_config -> nl_frontend -> nl_loop -> nl_backend -> per lane
---              skid FIFO -> byte_stuffer_nl -> nl_framer -> per lane output
---              FIFO. One byte_stuffer_nl and one nl_framer serve the 4 lanes
---              taking turns (lane sSlot this cycle), so the whole core emits
---              at most 4 payload bytes per clock.
---
--- Assumptions:
---              iImageWidth multiple of 4 in [32, MAX_IMAGE_WIDTH], iImageHeight in
---              [1, MAX_IMAGE_HEIGHT], iNear <= min(255, MAXVAL/2): sampled in reset,
---              checked by nl_frontend / nl_config. A lane line is <= 16383 pixels
---              (nl_backend run contract). iReady per lane is free (AXI-Stream).
---              The ASSERTIONS block checks the lane slot hand-off and the streams.
---
-----------------------------------------------------------------------------------
+-- Lane l codes stripe l (W/4 x H) onto slice l of the output buses. iNear, iImageWidth and
+-- iImageHeight are sampled while iRst = '1'; W is a multiple of 4 in [32, MAX_IMAGE_WIDTH].
+-- nl_config -> nl_frontend -> nl_loop -> nl_backend -> per-lane skid FIFO -> byte_stuffer_nl ->
+-- nl_framer -> per-lane output FIFO. The stuffer and framer serve the lanes in turn (lane sSlot),
+-- so the core emits at most 4 payload bytes per clock.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -78,25 +57,25 @@ architecture rtl of nl_top is
   constant FW_W       : natural := log2ceil(MAX_IMAGE_WIDTH / 4 + 1);
   constant FH_W       : natural := log2ceil(MAX_IMAGE_HEIGHT + 1);
 
-  signal sWidth     : unsigned(15 downto 0);
-  signal sHeight    : unsigned(15 downto 0);
+  signal sWidth     : unsigned(15 downto 0);                            -- [32, MAX_IMAGE_WIDTH], multiple of 4
+  signal sHeight    : unsigned(15 downto 0);                            -- [1, MAX_IMAGE_HEIGHT]
   signal sHold      : std_logic;                                      -- any skid FIFO almost full
 
   -- Config
   signal sCfgDone   : std_logic;
-  signal sNear      : unsigned(7 downto 0);
-  signal sRecip     : unsigned(BITNESS + 10 downto 0);
-  signal sRange     : unsigned(BITNESS downto 0);
-  signal sRangeD    : unsigned(BITNESS + 1 downto 0);
-  signal sQbpp      : unsigned(4 downto 0);
-  signal sAinit     : unsigned(BITNESS - 1 downto 0);
-  signal sT1        : unsigned(BITNESS - 1 downto 0);
-  signal sT2        : unsigned(BITNESS - 1 downto 0);
-  signal sT3        : unsigned(BITNESS - 1 downto 0);
+  signal sNear      : unsigned(7 downto 0);                             -- [0, NMAX] (nl_config)
+  signal sRecip     : unsigned(BITNESS + 10 downto 0);                  -- 1/(2*NEAR+1) (nl_config)
+  signal sRange     : unsigned(BITNESS downto 0);                       -- A.2 RANGE (nl_config)
+  signal sRangeD    : unsigned(BITNESS + 1 downto 0);                   -- [MAXVAL+1, MAXVAL+4*NEAR+1] (nl_config)
+  signal sQbpp      : unsigned(4 downto 0);                             -- [1, BITNESS]
+  signal sAinit     : unsigned(BITNESS - 1 downto 0);                   -- [2, 2^(BITNESS-5)]
+  signal sT1        : unsigned(BITNESS - 1 downto 0);                   -- C.2.4.1.1 thresholds (nl_config)
+  signal sT2        : unsigned(BITNESS - 1 downto 0);                   -- C.2.4.1.1 thresholds (nl_config)
+  signal sT3        : unsigned(BITNESS - 1 downto 0);                   -- C.2.4.1.1 thresholds (nl_config)
 
   -- Front end -> loop
   signal sClr       : std_logic;
-  signal sClrAddr   : unsigned(8 downto 0);
+  signal sClrAddr   : unsigned(8 downto 0);                             -- [0, 511]
 
   -- Kept by name in the netlist: the post-synth OSVVM TB probes it.
   attribute keep : string;
@@ -106,30 +85,30 @@ architecture rtl of nl_top is
   signal fFirstPix  : std_logic;
   signal fFirstCol  : std_logic;
   signal fEol       : std_logic;
-  signal fIx        : unsigned(BITNESS - 1 downto 0);
-  signal fRb        : unsigned(BITNESS - 1 downto 0);
-  signal fRc        : unsigned(BITNESS - 1 downto 0);
+  signal fIx        : unsigned(BITNESS - 1 downto 0);                   -- [0, MAXVAL]
+  signal fRb        : unsigned(BITNESS - 1 downto 0);                   -- [0, MAXVAL]
+  signal fRc        : unsigned(BITNESS - 1 downto 0);                   -- [0, MAXVAL]
   signal fQ12Zero   : std_logic;
-  signal fQ3Bound   : t_signed_array(0 to 7)(BITNESS + 1 downto 0);
-  signal fCandCtx   : t_unsigned_array(0 to 8)(CO_CTX_WIDTH - 1 downto 0);
+  signal fQ3Bound   : t_signed_array(0 to 7)(BITNESS + 1 downto 0);     -- nl_frontend bound ranges
+  signal fCandCtx   : t_unsigned_array(0 to 8)(CO_CTX_WIDTH - 1 downto 0);-- [0, 368]
   signal fCandSign  : std_logic_vector(0 to 8);
-  signal fCandC     : t_signed_array(0 to 8)(CO_C_WIDTH - 1 downto 0);
-  signal fCandB     : t_signed_array(0 to 8)(6 downto 0);
-  signal fCandN     : t_unsigned_array(0 to 8)(6 downto 0);
+  signal fCandC     : t_signed_array(0 to 8)(CO_C_WIDTH - 1 downto 0);  -- [MIN_C, MAX_C]
+  signal fCandB     : t_signed_array(0 to 8)(6 downto 0);               -- [1-N, 0]
+  signal fCandN     : t_unsigned_array(0 to 8)(6 downto 0);             -- [1, RESET]
 
   -- Loop exit
   signal xLoopValid : std_logic;                                     -- includes exits from before iRst
   signal xValid     : std_logic;
   signal xMode      : std_logic_vector(1 downto 0);
   signal xRiType    : std_logic;
-  signal xRx        : unsigned(BITNESS - 1 downto 0);
-  signal xErrval    : signed(BITNESS downto 0);
-  signal xCtx       : unsigned(CO_CTX_WIDTH - 1 downto 0);
-  signal xCq        : signed(CO_C_WIDTH - 1 downto 0);
-  signal xBq        : signed(6 downto 0);
-  signal xNq        : unsigned(6 downto 0);
-  signal xBpre      : signed(6 downto 0);
-  signal xNpre      : unsigned(6 downto 0);
+  signal xRx        : unsigned(BITNESS - 1 downto 0);                   -- [0, MAXVAL]
+  signal xErrval    : signed(BITNESS downto 0);                         -- A.9 range (nl_loop)
+  signal xCtx       : unsigned(CO_CTX_WIDTH - 1 downto 0);              -- [0, 368]
+  signal xCq        : signed(CO_C_WIDTH - 1 downto 0);                  -- [MIN_C, MAX_C]
+  signal xBq        : signed(6 downto 0);                               -- [1-N, 0]
+  signal xNq        : unsigned(6 downto 0);                             -- [1, RESET]
+  signal xBpre      : signed(6 downto 0);                               -- [1-N, 0]
+  signal xNpre      : unsigned(6 downto 0);                             -- [1, RESET]
   signal xNRes      : std_logic;
   signal xLane      : unsigned(1 downto 0);
   signal xFirstPix  : std_logic;
@@ -139,7 +118,7 @@ architecture rtl of nl_top is
   -- Back end
   signal bWord      : std_logic_vector(LIMIT - 1 downto 0);
   signal bValid     : std_logic;
-  signal bLen       : unsigned(LENW - 1 downto 0);
+  signal bLen       : unsigned(LENW - 1 downto 0);                      -- [0, LIMIT]
   signal bLane      : unsigned(1 downto 0);
   signal bLast      : std_logic;
 
@@ -159,15 +138,15 @@ architecture rtl of nl_top is
   signal sBsIn      : std_logic_vector(SKID_W - 1 downto 0);
   signal sBsWord    : std_logic_vector(BS_OUT_W - 1 downto 0);
   signal sBsValid   : std_logic;
-  signal sBsBytes   : unsigned(2 downto 0);
+  signal sBsBytes   : unsigned(2 downto 0);                             -- [0, 4]
   signal sBsDone    : std_logic;
   signal sFrReady   : std_logic;
   signal sFrWord    : std_logic_vector(OUT_WIDTH - 1 downto 0);
   signal sFrValid   : std_logic;
-  signal sFrBytes   : unsigned(OB_W - 1 downto 0);
+  signal sFrBytes   : unsigned(OB_W - 1 downto 0);                      -- [0, OUT_WIDTH/8]
   signal sFrLast    : std_logic;
   signal sOutRdy    : std_logic_vector(3 downto 0);
-  signal sImgOpen   : std_logic_vector(3 downto 0) := (others => '0');  -- ASSERTIONS only: lane between start and last word
+  signal sImgOpen   : std_logic_vector(3 downto 0) := (others => '0');  -- simulation only: lane between start and last word
 
   function bool2sl (
     b : boolean
@@ -347,7 +326,7 @@ begin
 
   sSkidIn <= bLast & std_logic_vector(bLen) & bWord;
 
-  -- Lane turn counter and per-lane start flags ----------------------------------------------------
+  -- Lane turn counter and per-lane start flags
   p_slot : process (iClk) is
   begin
 
@@ -371,7 +350,7 @@ begin
 
   end process p_slot;
 
-  -- Per lane skid FIFO, popped on the lane's turn ------------------------------------------------
+  -- Per lane skid FIFO, popped on the lane's turn
   gen_skid : for l in 0 to 3 generate
 
     signal sSkidWe  : std_logic;
@@ -409,7 +388,7 @@ begin
 
   sBsIn <= sSkidOut(to_integer(sSlot));
 
-  -- Shared stuffer + framer -----------------------------------------------------------------------
+  -- Shared stuffer + framer
   u_bs : entity work.byte_stuffer_nl
     generic map (
       IN_WIDTH            => LIMIT,
@@ -460,7 +439,7 @@ begin
       iReady       => sOutRdy(to_integer(sSlot))
     );
 
-  -- Per lane output FIFO, written on the lane's turn ---------------------------------------------
+  -- Per lane output FIFO, written on the lane's turn
   gen_out : for l in 0 to 3 generate
 
     signal sOutData : std_logic_vector(OUTF_W - 1 downto 0);
@@ -495,9 +474,8 @@ begin
 
   end generate gen_out;
 
-  -- ASSERTIONS -------------------------------------------------------------------------------
   -- Lane hand-off: one start per lane image, framed before the next; the back end
-  -- emits words of a lane only inside its image, and the last one once.
+  -- emits words of a lane only inside its image, and the last one once
   assert_proc : process (iClk) is
   begin
 
@@ -525,6 +503,14 @@ begin
     end if;
 
   end process assert_proc;
+
+  -- Wiring between blocks
+  postponed assert bValid /= '1' or is_x(bLen) or bLen <= LIMIT
+    report "nl_top: back-end word length past LIMIT" severity error;
+  postponed assert sBsValid /= '1' or is_x(sBsBytes) or sBsBytes <= BS_OUT_W / 8
+    report "nl_top: stuffer byte count past 4" severity error;
+  postponed assert sFrValid /= '1' or is_x(sFrBytes) or sFrBytes <= OUT_WIDTH / 8
+    report "nl_top: framer byte count past OUT_WIDTH/8" severity error;
 
   gen_psl : for l in 0 to 3 generate
   begin

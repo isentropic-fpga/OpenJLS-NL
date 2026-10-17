@@ -4,14 +4,7 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
---
--- Module Name: nl_pkg
--- Description: Shared types for the near-lossless core.
---
-----------------------------------------------------------------------------------
+-- nl_pkg: types and constants shared by the near-lossless core
 
 library ieee;
   use ieee.std_logic_1164.all;

@@ -6,7 +6,7 @@
 # commercial license. See LICENSE and README for details.
 #
 
-# Main OSVVM entry point — full NL regression, HTML reports and NVC
+# Main OSVVM entry point - full NL regression, HTML reports and NVC
 # statement+branch coverage of Sources/ (merged into NVC_CodeCoverage/html/).
 # The coverage helpers are shared with OpenJLS (submodule).
 #

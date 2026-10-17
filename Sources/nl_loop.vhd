@@ -4,47 +4,15 @@
 -- This file is part of OpenJLS. Available under GPLv3 or a
 -- commercial license. See LICENSE and README for details.
 --
-
-----------------------------------------------------------------------------------
--- Engineer:    Vitor Mendes Camilo
+-- nl_loop: T.87 A.4-A.9, A.12-A.14, A.17-A.19, the Ra -> Rx recurrence
 --
--- Module Name: nl_loop - Behavioral
---
--- Notes:
---              Near-lossless recurrence: everything that depends on Ra = Rx of the
---              previous pixel, or on C/B/N written back by it (same context).
---              Ra -> Q3 -> C[Q] -> Px -> Errval -> quantize -> Rx (A.4-A.8, A.14,
---              A.17-A.19) and Errval -> B, N -> C (A.9, A.12, A.13).
---
---              Pipeline: input register S0, then S1..S6. The loop is 4 cycles long:
---                Ra, run state  S4 -> S1
---                C              S5 -> S2
---                B, N           S6 -> S3
---              Slot k belongs to lane k mod 4. A lane is one stripe; a single
---              stream must leave 3 empty slots between pixels. State travels with
---              the slot, empty slots pass it through.
---
---              Pre-loop inputs (everything that does not depend on Ra):
---                iQ3Bound(k) : Q3 = -4 + #{k : Ra < iQ3Bound(k)}
---                              = Rc+T3, Rc+T2, Rc+T1, Rc+NEAR+1,
---                                Rc-NEAR, Rc-T1+1, Rc-T2+1, Rc-T3+1
---                iCand*(t)   : context of (Q1, Q2, Q3 = t-4) after sign merging,
---                              as read from the context RAM.
---
---              Only the last regular update of each lane is forwarded here;
---              the context RAM read must already reflect older writes.
---
--- Assumptions:
---              NEAR <= min(255, MAXVAL/2), RESET is even.
---              iRecip = ceil(2^(BITNESS+10) / (2*NEAR+1)).
---              Context candidates hold T.87 values: C in [-128, 127],
---              N in [1, RESET], B in [1-N, 0].
---
---              Ranges below are for worst-case generics (BITNESS 16, NEAR 255,
---              RESET 64); D = 2*NEAR+1, RANGE as in A.2. The ASSERTIONS block
---              checks them on every valid slot.
---
-----------------------------------------------------------------------------------
+-- Pipeline S0..S6 with a 4-cycle loop: Ra and run state S4 -> S1, C S5 -> S2, B and N S6 -> S3.
+-- Slot k belongs to lane k mod 4, so one stream needs 3 empty slots between pixels; empty slots
+-- pass the lane state through.
+-- Everything independent of Ra comes in precomputed: Q3 = -4 + #{k : Ra < iQ3Bound(k)}, and
+-- iCand*(t) is the context of Q3 = t - 4 after sign merging. Only the lane's last regular update
+-- is forwarded; the context RAM read must already hold older writes.
+-- Ranges are for BITNESS 16, NEAR 255, RESET 64; D = 2*NEAR + 1.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -92,7 +60,7 @@ entity nl_loop is
     oBpre     : out   signed;                                         -- before the update (A.10, A.11)
     oNpre     : out   unsigned;
     oNRes     : out   std_logic;                                      -- N = RESET before the update
-    -- Verification observation (Px of A.6 / A.18); left open in nl_top, pruned
+    -- Verification only, open in nl_top
     oPx       : out   unsigned(BITNESS - 1 downto 0)
   );
 end entity nl_loop;
@@ -115,7 +83,6 @@ architecture behavioral of nl_loop is
     lastCtx   : unsigned(CO_CTX_WIDTH - 1 downto 0);
   end record t_early;
 
-  -- One pipeline slot; fields not read past a stage are pruned by synthesis
   type t_pipe is record
     -- S0
     firstPix  : std_logic;
@@ -193,16 +160,15 @@ architecture behavioral of nl_loop is
 
   type t_pipe_array is array (0 to STAGES) of t_pipe;
 
-  -- Per image constants, registered
-  signal sNear         : signed(W - 1 downto 0);
-  signal sMaxVal       : signed(W - 1 downto 0);
-  signal sMaxP1        : signed(W - 1 downto 0);
-  signal sD            : unsigned(CO_D_WIDTH - 1 downto 0);
-  signal sRecip        : unsigned(BITNESS + 10 downto 0);
-  signal sRange        : signed(BITNESS downto 0);
-  signal sRangeD       : signed(W - 1 downto 0);
-  signal sHalf         : unsigned(BITNESS downto 0);
-  signal sRangeMHalf   : unsigned(BITNESS downto 0);
+  signal sNear         : signed(W - 1 downto 0);                    -- [0, NMAX]
+  signal sMaxVal       : signed(W - 1 downto 0);                    -- MAXVAL
+  signal sMaxP1        : signed(W - 1 downto 0);                    -- MAXVAL+1
+  signal sD            : unsigned(CO_D_WIDTH - 1 downto 0);         -- 2*NEAR+1: [1, 2*NMAX+1]
+  signal sRecip        : unsigned(BITNESS + 10 downto 0);           -- ceil(2^SH/D): [2^SH/(2*NMAX+1), 2^SH]
+  signal sRange        : signed(BITNESS downto 0);                  -- RANGE: [2, MAXVAL+1]
+  signal sRangeD       : signed(W - 1 downto 0);                    -- RANGE*D: [MAXVAL+1, MAXVAL+4*NEAR+1]
+  signal sHalf         : unsigned(BITNESS downto 0);                -- ceil(RANGE/2): [1, (MAXVAL+2)/2]
+  signal sRangeMHalf   : unsigned(BITNESS downto 0);                -- floor(RANGE/2): [1, (MAXVAL+1)/2]
 
   signal sValid        : std_logic_vector(0 to STAGES) := (others => '0');
   signal r             : t_pipe_array;
@@ -226,29 +192,28 @@ begin
 
     variable v      : t_pipe;
     variable vSt    : t_early;
-    variable vRa    : signed(W - 1 downto 0);
+    variable vRa    : signed(W - 1 downto 0);                         -- [0, MAXVAL]
     variable vT     : natural range 0 to 8;
     variable vMatch : std_logic_vector(0 to 8);
     variable vRaLeRb : boolean;
-    variable vMed   : signed(W - 1 downto 0);
-    variable vCs    : signed(W - 1 downto 0);
-    variable vDiff  : signed(W - 1 downto 0);
-    variable vMA    : signed(W - 1 downto 0);
-    variable vMB    : signed(W - 1 downto 0);
+    variable vMed   : signed(W - 1 downto 0);                         -- [0, MAXVAL] (A.5)
+    variable vCs    : signed(W - 1 downto 0);                         -- SIGN*C: [-127, 128]
+    variable vDiff  : signed(W - 1 downto 0);                         -- Ix-Px unclamped: [-MAXVAL-128, MAXVAL+127]
+    variable vMA    : signed(W - 1 downto 0);                         -- [-MAXVAL-128, MAXVAL+NEAR+127]
+    variable vMB    : signed(W - 1 downto 0);                         -- [-MAXVAL-128, MAXVAL+NEAR+128]
     variable vM     : signed(W - 1 downto 0);                         -- [0, MAXVAL+NEAR]
-    variable vDd    : signed(DW - 1 downto 0);
-    variable vQs    : signed(BITNESS + 1 downto 0);
-    variable vRxRaw : signed(W - 1 downto 0);
-    variable vOvT   : signed(W - 1 downto 0);
-    variable vN     : unsigned(NW - 1 downto 0);
-    variable vSum   : signed(W - 1 downto 0);
-    variable vN1    : signed(W - 1 downto 0);
-    variable vB1    : signed(W - 1 downto 0);
+    variable vDd    : signed(DW - 1 downto 0);                        -- D: [1, 2*NMAX+1]
+    variable vQs    : signed(BITNESS + 1 downto 0);                   -- q: [0, (MAXVAL+NEAR)/D]
+    variable vRxRaw : signed(W - 1 downto 0);                         -- Px+-q*D: [-MAXVAL-NEAR, 2*MAXVAL+NEAR]
+    variable vOvT   : signed(W - 1 downto 0);                         -- vRxRaw-MAXVAL-1
+    variable vN     : unsigned(NW - 1 downto 0);                      -- [1, RESET]
+    variable vSum   : signed(W - 1 downto 0);                         -- B+Errval*D: [1-RESET-RANGE/2*D, RANGE/2*D]
+    variable vN1    : signed(W - 1 downto 0);                         -- [2, RESET]
+    variable vB1    : signed(W - 1 downto 0);                         -- [1-N, 0] after the A.13 clamp
 
   begin
 
     if rising_edge(iClk) then
-      -- Config ------------------------------------------------------------------------------
       sNear       <= signed(resize(iNear, W));
       sMaxVal     <= signed(resize(iMaxVal, W));
       sMaxP1      <= signed(resize(iMaxVal, W)) + 1;
@@ -261,7 +226,7 @@ begin
 
       sValid <= iValid & sValid(0 to STAGES - 1);
 
-      -- S0: input register and precompute ---------------------------------------------------
+      -- S0: input register and precompute
       v           := r(0);
       v.firstPix  := iFirstPix;
       v.firstCol  := iFirstCol;
@@ -293,7 +258,7 @@ begin
       end loop;
       r(0) <= v;
 
-      -- S1: Ra, Q3, context select, MED -----------------------------------------------------
+      -- S1: Ra, Q3, context select, MED
       v   := r(0);
       vSt := r(4).st;
       if (v.firstPix = '1') then
@@ -371,7 +336,7 @@ begin
       end if;
       r(1) <= v;
 
-      -- S2: forward C, Px, error magnitude --------------------------------------------------
+      -- S2: forward C, Px, error magnitude
       v        := r(1);
       v.lastC  := r(5).lastC;
       v.lastCn := r(5).lastCn;
@@ -413,7 +378,7 @@ begin
       v.ePos := v.dirPos xor v.sign;
       r(2) <= v;
 
-      -- S3: q = m / (2*NEAR+1), forward B/N, C +-1 ------------------------------------------
+      -- S3: q = m / (2*NEAR+1), forward B/N, C +-1
       v   := r(2);
       v.q := resize(shift_right(v.m * sRecip, SH), BITNESS + 1);
       vDd := signed(resize(sD, DW));
@@ -455,7 +420,7 @@ begin
       v.n1 := vN + 1;
       r(3) <= v;
 
-      -- S4: Rx, Errval*(2*NEAR+1), modulo flags ---------------------------------------------
+      -- S4: Rx, Errval*(2*NEAR+1), modulo flags
       v      := r(3);
       vQs    := signed('0' & v.q);
       vRxRaw := v.px + resize(vQs * v.dS, W);
@@ -486,7 +451,7 @@ begin
       end if;
       r(4) <= v;
 
-      -- S5: B + Errval*(2*NEAR+1), C update, Errval -----------------------------------------
+      -- S5: B + Errval*(2*NEAR+1), C update, Errval
       v    := r(4);
       vSum := v.x + v.qdE;
       if (v.nRes = '1') then
@@ -530,7 +495,7 @@ begin
       end if;
       r(5) <= v;
 
-      -- S6: B update ------------------------------------------------------------------------
+      -- S6: B update
       v   := r(5);
       vN1 := signed(resize(v.n1, W));
       if (v.dec = '1') then
@@ -558,7 +523,6 @@ begin
 
   end process pipe_proc;
 
-  -- Loop exit ----------------------------------------------------------------------------------
   oValid  <= sValid(STAGES);
   oMode   <= "00" when r(STAGES).run = '0' else
              "01" when r(STAGES).hit = '1' else
@@ -575,9 +539,7 @@ begin
   oNRes   <= r(STAGES).nRes;
   oPx     <= unsigned(r(STAGES).px(BITNESS - 1 downto 0));
 
-  -- ASSERTIONS -------------------------------------------------------------------------------
-  -- G2 ranges of the registered pipeline nodes, on valid slots only (idle slots carry
-  -- whatever the input held, U before the first pixel).
+  -- Valid slots only: idle slots carry junk, U before the first pixel
   range_assert_proc : process (iClk) is
     variable vD   : integer;
     variable vSum : integer;
@@ -620,5 +582,16 @@ begin
       end if;
     end if;
   end process range_assert_proc;
+
+  postponed assert oValid /= '1' or is_x(oRx) or oRx <= iMaxVal
+    report "nl_loop: oRx above MAXVAL" severity error;
+  postponed assert oValid /= '1' or is_x(oErrval) or
+                   (oErrval >= -signed(resize(sRangeMHalf, BITNESS + 1)) and oErrval < signed(resize(sHalf, BITNESS + 1)))
+    report "nl_loop: oErrval outside the A.9 range" severity error;
+  postponed assert oValid /= '1' or oMode /= "00" or is_x(oNq) or (oNq >= 2 and oNq <= RESET)
+    report "nl_loop: oNq outside [2, RESET]" severity error;
+  postponed assert oValid /= '1' or oMode /= "00" or is_x(oBq) or is_x(oNq) or
+                   (oBq <= 0 and to_integer(oBq) + to_integer(oNq) > 0)
+    report "nl_loop: oBq outside [1-N, 0]" severity error;
 
 end architecture behavioral;
