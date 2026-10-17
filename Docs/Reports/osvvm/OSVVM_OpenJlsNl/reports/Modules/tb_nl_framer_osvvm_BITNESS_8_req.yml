@@ -1,0 +1,10 @@
+- Requirement: "NL.LaneFrame"
+  TestCases: 
+  - TestName: "tb_nl_framer_osvvm"
+    Status: PASSED
+    Results: {Goal: 256, Passed: 570, Errors: 0, Checked: 570, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Reset"
+  TestCases: 
+  - TestName: "tb_nl_framer_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 50, Errors: 0, Checked: 50, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

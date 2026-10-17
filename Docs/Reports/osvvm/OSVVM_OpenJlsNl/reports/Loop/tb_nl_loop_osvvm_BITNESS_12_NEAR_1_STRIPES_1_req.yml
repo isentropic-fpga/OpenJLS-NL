@@ -1,0 +1,70 @@
+- Requirement: "T87.A2"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 150, Passed: 15633, Errors: 0, Checked: 15633, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A8"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 14874, Errors: 0, Checked: 14874, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A4"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 14874, Errors: 0, Checked: 14874, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A5"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 14874, Errors: 0, Checked: 14874, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A6"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 14874, Errors: 0, Checked: 14874, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A7"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 14874, Errors: 0, Checked: 14874, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A9"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 20, Passed: 2051, Errors: 0, Checked: 2051, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A12"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 200, Passed: 59496, Errors: 0, Checked: 59496, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A13"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 100, Passed: 29748, Errors: 0, Checked: 29748, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A14"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 345, Errors: 0, Checked: 345, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A17"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 414, Errors: 0, Checked: 414, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A18"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 50, Passed: 414, Errors: 0, Checked: 414, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A19"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 100, Passed: 828, Errors: 0, Checked: 828, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.CtxForward"
+  TestCases: 
+  - TestName: "tb_nl_loop_osvvm"
+    Status: PASSED
+    Results: {Goal: 20, Passed: 2974, Errors: 0, Checked: 2974, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

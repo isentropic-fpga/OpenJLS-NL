@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenJLS-NL — verification report</title>
+<link rel="icon" href="assets/isentropic-icon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/report.css">
+<script src="assets/theme.js"></script>
+</head><body>
+<nav class="site-nav">
+  <a class="brand" href="https://isentropic.com.br" aria-label="Isentropic — home"><img class="wm-light" src="assets/isentropic-wordmark.svg" alt="Isentropic"><img class="wm-dark" src="assets/isentropic-wordmark-dark.svg" alt="Isentropic"></a>
+  <a class="nlink" href="https://github.com/isentropic-fpga/OpenJLS-NL">GitHub</a>
+  <button type="button" class="theme-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+    <svg class="ico-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    <svg class="ico-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+  </button>
+</nav>
+<main><div class="wrap">
+<div class="hero">
+  <span class="kicker">Verification report</span>
+  <h1><img class="wm-light" src="assets/openjls-nl-wordmark.svg" alt="OpenJLS-NL"><img class="wm-dark" src="assets/openjls-nl-wordmark-dark.svg" alt="OpenJLS-NL"></h1>
+  <p class="lede">Results from the project's own verification suites for the OpenJLS-NL near-lossless JPEG-LS (ISO/IEC 14495-1) encoder IP core. Open a row's report for per-test and per-image detail.</p>
+</div>
+<div class="tbl-scroll"><table>
+  <thead><tr><th>Suite</th><th>Status</th><th>Pass / cov</th><th>Summary</th><th>Report</th><th>Run date</th></tr></thead>
+  <tbody>
+    <tr><td class="suite">NVC code coverage</td><td><span class="badge info">INFO</span></td><td class="pct">100.0%</td><td>per-file breakdown in report</td><td><a href="coverage/index.html">view</a></td><td class="date">2026-10-17</td></tr>
+    <tr><td class="suite">OSVVM suite</td><td><span class="badge ok">PASS</span></td><td class="pct">100%</td><td>64 tests &middot; 27,670,819 affirmations</td><td><a href="osvvm/OSVVM_OpenJlsNl/OSVVM_OpenJlsNl.html">view</a></td><td class="date">2026-10-16</td></tr>
+    <tr><td class="suite">Golden model</td><td><span class="badge ok">PASS</span></td><td class="pct">100%</td><td>10919 of 10919 image x NEAR jobs byte-exact vs CharLS (250 images skipped)</td><td><a href="golden/index.html">view</a></td><td class="date">2026-10-17</td></tr>
+    <tr><td class="suite">Post-synth golden</td><td><span class="badge ok">PASS</span></td><td class="pct">100%</td><td>57 of 57 images byte-exact vs CharLS (<= 0.01 MP)</td><td><a href="post-synth/index.html">view</a></td><td class="date">2026-10-17</td></tr>
+  </tbody>
+</table></div>
+<p class="notes"> <strong>NVC code coverage.</strong> Statement coverage of the NL RTL (Sources/), unioned over every OSVVM test; the report breaks it down per source file. <strong>OSVVM suite.</strong> Testbenches of every NL block against independent reference models, plus the nl_top stress test, with requirements tracking. <strong>Golden model.</strong> RTL encode of the OpenJLS corpus and the NL corpus (images up to 0.5&nbsp;MP, depths 8&ndash;16, NEAR sweep), each of the 4 stripes compared byte-for-byte with CharLS. <strong>Post-synth golden.</strong> Smoke test: 8-bit images up to 0.01&nbsp;MP encoded on the synthesized gate-level netlist (BITNESS 8, 4096x4096, OUT_WIDTH 64) and compared per stripe with CharLS; the cap keeps gate-level simulation time bounded. The OSVVM and coverage reports are full HTML; the golden and post-synthesis pages list every image. Generated 2026-10-17 04:06 UTC by <code>Verification/OSVVM/publish_reports.sh</code>.</p>
+</div></main>
+<footer>
+  <span style="font-weight:600;color:var(--color-text);">Isentropic</span>
+  <a href="https://isentropic.com.br">isentropic.com.br</a>
+  <a href="mailto:contact@isentropic.com.br">contact@isentropic.com.br</a>
+  <a href="https://github.com/isentropic-fpga">GitHub</a>
+  <span>&copy; 2026</span>
+</footer>
+</body></html>

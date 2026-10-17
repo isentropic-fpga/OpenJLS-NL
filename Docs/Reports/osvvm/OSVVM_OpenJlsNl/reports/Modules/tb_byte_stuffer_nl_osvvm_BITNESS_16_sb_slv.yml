@@ -1,0 +1,35 @@
+Version: "0.1"
+TestCase: "tb_byte_stuffer_nl_osvvm"
+Scoreboards: 
+  - Name:         "lane SB(1)"
+    ParentName:   "OSVVM"
+    ItemCount:    7712
+    ErrorCount:   0
+    ItemsChecked: 6797
+    ItemsPopped:  7712
+    ItemsDropped: 0
+    FifoCount:    0
+  - Name:         "lane SB(2)"
+    ParentName:   "OSVVM"
+    ItemCount:    8986
+    ErrorCount:   0
+    ItemsChecked: 8115
+    ItemsPopped:  8986
+    ItemsDropped: 0
+    FifoCount:    0
+  - Name:         "lane SB(3)"
+    ParentName:   "OSVVM"
+    ItemCount:    7628
+    ErrorCount:   0
+    ItemsChecked: 6716
+    ItemsPopped:  7628
+    ItemsDropped: 0
+    FifoCount:    0
+  - Name:         "lane SB(4)"
+    ParentName:   "OSVVM"
+    ItemCount:    7926
+    ErrorCount:   0
+    ItemsChecked: 7054
+    ItemsPopped:  7926
+    ItemsDropped: 0
+    FifoCount:    0

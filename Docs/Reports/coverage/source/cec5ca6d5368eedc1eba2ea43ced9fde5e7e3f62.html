@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NVC code coverage report</title>
+  <style>
+:root {
+    --table-row-color: #e8e8e8;
+    --margin-left: 20%;
+}
+
+body {
+    background-color: #f0f0e0ff;
+}
+
+header {
+    padding: 0.5em;
+    text-align: center;
+    font-size: 14pt;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    word-wrap: break-word;
+}
+
+h3 {
+    word-wrap: break-word;
+    margin-bottom: 0px;
+}
+
+hr {
+    border:none;
+    height: 2px;
+    background: black;
+}
+
+footer {
+    display: table;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav {
+    float: left;
+    background-color: var(--table-row-color);
+    width: 17%;
+    overflow: auto;
+    padding: 10px;
+    margin-top: -2px;
+    border: 2px solid black;
+}
+nav details details {
+    margin-left: 1rem;
+}
+nav details > a {
+    padding-left: 1.9rem;
+    display: block;
+}
+nav summary {
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+}
+nav summary::before {
+    content: '▶';
+    font-size: 0.7em;
+    margin-right: 0.4em;
+}
+nav details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+table {
+    table-layout: fixed;
+}
+
+table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+    word-wrap: break-word;
+}
+
+.tabcontent {
+    display: none;
+    padding: 0px 0px;
+    border: 2px solid #ccc;
+    border-top: none;
+    word-wrap: break-word;
+}
+
+.tab {
+    overflow: hidden;
+    border: 2px solid;
+    margin-left: var(--margin-left);
+    margin-top: 10px;
+}
+
+.cbg:hover {
+    background-color: #dddddd;
+}
+.cbg {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+
+.cbt {
+    margin-top: 8px;
+}
+.cbt th {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+.cbt td, .cbt th {
+    width: 50px;
+    text-align: center;
+}
+.cbt td + td, .cbt th + th {
+    width: 150px;
+}
+.cbt td + td + td, .cbt th + th + th {
+    width: 150px;
+}
+.cbt td + td + td + td, .cbt th + th + th + th {
+    width: 150px;
+}
+
+.percent100 {
+    background-color: #00cc00;
+}
+.percent90 {
+    background-color: #e6e600;
+}
+.percent80 {
+    background-color: #ff9900;
+}
+.percent0 {
+    background-color: #ff0000;
+}
+.percentna {
+    background-color: #cccccc;
+}
+
+.nav-sel {
+    font-weight: bold;
+}
+  </style>
+</head>
+<body style="font-family: verdana">
+
+<header><h1 style="text-align: center;">NVC code coverage report
+</h1></header>
+
+<h2 style="text-align: left;">
+   File:&nbsp; ../../Sources/nl_backend.vhd
+</h2><pre><code>     0: &nbsp; --&nbsp;Copyright&nbsp;(C)&nbsp;2026&nbsp;Vitor&nbsp;Mendes&nbsp;Camilo&nbsp;
+     1: &nbsp; --&nbsp;SPDX-License-Identifier:&nbsp;GPL-3.0-only&nbsp;
+     2: &nbsp; --&nbsp;
+     3: &nbsp; --&nbsp;This&nbsp;file&nbsp;is&nbsp;part&nbsp;of&nbsp;OpenJLS.&nbsp;Available&nbsp;under&nbsp;GPLv3&nbsp;or&nbsp;a&nbsp;
+     4: &nbsp; --&nbsp;commercial&nbsp;license.&nbsp;See&nbsp;LICENSE&nbsp;and&nbsp;README&nbsp;for&nbsp;details.&nbsp;
+     5: &nbsp; --&nbsp;
+     6: &nbsp; &nbsp;
+     7: &nbsp; ----------------------------------------------------------------------------------&nbsp;
+     8: &nbsp; --&nbsp;Engineer:&nbsp;&nbsp;&nbsp;&nbsp;Vitor&nbsp;Mendes&nbsp;Camilo&nbsp;
+     9: &nbsp; --&nbsp;
+    10: &nbsp; --&nbsp;Module&nbsp;Name:&nbsp;nl_backend&nbsp;-&nbsp;Behavioral&nbsp;
+    11: &nbsp; --&nbsp;
+    12: &nbsp; --&nbsp;Notes:&nbsp;
+    13: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Entropy&nbsp;coding&nbsp;of&nbsp;the&nbsp;loop&nbsp;exit&nbsp;stream&nbsp;(4&nbsp;lanes,&nbsp;same-lane&nbsp;pixels&nbsp;
+    14: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at&nbsp;least&nbsp;4&nbsp;cycles&nbsp;apart),&nbsp;one&nbsp;shared&nbsp;pipeline&nbsp;of&nbsp;OpenJLS&nbsp;blocks:&nbsp;
+    15: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X0&nbsp;&nbsp;run&nbsp;coding&nbsp;(A.15/A.16&nbsp;NL&nbsp;copy,&nbsp;state&nbsp;per&nbsp;lane),&nbsp;A&nbsp;RAM&nbsp;read&nbsp;
+    16: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X2&nbsp;&nbsp;A&nbsp;RAM&nbsp;data,&nbsp;A/N/Nn&nbsp;update&nbsp;(A.12,&nbsp;A.23),&nbsp;TEMP&nbsp;(A.20)&nbsp;
+    17: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X3&nbsp;&nbsp;A&nbsp;RAM&nbsp;write,&nbsp;k&nbsp;(A.10)&nbsp;
+    18: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X4&nbsp;&nbsp;mapping&nbsp;(A.11,&nbsp;A.21,&nbsp;A.22)&nbsp;
+    19: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X5&nbsp;&nbsp;limited&nbsp;Golomb&nbsp;(A.11.1,&nbsp;NL&nbsp;copy:&nbsp;runtime&nbsp;QBPP)&nbsp;
+    20: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X6&nbsp;&nbsp;bit&nbsp;packer&nbsp;-&gt;&nbsp;oWord&nbsp;(lane&nbsp;tagged)&nbsp;
+    21: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;RAM&nbsp;per&nbsp;lane:&nbsp;{A,&nbsp;N,&nbsp;Nn};&nbsp;regular&nbsp;contexts&nbsp;use&nbsp;A&nbsp;only&nbsp;(B,&nbsp;N&nbsp;come&nbsp;
+    22: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;the&nbsp;loop),&nbsp;RI&nbsp;contexts&nbsp;live&nbsp;at&nbsp;address&nbsp;RItype.&nbsp;
+    23: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A.14&nbsp;(|Ix&nbsp;-&nbsp;Ra|&nbsp;&lt;=&nbsp;NEAR)&nbsp;is&nbsp;in&nbsp;the&nbsp;loop,&nbsp;iMode&nbsp;carries&nbsp;the&nbsp;result.&nbsp;
+    24: &nbsp; --&nbsp;
+    25: &nbsp; --&nbsp;Assumptions:&nbsp;
+    26: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iMode&nbsp;/=&nbsp;"11";&nbsp;no&nbsp;token&nbsp;while&nbsp;iClr&nbsp;=&nbsp;'1';&nbsp;a&nbsp;lane's&nbsp;tokens&nbsp;&gt;=&nbsp;4&nbsp;cycles&nbsp;
+    27: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apart;&nbsp;the&nbsp;next&nbsp;clear&nbsp;sweep&nbsp;starts&nbsp;&gt;=&nbsp;6&nbsp;cycles&nbsp;after&nbsp;the&nbsp;last&nbsp;token.&nbsp;
+    28: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Regular:&nbsp;iCtx&nbsp;in&nbsp;[4,&nbsp;368],&nbsp;iNpre&nbsp;in&nbsp;[1,&nbsp;RESET],&nbsp;iBpre&nbsp;in&nbsp;[1-iNpre,&nbsp;0].&nbsp;
+    29: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Errval&nbsp;in&nbsp;[-2^(BITNESS-1),&nbsp;2^(BITNESS-1)-1]&nbsp;(A.9&nbsp;reduced),&nbsp;/=&nbsp;0&nbsp;for&nbsp;
+    30: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RItype&nbsp;=&nbsp;1.&nbsp;A&nbsp;lane&nbsp;in&nbsp;a&nbsp;run&nbsp;(RUNcnt&nbsp;&gt;&nbsp;0)&nbsp;gets&nbsp;only&nbsp;run&nbsp;tokens.&nbsp;
+    31: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;lane&nbsp;line&nbsp;has&nbsp;&lt;=&nbsp;16383&nbsp;pixels&nbsp;(nl_top:&nbsp;width&nbsp;&lt;=&nbsp;65532,&nbsp;4&nbsp;lanes),&nbsp;so&nbsp;
+    32: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RUNcnt&nbsp;&lt;=&nbsp;16383&nbsp;and&nbsp;RUNindex&nbsp;&lt;=&nbsp;30&nbsp;(a&nbsp;J&nbsp;=&nbsp;15&nbsp;segment&nbsp;needs&nbsp;32768).&nbsp;
+    33: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;ASSERTIONS&nbsp;block&nbsp;checks&nbsp;them.&nbsp;
+    34: &nbsp; --&nbsp;
+    35: &nbsp; ----------------------------------------------------------------------------------&nbsp;
+    36: &nbsp; &nbsp;
+    37: &nbsp; library&nbsp;ieee;&nbsp;
+    38: &nbsp; &nbsp;&nbsp;use&nbsp;ieee.std_logic_1164.all;&nbsp;
+    39: &nbsp; &nbsp;&nbsp;use&nbsp;ieee.numeric_std.all;&nbsp;
+    40: &nbsp; &nbsp;&nbsp;use&nbsp;work.nl_pkg.all;&nbsp;
+    41: &nbsp; &nbsp;
+    42: &nbsp; library&nbsp;work;&nbsp;
+    43: &nbsp; &nbsp;&nbsp;use&nbsp;work.olo_base_pkg_math.log2ceil;&nbsp;
+    44: &nbsp; &nbsp;
+    45: &nbsp; entity&nbsp;nl_backend&nbsp;is&nbsp;
+    46: &nbsp; &nbsp;&nbsp;generic&nbsp;(&nbsp;
+    47: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;BITNESS&nbsp;:&nbsp;natural&nbsp;range&nbsp;8&nbsp;to&nbsp;16&nbsp;:=&nbsp;12;&nbsp;
+    48: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;RESET&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;64&nbsp;
+    49: &nbsp; &nbsp;&nbsp;);&nbsp;
+    50: &nbsp; &nbsp;&nbsp;port&nbsp;(&nbsp;
+    51: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iClk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    52: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRst&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    53: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Per&nbsp;image&nbsp;
+    54: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iNear&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(7&nbsp;downto&nbsp;0);&nbsp;
+    55: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iQbpp&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+    56: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iAinit&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    57: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iClr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    58: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iClrAddr&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(8&nbsp;downto&nbsp;0);&nbsp;
+    59: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Loop&nbsp;exit&nbsp;+&nbsp;tags&nbsp;
+    60: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iValid&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    61: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iMode&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic_vector(1&nbsp;downto&nbsp;0);&nbsp;
+    62: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRiType&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    63: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iErrval&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;signed(BITNESS&nbsp;downto&nbsp;0);&nbsp;
+    64: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iCtx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    65: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iBpre&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;signed(6&nbsp;downto&nbsp;0);&nbsp;
+    66: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iNpre&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(6&nbsp;downto&nbsp;0);&nbsp;
+    67: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iLane&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(1&nbsp;downto&nbsp;0);&nbsp;
+    68: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iLastPix&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    69: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iEol&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    70: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Bit&nbsp;packer&nbsp;output&nbsp;
+    71: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oWord&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic_vector(2&nbsp;*&nbsp;(BITNESS&nbsp;+&nbsp;maximum(8,&nbsp;BITNESS))&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    72: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oValid&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    73: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oLen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned(log2ceil(2&nbsp;*&nbsp;(BITNESS&nbsp;+&nbsp;maximum(8,&nbsp;BITNESS))&nbsp;+&nbsp;1)&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    74: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oLane&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned(1&nbsp;downto&nbsp;0);&nbsp;
+    75: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oLast&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic&nbsp;
+    76: &nbsp; &nbsp;&nbsp;);&nbsp;
+    77: &nbsp; end&nbsp;entity&nbsp;nl_backend;&nbsp;
+    78: &nbsp; &nbsp;
+    79: &nbsp; architecture&nbsp;behavioral&nbsp;of&nbsp;nl_backend&nbsp;is&nbsp;
+    80: &nbsp; &nbsp;
+    81: &nbsp; &nbsp;&nbsp;constant&nbsp;LIMIT&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;2&nbsp;*&nbsp;(BITNESS&nbsp;+&nbsp;maximum(8,&nbsp;BITNESS));&nbsp;
+    82: &nbsp; &nbsp;&nbsp;constant&nbsp;AWID&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;BITNESS&nbsp;+&nbsp;7;&nbsp;
+    83: &nbsp; &nbsp;&nbsp;constant&nbsp;NWID&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;7;&nbsp;
+    84: &nbsp; &nbsp;&nbsp;constant&nbsp;KWID&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;log2ceil(AWID&nbsp;+&nbsp;1);&nbsp;
+    85: &nbsp; &nbsp;&nbsp;constant&nbsp;MW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;BITNESS&nbsp;+&nbsp;2;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;mapped&nbsp;error&nbsp;width&nbsp;
+    86: &nbsp; &nbsp;&nbsp;constant&nbsp;UW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;log2ceil(LIMIT);&nbsp;
+    87: &nbsp; &nbsp;&nbsp;constant&nbsp;SUFW&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;AWID;&nbsp;
+    88: &nbsp; &nbsp;&nbsp;constant&nbsp;WORD_W&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;AWID&nbsp;+&nbsp;2&nbsp;*&nbsp;NWID;&nbsp;
+    89: &nbsp; &nbsp;&nbsp;constant&nbsp;RUN_CNT&nbsp;:&nbsp;natural&nbsp;:=&nbsp;16;&nbsp;
+    90: &nbsp; &nbsp;
+    91: &nbsp; &nbsp;&nbsp;type&nbsp;t_stage&nbsp;is&nbsp;record&nbsp;
+    92: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;valid&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+    93: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(1&nbsp;downto&nbsp;0);&nbsp;
+    94: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ritype&nbsp;:&nbsp;std_logic;&nbsp;
+    95: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;errval&nbsp;:&nbsp;signed(BITNESS&nbsp;downto&nbsp;0);&nbsp;
+    96: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ctx&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    97: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bpre&nbsp;&nbsp;&nbsp;:&nbsp;signed(6&nbsp;downto&nbsp;0);&nbsp;
+    98: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;npre&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    99: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lane&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(1&nbsp;downto&nbsp;0);&nbsp;
+   100: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;last&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   101: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;eol&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   102: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;run&nbsp;coding&nbsp;
+   103: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rawv&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   104: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rawlen&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   105: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rawval&nbsp;:&nbsp;unsigned(RUN_CNT&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   106: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;runidx&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   107: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;A.10&nbsp;/&nbsp;mapping&nbsp;
+   108: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   109: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;nn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   110: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;temp&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(AWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   111: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;k&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(KWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   112: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;merr&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(MW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   113: &nbsp; &nbsp;&nbsp;end&nbsp;record&nbsp;t_stage;&nbsp;
+   114: &nbsp; &nbsp;
+   115: &nbsp; &nbsp;&nbsp;type&nbsp;t_pipe&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;5)&nbsp;of&nbsp;t_stage;&nbsp;
+   116: &nbsp; &nbsp;
+   117: &nbsp; &nbsp;&nbsp;type&nbsp;t_cnt_array&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;3)&nbsp;of&nbsp;unsigned(RUN_CNT&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   118: &nbsp; &nbsp;&nbsp;type&nbsp;t_bound_array&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;3)&nbsp;of&nbsp;unsigned(RUN_CNT&nbsp;downto&nbsp;0);&nbsp;
+   119: &nbsp; &nbsp;&nbsp;type&nbsp;t_idx_array&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;3)&nbsp;of&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   120: &nbsp; &nbsp;&nbsp;type&nbsp;t_word_array&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;3)&nbsp;of&nbsp;std_logic_vector(WORD_W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   121: &nbsp; &nbsp;
+   122: &nbsp; &nbsp;&nbsp;signal&nbsp;r&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_pipe;&nbsp;
+   123: &nbsp; &nbsp;
+   124: &nbsp; &nbsp;&nbsp;--&nbsp;X0&nbsp;run&nbsp;coding&nbsp;
+   125: &nbsp; &nbsp;&nbsp;signal&nbsp;sL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;range&nbsp;0&nbsp;to&nbsp;3;&nbsp;
+   126: &nbsp; &nbsp;&nbsp;signal&nbsp;sRun&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   127: &nbsp; &nbsp;&nbsp;signal&nbsp;sHit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   128: &nbsp; &nbsp;&nbsp;signal&nbsp;sCont&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   129: &nbsp; &nbsp;&nbsp;signal&nbsp;sEoi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   130: &nbsp; &nbsp;&nbsp;signal&nbsp;sRunCnt&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_cnt_array;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;per&nbsp;lane:&nbsp;A.14&nbsp;RUNcnt&nbsp;[0,&nbsp;16383]&nbsp;
+   131: &nbsp; &nbsp;&nbsp;signal&nbsp;sRunIdx&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_idx_array;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;RUNindex&nbsp;[0,&nbsp;30]&nbsp;(line&nbsp;&lt;=&nbsp;16383)&nbsp;
+   132: &nbsp; &nbsp;&nbsp;signal&nbsp;sBound&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_bound_array;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;&nbsp;&nbsp;A.15&nbsp;next&nbsp;boundary&nbsp;
+   133: &nbsp; &nbsp;&nbsp;signal&nbsp;sCntIn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(RUN_CNT&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   134: &nbsp; &nbsp;&nbsp;signal&nbsp;sIdxNext&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   135: &nbsp; &nbsp;&nbsp;signal&nbsp;sBoundNext&nbsp;:&nbsp;unsigned(RUN_CNT&nbsp;downto&nbsp;0);&nbsp;
+   136: &nbsp; &nbsp;&nbsp;signal&nbsp;sRawV&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   137: &nbsp; &nbsp;&nbsp;signal&nbsp;sGolV&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic&nbsp;:=&nbsp;'0';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;a11_1&nbsp;iValid,&nbsp;registered&nbsp;with&nbsp;r(5)&nbsp;
+   138: &nbsp; &nbsp;&nbsp;signal&nbsp;sRawLen&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   139: &nbsp; &nbsp;&nbsp;signal&nbsp;sRawVal&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(RUN_CNT&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   140: &nbsp; &nbsp;&nbsp;signal&nbsp;sRunIdxOut&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   141: &nbsp; &nbsp;
+   142: &nbsp; &nbsp;&nbsp;--&nbsp;X2&nbsp;context&nbsp;update&nbsp;
+   143: &nbsp; &nbsp;&nbsp;signal&nbsp;sRdAddr&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(8&nbsp;downto&nbsp;0);&nbsp;
+   144: &nbsp; &nbsp;&nbsp;signal&nbsp;sRd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_word_array;&nbsp;
+   145: &nbsp; &nbsp;&nbsp;signal&nbsp;sWord&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(WORD_W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   146: &nbsp; &nbsp;&nbsp;signal&nbsp;sAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(AWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;RESET*2^(BITNESS-1)]&nbsp;
+   147: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiErr&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BITNESS&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;A.23&nbsp;inputs,&nbsp;one&nbsp;snapshot&nbsp;
+   148: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiRt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   149: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiAqIn&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(AWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   150: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiNqIn&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   151: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiNnIn&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   152: &nbsp; &nbsp;&nbsp;signal&nbsp;sNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1,&nbsp;RESET]&nbsp;
+   153: &nbsp; &nbsp;&nbsp;signal&nbsp;sNn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;RESET-1]&nbsp;
+   154: &nbsp; &nbsp;&nbsp;signal&nbsp;sN2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   155: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiType&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;RItype&nbsp;of&nbsp;valid&nbsp;RI&nbsp;tokens,&nbsp;else&nbsp;0&nbsp;(A.23&nbsp;sees&nbsp;all&nbsp;cycles)&nbsp;
+   156: &nbsp; &nbsp;&nbsp;signal&nbsp;sTemp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(AWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   157: &nbsp; &nbsp;&nbsp;signal&nbsp;sRegAq&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(AWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   158: &nbsp; &nbsp;&nbsp;signal&nbsp;sRegNq&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   159: &nbsp; &nbsp;&nbsp;signal&nbsp;sRegBq&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(6&nbsp;downto&nbsp;0);&nbsp;
+   160: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(AWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   161: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   162: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiNn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   163: &nbsp; &nbsp;&nbsp;signal&nbsp;sWe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(0&nbsp;to&nbsp;3);&nbsp;
+   164: &nbsp; &nbsp;&nbsp;signal&nbsp;sWrAddr&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(8&nbsp;downto&nbsp;0);&nbsp;
+   165: &nbsp; &nbsp;&nbsp;signal&nbsp;sWrData&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(WORD_W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   166: &nbsp; &nbsp;&nbsp;signal&nbsp;sAWe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   167: &nbsp; &nbsp;&nbsp;signal&nbsp;sAWrAddr&nbsp;&nbsp;:&nbsp;unsigned(8&nbsp;downto&nbsp;0);&nbsp;
+   168: &nbsp; &nbsp;&nbsp;signal&nbsp;sAWrData&nbsp;&nbsp;:&nbsp;std_logic_vector(WORD_W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   169: &nbsp; &nbsp;&nbsp;signal&nbsp;sAWrLane&nbsp;&nbsp;:&nbsp;unsigned(1&nbsp;downto&nbsp;0);&nbsp;
+   170: &nbsp; &nbsp;
+   171: &nbsp; &nbsp;&nbsp;--&nbsp;X3&nbsp;..&nbsp;X5&nbsp;
+   172: &nbsp; &nbsp;&nbsp;signal&nbsp;sK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(KWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;BITNESS]&nbsp;on&nbsp;valid&nbsp;tokens&nbsp;
+   173: &nbsp; &nbsp;&nbsp;signal&nbsp;sBqMap&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(6&nbsp;downto&nbsp;0);&nbsp;
+   174: &nbsp; &nbsp;&nbsp;signal&nbsp;sRegMerr&nbsp;&nbsp;:&nbsp;unsigned(MW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   175: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiMap&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   176: &nbsp; &nbsp;&nbsp;signal&nbsp;sRiMerr&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(MW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   177: &nbsp; &nbsp;&nbsp;signal&nbsp;sUnary&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(UW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   178: &nbsp; &nbsp;&nbsp;signal&nbsp;sSufLen&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   179: &nbsp; &nbsp;&nbsp;signal&nbsp;sSufVal&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(SUFW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   180: &nbsp; &nbsp;
+   181: &nbsp; &nbsp;&nbsp;--&nbsp;X6&nbsp;bit&nbsp;packer&nbsp;inputs&nbsp;
+   182: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpRawV&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   183: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpRawLen&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   184: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpRawVal&nbsp;:&nbsp;unsigned(SUFW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   185: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpGolV&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   186: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpUnary&nbsp;&nbsp;:&nbsp;unsigned(UW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   187: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpSufLen&nbsp;:&nbsp;unsigned(4&nbsp;downto&nbsp;0);&nbsp;
+   188: &nbsp; &nbsp;&nbsp;signal&nbsp;sBpSufVal&nbsp;:&nbsp;unsigned(SUFW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   189: &nbsp; &nbsp;&nbsp;signal&nbsp;sTagLane&nbsp;&nbsp;:&nbsp;unsigned(1&nbsp;downto&nbsp;0);&nbsp;
+   190: &nbsp; &nbsp;&nbsp;signal&nbsp;sTagLast&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   191: &nbsp; &nbsp;
+   192: &nbsp; &nbsp;&nbsp;function&nbsp;bool2sl&nbsp;(&nbsp;
+   193: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;b&nbsp;:&nbsp;boolean&nbsp;
+   194: &nbsp; &nbsp;&nbsp;)&nbsp;return&nbsp;std_logic&nbsp;is&nbsp;
+   195: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   196: &nbsp; &nbsp;
+   197: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(b)&nbsp;then&nbsp;
+   198: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;'1';&nbsp;
+   199: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   200: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;'0';&nbsp;
+   201: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   202: &nbsp; &nbsp;
+   203: &nbsp; &nbsp;&nbsp;end&nbsp;function&nbsp;bool2sl;&nbsp;
+   204: &nbsp; &nbsp;
+   205: &nbsp; begin&nbsp;
+   206: &nbsp; &nbsp;
+   207: &nbsp; &nbsp;&nbsp;pipe_proc&nbsp;:&nbsp;process&nbsp;(iClk)&nbsp;is&nbsp;
+   208: &nbsp; &nbsp;
+   209: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vS&nbsp;:&nbsp;t_stage;&nbsp;
+   210: &nbsp; &nbsp;
+   211: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   212: &nbsp; &nbsp;
+   213: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;rising_edge(iClk)&nbsp;then&nbsp;
+   214: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Input&nbsp;register&nbsp;------------------------------------------------------------------------&nbsp;
+   215: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).valid&nbsp;&nbsp;&lt;=&nbsp;iValid;&nbsp;
+   216: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).mode&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iMode;&nbsp;
+   217: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).ritype&nbsp;&lt;=&nbsp;iRiType;&nbsp;
+   218: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).errval&nbsp;&lt;=&nbsp;iErrval;&nbsp;
+   219: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).ctx&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iCtx;&nbsp;
+   220: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).bpre&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iBpre;&nbsp;
+   221: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).npre&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iNpre;&nbsp;
+   222: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).lane&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iLane;&nbsp;
+   223: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).last&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iLastPix;&nbsp;
+   224: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0).eol&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iEol;&nbsp;
+   225: &nbsp; &nbsp;
+   226: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;X0:&nbsp;run&nbsp;coding&nbsp;tokens&nbsp;of&nbsp;the&nbsp;current&nbsp;lane&nbsp;---------------------------------------------&nbsp;
+   227: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;r(0);&nbsp;
+   228: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.rawv&nbsp;&nbsp;&nbsp;:=&nbsp;sRawV;&nbsp;
+   229: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.rawlen&nbsp;:=&nbsp;sRawLen;&nbsp;
+   230: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.rawval&nbsp;:=&nbsp;sRawVal;&nbsp;
+   231: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.runidx&nbsp;:=&nbsp;sRunIdxOut;&nbsp;
+   232: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;vS;&nbsp;
+   233: &nbsp; &nbsp;
+   234: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(2)&nbsp;&lt;=&nbsp;r(1);&nbsp;
+   235: &nbsp; &nbsp;
+   236: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;X2:&nbsp;context&nbsp;update&nbsp;(A.12&nbsp;regular&nbsp;A,&nbsp;A.23&nbsp;RI),&nbsp;TEMP&nbsp;(A.20)&nbsp;------------------------------&nbsp;
+   237: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;r(2);&nbsp;
+   238: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;sN2;&nbsp;
+   239: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.nn&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;sNn;&nbsp;
+   240: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.temp&nbsp;&nbsp;:=&nbsp;sTemp;&nbsp;
+   241: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(2).valid&nbsp;and&nbsp;bool2sl(r(2).mode&nbsp;/=&nbsp;"01");&nbsp;
+   242: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWrLane&nbsp;&lt;=&nbsp;r(2).lane;&nbsp;
+   243: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(r(2).mode&nbsp;=&nbsp;"00")&nbsp;then&nbsp;
+   244: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWrAddr&nbsp;&lt;=&nbsp;r(2).ctx;&nbsp;
+   245: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWrData&nbsp;&lt;=&nbsp;std_logic_vector(sRegAq)&nbsp;&amp;&nbsp;std_logic_vector(sRegNq)&nbsp;&amp;&nbsp;std_logic_vector(sNn);&nbsp;
+   246: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   247: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWrAddr&nbsp;&lt;=&nbsp;(0&nbsp;=&gt;&nbsp;r(2).ritype,&nbsp;others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   248: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWrData&nbsp;&lt;=&nbsp;std_logic_vector(sRiAq)&nbsp;&amp;&nbsp;std_logic_vector(sRiNq)&nbsp;&amp;&nbsp;std_logic_vector(sRiNn);&nbsp;
+   249: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   250: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(3)&nbsp;&lt;=&nbsp;vS;&nbsp;
+   251: &nbsp; &nbsp;
+   252: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;X3:&nbsp;k&nbsp;(A.10)&nbsp;----------------------------------------------------------------------------&nbsp;
+   253: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS&nbsp;&nbsp;&nbsp;:=&nbsp;r(3);&nbsp;
+   254: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.k&nbsp;:=&nbsp;sK;&nbsp;
+   255: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(4)&nbsp;&lt;=&nbsp;vS;&nbsp;
+   256: &nbsp; &nbsp;
+   257: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;X4:&nbsp;mapped&nbsp;error&nbsp;(A.11&nbsp;regular,&nbsp;A.21/A.22&nbsp;RI)&nbsp;--------------------------------------------&nbsp;
+   258: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS&nbsp;:=&nbsp;r(4);&nbsp;
+   259: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(r(4).mode&nbsp;=&nbsp;"00")&nbsp;then&nbsp;
+   260: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.merr&nbsp;:=&nbsp;sRegMerr;&nbsp;
+   261: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   262: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vS.merr&nbsp;:=&nbsp;sRiMerr;&nbsp;
+   263: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   264: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(5)&nbsp;&lt;=&nbsp;vS;&nbsp;
+   265: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sGolV&nbsp;&lt;=&nbsp;vS.valid&nbsp;and&nbsp;bool2sl(vS.mode&nbsp;/=&nbsp;"01");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;same&nbsp;delta&nbsp;as&nbsp;r(5)&nbsp;
+   266: &nbsp; &nbsp;
+   267: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;X5:&nbsp;limited&nbsp;Golomb&nbsp;(A.11.1)&nbsp;-&gt;&nbsp;bit&nbsp;packer&nbsp;-------------------------------------------------&nbsp;
+   268: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpRawV&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(5).valid&nbsp;and&nbsp;r(5).rawv;&nbsp;
+   269: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpRawLen&nbsp;&lt;=&nbsp;r(5).rawlen;&nbsp;
+   270: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpRawVal&nbsp;&lt;=&nbsp;resize(r(5).rawval,&nbsp;SUFW);&nbsp;
+   271: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpGolV&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(5).valid&nbsp;and&nbsp;bool2sl(r(5).mode&nbsp;/=&nbsp;"01");&nbsp;
+   272: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpUnary&nbsp;&nbsp;&lt;=&nbsp;sUnary;&nbsp;
+   273: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpSufLen&nbsp;&lt;=&nbsp;sSufLen;&nbsp;
+   274: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpSufVal&nbsp;&lt;=&nbsp;sSufVal;&nbsp;
+   275: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Last&nbsp;pixel&nbsp;always&nbsp;gives&nbsp;a&nbsp;word&nbsp;(EOL&nbsp;hit&nbsp;or&nbsp;coded&nbsp;sample)&nbsp;
+   276: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sTagLane&nbsp;&lt;=&nbsp;r(5).lane;&nbsp;
+   277: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sTagLast&nbsp;&lt;=&nbsp;r(5).valid&nbsp;and&nbsp;r(5).last;&nbsp;
+   278: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oLane&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;sTagLane;&nbsp;
+   279: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oLast&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;sTagLast;&nbsp;
+   280: &nbsp; &nbsp;
+   281: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRst&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   282: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;0&nbsp;to&nbsp;5&nbsp;loop&nbsp;
+   283: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(i).valid&nbsp;&lt;=&nbsp;'0';&nbsp;
+   284: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   285: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWe&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;'0';&nbsp;
+   286: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpRawV&nbsp;&lt;=&nbsp;'0';&nbsp;
+   287: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBpGolV&nbsp;&lt;=&nbsp;'0';&nbsp;
+   288: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sGolV&nbsp;&nbsp;&nbsp;&lt;=&nbsp;'0';&nbsp;
+   289: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   290: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   291: &nbsp; &nbsp;
+   292: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;pipe_proc;&nbsp;
+   293: &nbsp; &nbsp;
+   294: &nbsp; &nbsp;&nbsp;--&nbsp;X0:&nbsp;one&nbsp;A.15/A.16&nbsp;for&nbsp;all&nbsp;lanes,&nbsp;run&nbsp;state&nbsp;per&nbsp;lane.&nbsp;RUNcnt&nbsp;is&nbsp;the&nbsp;A.14&nbsp;
+   295: &nbsp; &nbsp;&nbsp;--&nbsp;count;&nbsp;a&nbsp;lane's&nbsp;state&nbsp;clears&nbsp;after&nbsp;its&nbsp;last&nbsp;pixel.&nbsp;
+   296: &nbsp; &nbsp;&nbsp;sL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;to_integer(r(0).lane);&nbsp;
+   297: &nbsp; &nbsp;&nbsp;sRun&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(0).valid&nbsp;and&nbsp;bool2sl(r(0).mode&nbsp;=&nbsp;"01"&nbsp;or&nbsp;r(0).mode&nbsp;=&nbsp;"10");&nbsp;
+   298: &nbsp; &nbsp;&nbsp;sHit&nbsp;&nbsp;&nbsp;&lt;=&nbsp;bool2sl(r(0).mode&nbsp;=&nbsp;"01");&nbsp;
+   299: &nbsp; &nbsp;&nbsp;sCont&nbsp;&nbsp;&lt;=&nbsp;sHit&nbsp;and&nbsp;not&nbsp;r(0).eol;&nbsp;
+   300: &nbsp; &nbsp;&nbsp;sEoi&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(0).valid&nbsp;and&nbsp;r(0).last;&nbsp;
+   301: &nbsp; &nbsp;&nbsp;sCntIn&nbsp;&lt;=&nbsp;sRunCnt(sL)&nbsp;+&nbsp;1&nbsp;when&nbsp;sHit&nbsp;=&nbsp;'1'&nbsp;else&nbsp;
+   302: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunCnt(sL);&nbsp;
+   303: &nbsp; &nbsp;
+   304: &nbsp; &nbsp;&nbsp;p_run_state&nbsp;:&nbsp;process&nbsp;(iClk)&nbsp;is&nbsp;
+   305: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   306: &nbsp; &nbsp;
+   307: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;rising_edge(iClk)&nbsp;then&nbsp;
+   308: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sEoi&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   309: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunCnt(sL)&nbsp;&lt;=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   310: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunIdx(sL)&nbsp;&lt;=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   311: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBound(sL)&nbsp;&nbsp;&lt;=&nbsp;to_unsigned(1,&nbsp;RUN_CNT&nbsp;+&nbsp;1);&nbsp;
+   312: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(sRun&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   313: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sCont&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   314: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunCnt(sL)&nbsp;&lt;=&nbsp;sCntIn;&nbsp;
+   315: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   316: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunCnt(sL)&nbsp;&lt;=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   317: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   318: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunIdx(sL)&nbsp;&lt;=&nbsp;sIdxNext;&nbsp;
+   319: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBound(sL)&nbsp;&nbsp;&lt;=&nbsp;sBoundNext;&nbsp;
+   320: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   321: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRst&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   322: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunCnt&nbsp;&lt;=&nbsp;(others&nbsp;=&gt;&nbsp;(others&nbsp;=&gt;&nbsp;'0'));&nbsp;
+   323: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRunIdx&nbsp;&lt;=&nbsp;(others&nbsp;=&gt;&nbsp;(others&nbsp;=&gt;&nbsp;'0'));&nbsp;
+   324: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sBound&nbsp;&nbsp;&lt;=&nbsp;(others&nbsp;=&gt;&nbsp;to_unsigned(1,&nbsp;RUN_CNT&nbsp;+&nbsp;1));&nbsp;
+   325: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   326: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   327: &nbsp; &nbsp;
+   328: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;p_run_state;&nbsp;
+   329: &nbsp; &nbsp;
+   330: &nbsp; &nbsp;&nbsp;u_a15_16&nbsp;:&nbsp;entity&nbsp;work.a15_a16_nl_encode_run(behavioral)&nbsp;
+   331: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   332: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BITNESS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;BITNESS,&nbsp;
+   333: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RUN_CNT_WIDTH&nbsp;&nbsp;=&gt;&nbsp;RUN_CNT&nbsp;
+   334: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   335: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   336: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRst&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iRst,&nbsp;
+   337: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRunIndex&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRunIdx(sL),&nbsp;
+   338: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNextBound&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBound(sL),&nbsp;
+   339: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iInRun&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;'0',&nbsp;
+   340: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRunIndexNext&nbsp;&nbsp;=&gt;&nbsp;sIdxNext,&nbsp;
+   341: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oNextBoundNext&nbsp;=&gt;&nbsp;sBoundNext,&nbsp;
+   342: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRunCnt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sCntIn,&nbsp;
+   343: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRunHit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sHit,&nbsp;
+   344: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRunContinue&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sCont,&nbsp;
+   345: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iModeIsRun&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRun,&nbsp;
+   346: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iIx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;(others&nbsp;=&gt;&nbsp;'0'),&nbsp;
+   347: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;(others&nbsp;=&gt;&nbsp;'0'),&nbsp;
+   348: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;(others&nbsp;=&gt;&nbsp;'0'),&nbsp;
+   349: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRawValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRawV,&nbsp;
+   350: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRawSuffixLen&nbsp;&nbsp;=&gt;&nbsp;sRawLen,&nbsp;
+   351: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRawSuffixVal&nbsp;&nbsp;=&gt;&nbsp;sRawVal,&nbsp;
+   352: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRiValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;open,&nbsp;
+   353: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRiIx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;open,&nbsp;
+   354: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRiRa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;open,&nbsp;
+   355: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRiRb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;open,&nbsp;
+   356: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oRiRunIndex&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRunIdxOut,&nbsp;
+   357: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oInRunNext&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;open&nbsp;
+   358: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   359: &nbsp; &nbsp;
+   360: &nbsp; &nbsp;&nbsp;--&nbsp;X2:&nbsp;A&nbsp;RAM&nbsp;word&nbsp;{A,&nbsp;N,&nbsp;Nn};&nbsp;regular&nbsp;N&nbsp;is&nbsp;the&nbsp;loop's&nbsp;pre-update&nbsp;N&nbsp;
+   361: &nbsp; &nbsp;&nbsp;sWord&nbsp;&nbsp;&nbsp;&lt;=&nbsp;sRd(to_integer(r(2).lane));&nbsp;
+   362: &nbsp; &nbsp;&nbsp;sAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;unsigned(sWord(WORD_W&nbsp;-&nbsp;1&nbsp;downto&nbsp;2&nbsp;*&nbsp;NWID));&nbsp;
+   363: &nbsp; &nbsp;&nbsp;sNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;unsigned(sWord(2&nbsp;*&nbsp;NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;NWID));&nbsp;
+   364: &nbsp; &nbsp;&nbsp;sNn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;unsigned(sWord(NWID&nbsp;-&nbsp;1&nbsp;downto&nbsp;0));&nbsp;
+   365: &nbsp; &nbsp;&nbsp;sN2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(2).npre&nbsp;when&nbsp;r(2).mode&nbsp;=&nbsp;"00"&nbsp;else&nbsp;
+   366: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sNq;&nbsp;
+   367: &nbsp; &nbsp;&nbsp;sRiType&nbsp;&lt;=&nbsp;r(2).valid&nbsp;and&nbsp;r(2).ritype&nbsp;and&nbsp;bool2sl(r(2).mode&nbsp;=&nbsp;"10");&nbsp;
+   368: &nbsp; &nbsp;
+   369: &nbsp; &nbsp;&nbsp;--&nbsp;A.23&nbsp;is&nbsp;combinational&nbsp;and&nbsp;r(2)&nbsp;settles&nbsp;deltas&nbsp;before&nbsp;the&nbsp;RAM&nbsp;word,&nbsp;so&nbsp;mixed&nbsp;
+   370: &nbsp; &nbsp;&nbsp;--&nbsp;old/new&nbsp;inputs&nbsp;can&nbsp;drive&nbsp;A&nbsp;+&nbsp;|Errval|&nbsp;-&nbsp;RItype&nbsp;to&nbsp;-1.&nbsp;Its&nbsp;inputs&nbsp;are&nbsp;built&nbsp;in&nbsp;
+   371: &nbsp; &nbsp;&nbsp;--&nbsp;one&nbsp;process&nbsp;(one&nbsp;delta)&nbsp;and&nbsp;RItype&nbsp;is&nbsp;dropped&nbsp;when&nbsp;A&nbsp;=&nbsp;Errval&nbsp;=&nbsp;0,&nbsp;which&nbsp;a&nbsp;
+   372: &nbsp; &nbsp;&nbsp;--&nbsp;real&nbsp;RItype=1&nbsp;token&nbsp;never&nbsp;has&nbsp;(Errval&nbsp;/=&nbsp;0):&nbsp;no-op&nbsp;on&nbsp;settled&nbsp;values.&nbsp;
+   373: &nbsp; &nbsp;&nbsp;p_ri_in&nbsp;:&nbsp;process&nbsp;(all)&nbsp;is&nbsp;
+   374: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   375: &nbsp; &nbsp;
+   376: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sRiErr&nbsp;&nbsp;&lt;=&nbsp;r(2).errval;&nbsp;
+   377: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sRiAqIn&nbsp;&lt;=&nbsp;sAq;&nbsp;
+   378: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sRiNqIn&nbsp;&lt;=&nbsp;sNq;&nbsp;
+   379: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sRiNnIn&nbsp;&lt;=&nbsp;sNn;&nbsp;
+   380: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sRiRt&nbsp;&nbsp;&nbsp;&lt;=&nbsp;sRiType;&nbsp;
+   381: &nbsp; &nbsp;
+   382: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sAq&nbsp;=&nbsp;0&nbsp;and&nbsp;r(2).errval&nbsp;=&nbsp;0)&nbsp;then&nbsp;
+   383: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRiRt&nbsp;&lt;=&nbsp;'0';&nbsp;
+   384: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   385: &nbsp; &nbsp;
+   386: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;p_ri_in;&nbsp;
+   387: &nbsp; &nbsp;
+   388: &nbsp; &nbsp;
+   389: &nbsp; &nbsp;&nbsp;u_a12&nbsp;:&nbsp;entity&nbsp;work.a12_variables_update(rtl)&nbsp;
+   390: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   391: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR_WIDTH&nbsp;=&gt;&nbsp;BITNESS&nbsp;+&nbsp;1,&nbsp;
+   392: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;AWID,&nbsp;
+   393: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;7,&nbsp;
+   394: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;NWID,&nbsp;
+   395: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;RESET&nbsp;
+   396: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   397: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   398: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iErrorVal&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(2).errval,&nbsp;
+   399: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sAq,&nbsp;
+   400: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iBq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(2).bpre,&nbsp;
+   401: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(2).npre,&nbsp;
+   402: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRegAq,&nbsp;
+   403: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oBq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRegBq,&nbsp;
+   404: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRegNq&nbsp;
+   405: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   406: &nbsp; &nbsp;
+   407: &nbsp; &nbsp;&nbsp;u_a23&nbsp;:&nbsp;entity&nbsp;work.a23_run_interruption_update(behavioral)&nbsp;
+   408: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   409: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;AWID,&nbsp;
+   410: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;NWID,&nbsp;
+   411: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NN_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;NWID,&nbsp;
+   412: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR_WIDTH&nbsp;=&gt;&nbsp;BITNESS&nbsp;+&nbsp;1,&nbsp;
+   413: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;RESET&nbsp;
+   414: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   415: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   416: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iErrVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiErr,&nbsp;
+   417: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRiType&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiRt,&nbsp;
+   418: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiAqIn,&nbsp;
+   419: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiNqIn,&nbsp;
+   420: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiNnIn,&nbsp;
+   421: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiAq,&nbsp;
+   422: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiNq,&nbsp;
+   423: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oNn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiNn&nbsp;
+   424: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   425: &nbsp; &nbsp;
+   426: &nbsp; &nbsp;&nbsp;u_a20&nbsp;:&nbsp;entity&nbsp;work.a20_compute_temp(behavioral)&nbsp;
+   427: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   428: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A_WIDTH&nbsp;=&gt;&nbsp;AWID,&nbsp;
+   429: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N_WIDTH&nbsp;=&gt;&nbsp;NWID&nbsp;
+   430: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   431: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   432: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRItype&nbsp;=&gt;&nbsp;sRiType,&nbsp;
+   433: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sAq,&nbsp;
+   434: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sN2,&nbsp;
+   435: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oTemp&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sTemp&nbsp;
+   436: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   437: &nbsp; &nbsp;
+   438: &nbsp; &nbsp;&nbsp;--&nbsp;X3&nbsp;
+   439: &nbsp; &nbsp;&nbsp;u_a10&nbsp;:&nbsp;entity&nbsp;work.a10_compute_k(behavioral)&nbsp;
+   440: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   441: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A_WIDTH&nbsp;=&gt;&nbsp;AWID,&nbsp;
+   442: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K_WIDTH&nbsp;=&gt;&nbsp;KWID,&nbsp;
+   443: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N_WIDTH&nbsp;=&gt;&nbsp;NWID&nbsp;
+   444: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   445: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   446: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(3).n,&nbsp;
+   447: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iAq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(3).temp,&nbsp;
+   448: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sK&nbsp;
+   449: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   450: &nbsp; &nbsp;
+   451: &nbsp; &nbsp;&nbsp;--&nbsp;X4:&nbsp;the&nbsp;A.11&nbsp;special&nbsp;mapping&nbsp;is&nbsp;lossless&nbsp;only;&nbsp;B&nbsp;=&nbsp;0&nbsp;disables&nbsp;it&nbsp;(2B&nbsp;&lt;=&nbsp;-N&nbsp;needs&nbsp;N&nbsp;&lt;=&nbsp;0)&nbsp;
+   452: &nbsp; &nbsp;&nbsp;sBqMap&nbsp;&lt;=&nbsp;r(4).bpre&nbsp;when&nbsp;iNear&nbsp;=&nbsp;0&nbsp;else&nbsp;
+   453: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   454: &nbsp; &nbsp;
+   455: &nbsp; &nbsp;&nbsp;u_a11&nbsp;:&nbsp;entity&nbsp;work.a11_error_mapping(behavioral)&nbsp;
+   456: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   457: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;NWID,&nbsp;
+   458: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;7,&nbsp;
+   459: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;KWID,&nbsp;
+   460: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;BITNESS&nbsp;+&nbsp;1,&nbsp;
+   461: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAPPED_ERROR_VAL_WIDTH&nbsp;=&gt;&nbsp;MW&nbsp;
+   462: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   463: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   464: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).k,&nbsp;
+   465: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iBq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBqMap,&nbsp;
+   466: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).n,&nbsp;
+   467: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iErrorVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).errval,&nbsp;
+   468: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oMappedErrorVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRegMerr&nbsp;
+   469: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   470: &nbsp; &nbsp;
+   471: &nbsp; &nbsp;&nbsp;u_a21&nbsp;:&nbsp;entity&nbsp;work.a21_compute_map(behavioral)&nbsp;
+   472: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   473: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;KWID,&nbsp;
+   474: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;NWID,&nbsp;
+   475: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR_WIDTH&nbsp;=&gt;&nbsp;BITNESS&nbsp;+&nbsp;1&nbsp;
+   476: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   477: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   478: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).k,&nbsp;
+   479: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iErrval&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).errval,&nbsp;
+   480: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).nn,&nbsp;
+   481: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).n,&nbsp;
+   482: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oMap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiMap&nbsp;
+   483: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   484: &nbsp; &nbsp;
+   485: &nbsp; &nbsp;&nbsp;u_a22&nbsp;:&nbsp;entity&nbsp;work.a22_errval_mapping(behavioral)&nbsp;
+   486: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   487: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;BITNESS&nbsp;+&nbsp;1,&nbsp;
+   488: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAPPED_ERRVAL_WIDTH&nbsp;=&gt;&nbsp;MW&nbsp;
+   489: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   490: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   491: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iErrval&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).errval,&nbsp;
+   492: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRiType&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(4).ritype,&nbsp;
+   493: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iMap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiMap,&nbsp;
+   494: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oEmErrVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sRiMerr&nbsp;
+   495: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   496: &nbsp; &nbsp;
+   497: &nbsp; &nbsp;&nbsp;--&nbsp;X5&nbsp;
+   498: &nbsp; &nbsp;&nbsp;u_a11_1&nbsp;:&nbsp;entity&nbsp;work.a11_1_nl_golomb_encoder(behavioral)&nbsp;
+   499: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   500: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;KWID,&nbsp;
+   501: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIMIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;LIMIT,&nbsp;
+   502: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UNARY_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;UW,&nbsp;
+   503: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SUFFIX_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;SUFW,&nbsp;
+   504: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SUFFIXLEN_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;5,&nbsp;
+   505: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAPPED_ERROR_VAL_WIDTH&nbsp;=&gt;&nbsp;MW&nbsp;
+   506: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   507: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   508: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sGolV,&nbsp;
+   509: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(5).k,&nbsp;
+   510: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iQbpp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iQbpp,&nbsp;
+   511: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iMappedErrorVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(5).merr,&nbsp;
+   512: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRiMode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;bool2sl(r(5).mode&nbsp;=&nbsp;"10"),&nbsp;
+   513: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRunIndex&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;r(5).runidx,&nbsp;
+   514: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oUnaryZeros&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sUnary,&nbsp;
+   515: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oSuffixLen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sSufLen,&nbsp;
+   516: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oSuffixVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sSufVal&nbsp;
+   517: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   518: &nbsp; &nbsp;
+   519: &nbsp; &nbsp;&nbsp;--&nbsp;A&nbsp;RAMs:&nbsp;clear&nbsp;sweep&nbsp;writes&nbsp;{Ainit,&nbsp;N&nbsp;=&nbsp;1,&nbsp;Nn&nbsp;=&nbsp;0}&nbsp;
+   520: &nbsp; &nbsp;&nbsp;sRdAddr&nbsp;&lt;=&nbsp;std_logic_vector(r(0).ctx)&nbsp;when&nbsp;r(0).mode&nbsp;=&nbsp;"00"&nbsp;else&nbsp;
+   521: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(0&nbsp;=&gt;&nbsp;r(0).ritype,&nbsp;others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   522: &nbsp; &nbsp;&nbsp;sWrAddr&nbsp;&lt;=&nbsp;std_logic_vector(iClrAddr)&nbsp;when&nbsp;iClr&nbsp;=&nbsp;'1'&nbsp;else&nbsp;
+   523: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std_logic_vector(sAWrAddr);&nbsp;
+   524: &nbsp; &nbsp;&nbsp;sWrData&nbsp;&lt;=&nbsp;std_logic_vector(resize(iAinit,&nbsp;AWID))&nbsp;&amp;&nbsp;std_logic_vector(to_unsigned(1,&nbsp;NWID))&nbsp;&amp;&nbsp;
+   525: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std_logic_vector(to_unsigned(0,&nbsp;NWID))&nbsp;when&nbsp;iClr&nbsp;=&nbsp;'1'&nbsp;else&nbsp;
+   526: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sAWrData;&nbsp;
+   527: &nbsp; &nbsp;
+   528: &nbsp; &nbsp;&nbsp;gen_aram&nbsp;:&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;3&nbsp;generate&nbsp;
+   529: &nbsp; &nbsp;
+   530: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sWe(l)&nbsp;&lt;=&nbsp;iClr&nbsp;or&nbsp;(sAWe&nbsp;and&nbsp;bool2sl(sAWrLane&nbsp;=&nbsp;l));&nbsp;
+   531: &nbsp; &nbsp;
+   532: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;u_aram&nbsp;:&nbsp;entity&nbsp;work.olo_base_ram_sdp&nbsp;
+   533: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   534: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Depth_g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;512,&nbsp;
+   535: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Width_g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;WORD_W,&nbsp;
+   536: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RdLatency_g&nbsp;=&gt;&nbsp;2&nbsp;
+   537: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   538: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   539: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Clk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iClk,&nbsp;
+   540: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wr_Addr&nbsp;=&gt;&nbsp;sWrAddr,&nbsp;
+   541: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wr_Ena&nbsp;&nbsp;=&gt;&nbsp;sWe(l),&nbsp;
+   542: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wr_Data&nbsp;=&gt;&nbsp;sWrData,&nbsp;
+   543: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rd_Addr&nbsp;=&gt;&nbsp;sRdAddr,&nbsp;
+   544: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rd_Data&nbsp;=&gt;&nbsp;sRd(l)&nbsp;
+   545: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   546: &nbsp; &nbsp;
+   547: &nbsp; &nbsp;&nbsp;end&nbsp;generate&nbsp;gen_aram;&nbsp;
+   548: &nbsp; &nbsp;
+   549: &nbsp; &nbsp;&nbsp;u_packer&nbsp;:&nbsp;entity&nbsp;work.a11_2_bit_packer&nbsp;
+   550: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   551: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIMIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;LIMIT,&nbsp;
+   552: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UNARY_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;UW,&nbsp;
+   553: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SUFFIX_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;SUFW,&nbsp;
+   554: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SUFFIXLEN_WIDTH&nbsp;=&gt;&nbsp;5,&nbsp;
+   555: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OUT_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;LIMIT&nbsp;
+   556: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   557: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   558: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iClk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iClk,&nbsp;
+   559: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRst&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iRst,&nbsp;
+   560: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iStall&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;'0',&nbsp;
+   561: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRawValid&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBpRawV,&nbsp;
+   562: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRawLen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBpRawLen,&nbsp;
+   563: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRawVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBpRawVal,&nbsp;
+   564: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iGolombValid&nbsp;=&gt;&nbsp;sBpGolV,&nbsp;
+   565: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iUnaryZeros&nbsp;&nbsp;=&gt;&nbsp;sBpUnary,&nbsp;
+   566: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iSuffixLen&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBpSufLen,&nbsp;
+   567: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iSuffixVal&nbsp;&nbsp;&nbsp;=&gt;&nbsp;sBpSufVal,&nbsp;
+   568: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oWord&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oWord,&nbsp;
+   569: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oWordValid&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oValid,&nbsp;
+   570: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oValidLen&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oLen&nbsp;
+   571: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   572: &nbsp; &nbsp;
+   573: &nbsp; &nbsp;&nbsp;--&nbsp;ASSERTIONS&nbsp;-------------------------------------------------------------------------------&nbsp;
+   574: &nbsp; &nbsp;&nbsp;--&nbsp;Input&nbsp;contract&nbsp;on&nbsp;valid&nbsp;tokens,&nbsp;A&nbsp;RAM&nbsp;ranges&nbsp;on&nbsp;the&nbsp;tokens&nbsp;that&nbsp;use&nbsp;them.&nbsp;
+   575: &nbsp; &nbsp;&nbsp;assert_proc&nbsp;:&nbsp;process&nbsp;(iClk)&nbsp;is&nbsp;
+   576: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;constant&nbsp;EMAX&nbsp;:&nbsp;integer&nbsp;:=&nbsp;2&nbsp;**&nbsp;(BITNESS&nbsp;-&nbsp;1);&nbsp;
+   577: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vA&nbsp;&nbsp;&nbsp;:&nbsp;integer;&nbsp;
+   578: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   579: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;rising_edge(iClk)&nbsp;then&nbsp;
+   580: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRst&nbsp;=&nbsp;'0'&nbsp;and&nbsp;iValid&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   581: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iMode&nbsp;/=&nbsp;"11"&nbsp;report&nbsp;"nl_backend:&nbsp;token&nbsp;mode&nbsp;11"&nbsp;severity&nbsp;failure;&nbsp;
+   582: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iClr&nbsp;=&nbsp;'0'&nbsp;report&nbsp;"nl_backend:&nbsp;token&nbsp;during&nbsp;the&nbsp;clear&nbsp;sweep"&nbsp;severity&nbsp;failure;&nbsp;
+   583: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;not&nbsp;((r(0).valid&nbsp;=&nbsp;'1'&nbsp;and&nbsp;r(0).lane&nbsp;=&nbsp;iLane)&nbsp;or&nbsp;(r(1).valid&nbsp;=&nbsp;'1'&nbsp;and&nbsp;r(1).lane&nbsp;=&nbsp;iLane)&nbsp;or&nbsp;
+   584: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(r(2).valid&nbsp;=&nbsp;'1'&nbsp;and&nbsp;r(2).lane&nbsp;=&nbsp;iLane))&nbsp;
+   585: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_backend:&nbsp;same-lane&nbsp;tokens&nbsp;less&nbsp;than&nbsp;4&nbsp;cycles&nbsp;apart"&nbsp;severity&nbsp;failure;&nbsp;
+   586: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;to_integer(iErrval)&nbsp;&gt;=&nbsp;-EMAX&nbsp;and&nbsp;to_integer(iErrval)&nbsp;&lt;&nbsp;EMAX&nbsp;
+   587: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_backend:&nbsp;Errval&nbsp;outside&nbsp;[-2^(BITNESS-1),&nbsp;2^(BITNESS-1)-1]"&nbsp;severity&nbsp;failure;&nbsp;
+   588: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iMode&nbsp;=&nbsp;"00")&nbsp;then&nbsp;
+   589: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iCtx&nbsp;&gt;=&nbsp;4&nbsp;and&nbsp;iCtx&nbsp;&lt;=&nbsp;368&nbsp;report&nbsp;"nl_backend:&nbsp;regular&nbsp;ctx&nbsp;outside&nbsp;[4,&nbsp;368]"&nbsp;severity&nbsp;failure;&nbsp;
+   590: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iNpre&nbsp;&gt;=&nbsp;1&nbsp;and&nbsp;iNpre&nbsp;&lt;=&nbsp;RESET&nbsp;report&nbsp;"nl_backend:&nbsp;N&nbsp;outside&nbsp;[1,&nbsp;RESET]"&nbsp;severity&nbsp;failure;&nbsp;
+   591: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;to_integer(iBpre)&nbsp;&gt;=&nbsp;1&nbsp;-&nbsp;to_integer(iNpre)&nbsp;and&nbsp;iBpre&nbsp;&lt;=&nbsp;0&nbsp;
+   592: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_backend:&nbsp;B&nbsp;outside&nbsp;[1-N,&nbsp;0]"&nbsp;severity&nbsp;failure;&nbsp;
+   593: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   594: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iMode&nbsp;=&nbsp;"10"&nbsp;and&nbsp;iRiType&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   595: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iErrval&nbsp;/=&nbsp;0&nbsp;report&nbsp;"nl_backend:&nbsp;RItype&nbsp;1&nbsp;with&nbsp;Errval&nbsp;0"&nbsp;severity&nbsp;failure;&nbsp;
+   596: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   597: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   598: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRst&nbsp;=&nbsp;'0'&nbsp;and&nbsp;r(0).valid&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   599: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(0).mode&nbsp;/=&nbsp;"00"&nbsp;or&nbsp;sRunCnt(sL)&nbsp;=&nbsp;0&nbsp;
+   600: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_backend:&nbsp;regular&nbsp;token&nbsp;inside&nbsp;a&nbsp;run"&nbsp;severity&nbsp;failure;&nbsp;
+   601: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;sRunCnt(sL)&nbsp;&lt;=&nbsp;16383&nbsp;report&nbsp;"nl_backend:&nbsp;run&nbsp;longer&nbsp;than&nbsp;a&nbsp;16383-pixel&nbsp;lane&nbsp;line"&nbsp;severity&nbsp;failure;&nbsp;
+   602: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   603: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRst&nbsp;=&nbsp;'0'&nbsp;and&nbsp;r(2).valid&nbsp;=&nbsp;'1'&nbsp;and&nbsp;r(2).mode&nbsp;/=&nbsp;"01")&nbsp;then&nbsp;
+   604: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vA&nbsp;:=&nbsp;to_integer(sAq);&nbsp;
+   605: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;vA&nbsp;&lt;=&nbsp;RESET&nbsp;*&nbsp;EMAX&nbsp;and&nbsp;sNq&nbsp;&gt;=&nbsp;1&nbsp;and&nbsp;sNq&nbsp;&lt;=&nbsp;RESET&nbsp;and&nbsp;sNn&nbsp;&lt;&nbsp;RESET&nbsp;
+   606: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_backend:&nbsp;A&nbsp;RAM&nbsp;word&nbsp;outside&nbsp;A&nbsp;[0,&nbsp;RESET*2^(BITNESS-1)],&nbsp;N&nbsp;[1,&nbsp;RESET],&nbsp;Nn&nbsp;[0,&nbsp;RESET-1]"&nbsp;
+   607: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;severity&nbsp;failure;&nbsp;
+   608: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   609: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRst&nbsp;=&nbsp;'0'&nbsp;and&nbsp;r(3).valid&nbsp;=&nbsp;'1'&nbsp;and&nbsp;r(3).mode&nbsp;/=&nbsp;"01")&nbsp;then&nbsp;
+   610: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;sK&nbsp;&lt;=&nbsp;BITNESS&nbsp;report&nbsp;"nl_backend:&nbsp;k&nbsp;above&nbsp;BITNESS"&nbsp;severity&nbsp;failure;&nbsp;
+   611: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   612: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   613: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;assert_proc;&nbsp;
+   614: &nbsp; &nbsp;
+   615: &nbsp; end&nbsp;architecture&nbsp;behavioral;&nbsp;
+</code></pre>

@@ -1,5 +1,6 @@
 build/
 Verification/OSVVM/Golden/Output/
+Verification/OSVVM/PostSynth/Output/
 .Xil/
 clockInfo.txt
 cong/

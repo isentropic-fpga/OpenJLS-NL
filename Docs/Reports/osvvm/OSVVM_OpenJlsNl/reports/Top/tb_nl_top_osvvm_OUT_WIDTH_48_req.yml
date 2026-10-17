@@ -1,0 +1,35 @@
+- Requirement: "NL.StripeGolden"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 240, Passed: 256, Errors: 0, Checked: 256, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.BackToBack"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 20, Passed: 20, Errors: 0, Checked: 20, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.AxisOut"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 40370, Errors: 0, Checked: 40370, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.StallPropagation"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 5, Passed: 5, Errors: 0, Checked: 5, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.NoStall"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 7, Passed: 7, Errors: 0, Checked: 7, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.ConfigInReset"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 24, Passed: 164, Errors: 0, Checked: 164, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Reset"
+  TestCases: 
+  - TestName: "tb_nl_top_osvvm"
+    Status: PASSED
+    Results: {Goal: 48, Passed: 103, Errors: 0, Checked: 103, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

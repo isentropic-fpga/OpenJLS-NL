@@ -1,0 +1,55 @@
+- Requirement: "NL.LaneIssue"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 208942, Errors: 0, Checked: 208942, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Neighbours"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 72676, Errors: 0, Checked: 72676, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A4"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 72676, Errors: 0, Checked: 72676, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A4.1"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 327042, Errors: 0, Checked: 327042, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A4.2"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 654084, Errors: 0, Checked: 654084, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.CtxNumbering"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 327042, Errors: 0, Checked: 327042, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Q3Bounds"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 690422, Errors: 0, Checked: 690422, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.CtxStore"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 327042, Errors: 0, Checked: 327042, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.ClearSweep"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 100, Passed: 75004, Errors: 0, Checked: 75004, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.ExitTags"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 258010, Errors: 0, Checked: 258010, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Reset"
+  TestCases: 
+  - TestName: "tb_nl_frontend_osvvm"
+    Status: PASSED
+    Results: {Goal: 20, Passed: 73, Errors: 0, Checked: 73, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

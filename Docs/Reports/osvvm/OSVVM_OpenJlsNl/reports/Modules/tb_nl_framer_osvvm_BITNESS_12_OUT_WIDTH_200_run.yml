@@ -1,0 +1,26 @@
+Version: "0.1"
+TestCaseName: "tb_nl_framer_osvvm"
+TestCaseFile:  "../../../Modules/tb_nl_framer_osvvm.vhd"
+TestSuiteName: "Modules"
+BuildName: "OSVVM_OpenJlsNl"
+Generics:
+  BITNESS: "12"
+  OUT_WIDTH: "200"
+ReportsTestSuiteDirectory:  "reports/Modules"
+RequirementsYamlFile:  "reports/Modules/tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200_req.yml"
+AlertYamlFile:  "reports/Modules/tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200_alerts.yml"
+CovYamlFile:  "reports/Modules/tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200_cov.yml"
+ScoreboardDict:
+  slv: "reports/Modules/tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200_sb_slv.yml"
+TranscriptFiles: ""
+TestCaseFileName: "tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200"
+GenericNames: "_BITNESS_12_OUT_WIDTH_200"
+OsvvmSettingsInfo:
+  ReportsSubdirectory:  "reports"
+  SimulationLogFile: "logs/OSVVM_OpenJlsNl.log"
+  SimulationHtmlLogFile: "logs/OSVVM_OpenJlsNl_log.html"
+  RequirementsSubdirectory: ""
+  CoverageSubdirectory:    "CodeCoverage/OSVVM_OpenJlsNl_code_cov.html"
+  Report2CssFiles:
+    - "reports/CssOsvvmStyle.css"
+  Report2PngFile:  "reports/OsvvmLogo.png"

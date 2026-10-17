@@ -1,0 +1,114 @@
+Version: "0.1"
+Name: "tb_nl_loop_osvvm"
+Status: PASSED
+Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 413495, AffirmCount: 413495, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+Settings: {ExternalErrors: {Failure: 0, Error: 0, Warning: 0}, FailOnDisabledErrors: "true", FailOnRequirementErrors: "true", FailOnWarning: "true"}
+Children: 
+  - Name: "Default"
+    Status: PASSED
+    Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Children: []
+  - Name: "OSVVM"
+    Status: PASSED
+    Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Children: 
+      - Name: "lane x mode"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "regular: lane x forward x gap"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "mode x errval sign"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "mode x modulo wrap"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "mode x reconstruction clamp"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "stripe events"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "value ranges"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+  - Name: "Requirements"
+    Status: PASSED
+    Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Children: 
+      - Name: "T87.A2"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 36071, AffirmCount: 36071, RequirementsPassed: 36071, RequirementsGoal: 600, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A8"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 32395, AffirmCount: 32395, RequirementsPassed: 32395, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A4"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 32395, AffirmCount: 32395, RequirementsPassed: 32395, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A5"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 32395, AffirmCount: 32395, RequirementsPassed: 32395, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A6"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 32395, AffirmCount: 32395, RequirementsPassed: 32395, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A7"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 32395, AffirmCount: 32395, RequirementsPassed: 32395, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A9"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 4342, AffirmCount: 4342, RequirementsPassed: 4342, RequirementsGoal: 20, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A12"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 129580, AffirmCount: 129580, RequirementsPassed: 129580, RequirementsGoal: 800, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A13"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 64790, AffirmCount: 64790, RequirementsPassed: 64790, RequirementsGoal: 400, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A14"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1873, AffirmCount: 1873, RequirementsPassed: 1873, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A17"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1803, AffirmCount: 1803, RequirementsPassed: 1803, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A18"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1803, AffirmCount: 1803, RequirementsPassed: 1803, RequirementsGoal: 200, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "T87.A19"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 3606, AffirmCount: 3606, RequirementsPassed: 3606, RequirementsGoal: 400, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+      - Name: "NL.CtxForward"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 7650, AffirmCount: 7650, RequirementsPassed: 7650, RequirementsGoal: 80, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+        Children: []
+  - Name: "StreamProtocol"
+    Status: PASSED
+    Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1, AffirmCount: 1, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Children: []
+  - Name: "CoverageClosure"
+    Status: PASSED
+    Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1, AffirmCount: 1, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Children: []
+  - Name: "KnownOutputs"
+    Status: PASSED
+    Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Children: []

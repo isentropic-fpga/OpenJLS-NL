@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NVC code coverage report</title>
+  <style>
+:root {
+    --table-row-color: #e8e8e8;
+    --margin-left: 20%;
+}
+
+body {
+    background-color: #f0f0e0ff;
+}
+
+header {
+    padding: 0.5em;
+    text-align: center;
+    font-size: 14pt;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    word-wrap: break-word;
+}
+
+h3 {
+    word-wrap: break-word;
+    margin-bottom: 0px;
+}
+
+hr {
+    border:none;
+    height: 2px;
+    background: black;
+}
+
+footer {
+    display: table;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav {
+    float: left;
+    background-color: var(--table-row-color);
+    width: 17%;
+    overflow: auto;
+    padding: 10px;
+    margin-top: -2px;
+    border: 2px solid black;
+}
+nav details details {
+    margin-left: 1rem;
+}
+nav details > a {
+    padding-left: 1.9rem;
+    display: block;
+}
+nav summary {
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+}
+nav summary::before {
+    content: '▶';
+    font-size: 0.7em;
+    margin-right: 0.4em;
+}
+nav details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+table {
+    table-layout: fixed;
+}
+
+table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+    word-wrap: break-word;
+}
+
+.tabcontent {
+    display: none;
+    padding: 0px 0px;
+    border: 2px solid #ccc;
+    border-top: none;
+    word-wrap: break-word;
+}
+
+.tab {
+    overflow: hidden;
+    border: 2px solid;
+    margin-left: var(--margin-left);
+    margin-top: 10px;
+}
+
+.cbg:hover {
+    background-color: #dddddd;
+}
+.cbg {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+
+.cbt {
+    margin-top: 8px;
+}
+.cbt th {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+.cbt td, .cbt th {
+    width: 50px;
+    text-align: center;
+}
+.cbt td + td, .cbt th + th {
+    width: 150px;
+}
+.cbt td + td + td, .cbt th + th + th {
+    width: 150px;
+}
+.cbt td + td + td + td, .cbt th + th + th + th {
+    width: 150px;
+}
+
+.percent100 {
+    background-color: #00cc00;
+}
+.percent90 {
+    background-color: #e6e600;
+}
+.percent80 {
+    background-color: #ff9900;
+}
+.percent0 {
+    background-color: #ff0000;
+}
+.percentna {
+    background-color: #cccccc;
+}
+
+.nav-sel {
+    font-weight: bold;
+}
+  </style>
+</head>
+<body style="font-family: verdana">
+
+<header><h1 style="text-align: center;">NVC code coverage report
+</h1></header>
+
+<h2 style="text-align: left;">
+   File:&nbsp; ../../Sources/nl_loop.vhd
+</h2><pre><code>     0: &nbsp; --&nbsp;Copyright&nbsp;(C)&nbsp;2026&nbsp;Vitor&nbsp;Mendes&nbsp;Camilo&nbsp;
+     1: &nbsp; --&nbsp;SPDX-License-Identifier:&nbsp;GPL-3.0-only&nbsp;
+     2: &nbsp; --&nbsp;
+     3: &nbsp; --&nbsp;This&nbsp;file&nbsp;is&nbsp;part&nbsp;of&nbsp;OpenJLS.&nbsp;Available&nbsp;under&nbsp;GPLv3&nbsp;or&nbsp;a&nbsp;
+     4: &nbsp; --&nbsp;commercial&nbsp;license.&nbsp;See&nbsp;LICENSE&nbsp;and&nbsp;README&nbsp;for&nbsp;details.&nbsp;
+     5: &nbsp; --&nbsp;
+     6: &nbsp; &nbsp;
+     7: &nbsp; ----------------------------------------------------------------------------------&nbsp;
+     8: &nbsp; --&nbsp;Engineer:&nbsp;&nbsp;&nbsp;&nbsp;Vitor&nbsp;Mendes&nbsp;Camilo&nbsp;
+     9: &nbsp; --&nbsp;
+    10: &nbsp; --&nbsp;Module&nbsp;Name:&nbsp;nl_loop&nbsp;-&nbsp;Behavioral&nbsp;
+    11: &nbsp; --&nbsp;
+    12: &nbsp; --&nbsp;Notes:&nbsp;
+    13: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Near-lossless&nbsp;recurrence:&nbsp;everything&nbsp;that&nbsp;depends&nbsp;on&nbsp;Ra&nbsp;=&nbsp;Rx&nbsp;of&nbsp;the&nbsp;
+    14: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;previous&nbsp;pixel,&nbsp;or&nbsp;on&nbsp;C/B/N&nbsp;written&nbsp;back&nbsp;by&nbsp;it&nbsp;(same&nbsp;context).&nbsp;
+    15: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ra&nbsp;-&gt;&nbsp;Q3&nbsp;-&gt;&nbsp;C[Q]&nbsp;-&gt;&nbsp;Px&nbsp;-&gt;&nbsp;Errval&nbsp;-&gt;&nbsp;quantize&nbsp;-&gt;&nbsp;Rx&nbsp;(A.4-A.8,&nbsp;A.14,&nbsp;
+    16: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A.17-A.19)&nbsp;and&nbsp;Errval&nbsp;-&gt;&nbsp;B,&nbsp;N&nbsp;-&gt;&nbsp;C&nbsp;(A.9,&nbsp;A.12,&nbsp;A.13).&nbsp;
+    17: &nbsp; --&nbsp;
+    18: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pipeline:&nbsp;input&nbsp;register&nbsp;S0,&nbsp;then&nbsp;S1..S6.&nbsp;The&nbsp;loop&nbsp;is&nbsp;4&nbsp;cycles&nbsp;long:&nbsp;
+    19: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ra,&nbsp;run&nbsp;state&nbsp;&nbsp;S4&nbsp;-&gt;&nbsp;S1&nbsp;
+    20: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S5&nbsp;-&gt;&nbsp;S2&nbsp;
+    21: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B,&nbsp;N&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S6&nbsp;-&gt;&nbsp;S3&nbsp;
+    22: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slot&nbsp;k&nbsp;belongs&nbsp;to&nbsp;lane&nbsp;k&nbsp;mod&nbsp;4.&nbsp;A&nbsp;lane&nbsp;is&nbsp;one&nbsp;stripe;&nbsp;a&nbsp;single&nbsp;
+    23: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stream&nbsp;must&nbsp;leave&nbsp;3&nbsp;empty&nbsp;slots&nbsp;between&nbsp;pixels.&nbsp;State&nbsp;travels&nbsp;with&nbsp;
+    24: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;slot,&nbsp;empty&nbsp;slots&nbsp;pass&nbsp;it&nbsp;through.&nbsp;
+    25: &nbsp; --&nbsp;
+    26: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pre-loop&nbsp;inputs&nbsp;(everything&nbsp;that&nbsp;does&nbsp;not&nbsp;depend&nbsp;on&nbsp;Ra):&nbsp;
+    27: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iQ3Bound(k)&nbsp;:&nbsp;Q3&nbsp;=&nbsp;-4&nbsp;+&nbsp;#{k&nbsp;:&nbsp;Ra&nbsp;&lt;&nbsp;iQ3Bound(k)}&nbsp;
+    28: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;Rc+T3,&nbsp;Rc+T2,&nbsp;Rc+T1,&nbsp;Rc+NEAR+1,&nbsp;
+    29: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rc-NEAR,&nbsp;Rc-T1+1,&nbsp;Rc-T2+1,&nbsp;Rc-T3+1&nbsp;
+    30: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iCand*(t)&nbsp;&nbsp;&nbsp;:&nbsp;context&nbsp;of&nbsp;(Q1,&nbsp;Q2,&nbsp;Q3&nbsp;=&nbsp;t-4)&nbsp;after&nbsp;sign&nbsp;merging,&nbsp;
+    31: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;read&nbsp;from&nbsp;the&nbsp;context&nbsp;RAM.&nbsp;
+    32: &nbsp; --&nbsp;
+    33: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Only&nbsp;the&nbsp;last&nbsp;regular&nbsp;update&nbsp;of&nbsp;each&nbsp;lane&nbsp;is&nbsp;forwarded&nbsp;here;&nbsp;
+    34: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;context&nbsp;RAM&nbsp;read&nbsp;must&nbsp;already&nbsp;reflect&nbsp;older&nbsp;writes.&nbsp;
+    35: &nbsp; --&nbsp;
+    36: &nbsp; --&nbsp;Assumptions:&nbsp;
+    37: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NEAR&nbsp;&lt;=&nbsp;min(255,&nbsp;MAXVAL/2),&nbsp;RESET&nbsp;is&nbsp;even.&nbsp;
+    38: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRecip&nbsp;=&nbsp;ceil(2^(BITNESS+10)&nbsp;/&nbsp;(2*NEAR+1)).&nbsp;
+    39: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Context&nbsp;candidates&nbsp;hold&nbsp;T.87&nbsp;values:&nbsp;C&nbsp;in&nbsp;[-128,&nbsp;127],&nbsp;
+    40: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&nbsp;in&nbsp;[1,&nbsp;RESET],&nbsp;B&nbsp;in&nbsp;[1-N,&nbsp;0].&nbsp;
+    41: &nbsp; --&nbsp;
+    42: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ranges&nbsp;below&nbsp;are&nbsp;for&nbsp;worst-case&nbsp;generics&nbsp;(BITNESS&nbsp;16,&nbsp;NEAR&nbsp;255,&nbsp;
+    43: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RESET&nbsp;64);&nbsp;D&nbsp;=&nbsp;2*NEAR+1,&nbsp;RANGE&nbsp;as&nbsp;in&nbsp;A.2.&nbsp;The&nbsp;ASSERTIONS&nbsp;block&nbsp;
+    44: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;checks&nbsp;them&nbsp;on&nbsp;every&nbsp;valid&nbsp;slot.&nbsp;
+    45: &nbsp; --&nbsp;
+    46: &nbsp; ----------------------------------------------------------------------------------&nbsp;
+    47: &nbsp; &nbsp;
+    48: &nbsp; library&nbsp;ieee;&nbsp;
+    49: &nbsp; &nbsp;&nbsp;use&nbsp;ieee.std_logic_1164.all;&nbsp;
+    50: &nbsp; &nbsp;&nbsp;use&nbsp;ieee.numeric_std.all;&nbsp;
+    51: &nbsp; &nbsp;&nbsp;use&nbsp;work.nl_pkg.all;&nbsp;
+    52: &nbsp; &nbsp;
+    53: &nbsp; entity&nbsp;nl_loop&nbsp;is&nbsp;
+    54: &nbsp; &nbsp;&nbsp;generic&nbsp;(&nbsp;
+    55: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;BITNESS&nbsp;:&nbsp;natural&nbsp;&nbsp;:=&nbsp;12;&nbsp;
+    56: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;RESET&nbsp;&nbsp;&nbsp;:&nbsp;positive&nbsp;:=&nbsp;64&nbsp;
+    57: &nbsp; &nbsp;&nbsp;);&nbsp;
+    58: &nbsp; &nbsp;&nbsp;port&nbsp;(&nbsp;
+    59: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iClk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    60: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Per&nbsp;image&nbsp;
+    61: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iNear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(7&nbsp;downto&nbsp;0);&nbsp;
+    62: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iMaxVal&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    63: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRecip&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;+&nbsp;10&nbsp;downto&nbsp;0);&nbsp;
+    64: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRange&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;downto&nbsp;0);&nbsp;
+    65: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRangeD&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;+&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;RANGE*(2*NEAR+1)&nbsp;
+    66: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Per&nbsp;pixel&nbsp;
+    67: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iValid&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    68: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iFirstPix&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;first&nbsp;pixel&nbsp;of&nbsp;the&nbsp;stripe&nbsp;image&nbsp;
+    69: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iFirstCol&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Ra&nbsp;=&nbsp;Rb&nbsp;
+    70: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iEol&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    71: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iIx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    72: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    73: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iRc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    74: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iQ12Zero&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    75: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iQ3Bound&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;t_signed_array(0&nbsp;to&nbsp;7)(BITNESS&nbsp;+&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    76: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iCandCtx&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;t_unsigned_array(0&nbsp;to&nbsp;8)(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    77: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iCandSign&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;std_logic_vector(0&nbsp;to&nbsp;8);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;'1'&nbsp;=&nbsp;SIGN&nbsp;-1&nbsp;
+    78: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iCandC&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;t_signed_array(0&nbsp;to&nbsp;8)(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    79: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iCandB&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;t_signed_array(0&nbsp;to&nbsp;8);&nbsp;
+    80: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;iCandN&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;in&nbsp;&nbsp;&nbsp;&nbsp;t_unsigned_array(0&nbsp;to&nbsp;8);&nbsp;
+    81: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Loop&nbsp;exit&nbsp;
+    82: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oValid&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    83: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oMode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic_vector(1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;00&nbsp;regular,&nbsp;01&nbsp;run&nbsp;hit,&nbsp;10&nbsp;run&nbsp;interruption&nbsp;
+    84: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oRiType&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic;&nbsp;
+    85: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oRx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    86: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oErrval&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;signed(BITNESS&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;quantized,&nbsp;modulo&nbsp;reduced&nbsp;
+    87: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oCtx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    88: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oCq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;signed(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+    89: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oBq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;signed;&nbsp;
+    90: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned;&nbsp;
+    91: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oBpre&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;signed;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;before&nbsp;the&nbsp;update&nbsp;(A.10,&nbsp;A.11)&nbsp;
+    92: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oNpre&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned;&nbsp;
+    93: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oNRes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;std_logic;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;N&nbsp;=&nbsp;RESET&nbsp;before&nbsp;the&nbsp;update&nbsp;
+    94: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Verification&nbsp;observation&nbsp;(Px&nbsp;of&nbsp;A.6&nbsp;/&nbsp;A.18);&nbsp;left&nbsp;open&nbsp;in&nbsp;nl_top,&nbsp;pruned&nbsp;
+    95: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;oPx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;out&nbsp;&nbsp;&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0)&nbsp;
+    96: &nbsp; &nbsp;&nbsp;);&nbsp;
+    97: &nbsp; end&nbsp;entity&nbsp;nl_loop;&nbsp;
+    98: &nbsp; &nbsp;
+    99: &nbsp; architecture&nbsp;behavioral&nbsp;of&nbsp;nl_loop&nbsp;is&nbsp;
+   100: &nbsp; &nbsp;
+   101: &nbsp; &nbsp;&nbsp;constant&nbsp;W&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;BITNESS&nbsp;+&nbsp;5;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;internal&nbsp;signed&nbsp;width&nbsp;
+   102: &nbsp; &nbsp;&nbsp;constant&nbsp;SH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;BITNESS&nbsp;+&nbsp;10;&nbsp;
+   103: &nbsp; &nbsp;&nbsp;constant&nbsp;CW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;CO_C_WIDTH&nbsp;+&nbsp;1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;sign-applied&nbsp;C&nbsp;
+   104: &nbsp; &nbsp;&nbsp;constant&nbsp;DW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;CO_D_WIDTH&nbsp;+&nbsp;1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;signed&nbsp;2*NEAR+1&nbsp;
+   105: &nbsp; &nbsp;&nbsp;constant&nbsp;NW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;iCandN(0)'length;&nbsp;
+   106: &nbsp; &nbsp;&nbsp;constant&nbsp;BW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;iCandB(0)'length;&nbsp;
+   107: &nbsp; &nbsp;&nbsp;constant&nbsp;STAGES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;6;&nbsp;
+   108: &nbsp; &nbsp;
+   109: &nbsp; &nbsp;&nbsp;--&nbsp;Lane&nbsp;state&nbsp;that&nbsp;must&nbsp;be&nbsp;back&nbsp;in&nbsp;S1&nbsp;four&nbsp;slots&nbsp;later&nbsp;
+   110: &nbsp; &nbsp;&nbsp;type&nbsp;t_early&nbsp;is&nbsp;record&nbsp;
+   111: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ra&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   112: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;inRun&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   113: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lastValid&nbsp;:&nbsp;std_logic;&nbsp;
+   114: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lastCtx&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   115: &nbsp; &nbsp;&nbsp;end&nbsp;record&nbsp;t_early;&nbsp;
+   116: &nbsp; &nbsp;
+   117: &nbsp; &nbsp;&nbsp;--&nbsp;One&nbsp;pipeline&nbsp;slot;&nbsp;fields&nbsp;not&nbsp;read&nbsp;past&nbsp;a&nbsp;stage&nbsp;are&nbsp;pruned&nbsp;by&nbsp;synthesis&nbsp;
+   118: &nbsp; &nbsp;&nbsp;type&nbsp;t_pipe&nbsp;is&nbsp;record&nbsp;
+   119: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S0&nbsp;
+   120: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;firstPix&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   121: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;firstCol&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   122: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;eol&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   123: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;q12Zero&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   124: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   125: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   126: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   127: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rbRc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-MAXVAL,&nbsp;MAXVAL]&nbsp;
+   128: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ixN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[NEAR,&nbsp;MAXVAL+NEAR]&nbsp;
+   129: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ixM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-NEAR,&nbsp;MAXVAL-NEAR]&nbsp;
+   130: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rbN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[NEAR,&nbsp;MAXVAL+NEAR]&nbsp;
+   131: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rbM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-NEAR,&nbsp;MAXVAL-NEAR]&nbsp;
+   132: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;magMax&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[NEAR,&nbsp;MAXVAL+NEAR]&nbsp;
+   133: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rcGeRb&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   134: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rcLeRb&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   135: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;bound&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_signed_array(0&nbsp;to&nbsp;7)(BITNESS&nbsp;+&nbsp;1&nbsp;downto&nbsp;0);&nbsp;--&nbsp;[1-MAXVAL,&nbsp;2*MAXVAL]&nbsp;
+   136: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cCtx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_unsigned_array(0&nbsp;to&nbsp;8)(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   137: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cSign&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(0&nbsp;to&nbsp;8);&nbsp;
+   138: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cCs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_signed_array(0&nbsp;to&nbsp;8)(CW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-127,&nbsp;128]&nbsp;
+   139: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_signed_array(0&nbsp;to&nbsp;8)(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;--&nbsp;[-128,&nbsp;127]&nbsp;
+   140: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_signed_array(0&nbsp;to&nbsp;8)(BW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1-RESET,&nbsp;0]&nbsp;
+   141: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_unsigned_array(0&nbsp;to&nbsp;8)(NW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1,&nbsp;RESET]&nbsp;
+   142: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S1&nbsp;
+   143: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;st&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_early;&nbsp;
+   144: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ra&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   145: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;run&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   146: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;hit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   147: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;riType&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   148: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;match&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   149: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ctx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(CO_CTX_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   150: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;sign&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   151: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-127,&nbsp;128]&nbsp;
+   152: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-128,&nbsp;127]&nbsp;
+   153: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1-N,&nbsp;0]&nbsp;
+   154: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1,&nbsp;RESET]&nbsp;
+   155: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;pbase&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   156: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S2&nbsp;
+   157: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lastC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-128,&nbsp;127]&nbsp;
+   158: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lastCn&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-127,&nbsp;128]&nbsp;
+   159: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;px&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   160: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;|Errval|+NEAR:&nbsp;[0,&nbsp;MAXVAL+NEAR]&nbsp;
+   161: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dirPos&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   162: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ePos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   163: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S3&nbsp;
+   164: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;q&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;m/D:&nbsp;[0,&nbsp;(MAXVAL+NEAR)/D]&nbsp;
+   165: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(DW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;+-D&nbsp;
+   166: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(DW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;+-D&nbsp;
+   167: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;pxOv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Px-MAXVAL-1:&nbsp;[-MAXVAL-1,&nbsp;-1]&nbsp;
+   168: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cP1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-127,&nbsp;127]&nbsp;
+   169: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cM1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-128,&nbsp;126]&nbsp;
+   170: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cNeg&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-127,&nbsp;128]&nbsp;
+   171: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cP1Neg&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-127,&nbsp;127]&nbsp;
+   172: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;cM1Neg&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-126,&nbsp;128]&nbsp;
+   173: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lastB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1-RESET,&nbsp;0]&nbsp;
+   174: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;lastN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[2,&nbsp;RESET]&nbsp;
+   175: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;nRes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   176: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;n1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[2,&nbsp;RESET]&nbsp;
+   177: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S4&nbsp;
+   178: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL]&nbsp;
+   179: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;qdE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;+-(MAXVAL+NEAR)&nbsp;
+   180: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;wrapDn&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   181: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;wrapUp&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   182: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;B+-RANGE*D:&nbsp;[1-RESET-RANGE*D,&nbsp;RANGE*D]&nbsp;
+   183: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S5&nbsp;
+   184: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;B+Errval*D&nbsp;(halved):&nbsp;[1-RESET-RANGE/2*D,&nbsp;RANGE/2*D]&nbsp;
+   185: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;dec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   186: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;inc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   187: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;errq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BITNESS&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-floor(RANGE/2),&nbsp;ceil(RANGE/2)-1]&nbsp;
+   188: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;c1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(CO_C_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[-128,&nbsp;127]&nbsp;
+   189: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S6&nbsp;
+   190: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;b1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[1-N,&nbsp;0]&nbsp;
+   191: &nbsp; &nbsp;&nbsp;end&nbsp;record&nbsp;t_pipe;&nbsp;
+   192: &nbsp; &nbsp;
+   193: &nbsp; &nbsp;&nbsp;type&nbsp;t_pipe_array&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;STAGES)&nbsp;of&nbsp;t_pipe;&nbsp;
+   194: &nbsp; &nbsp;
+   195: &nbsp; &nbsp;&nbsp;--&nbsp;Per&nbsp;image&nbsp;constants,&nbsp;registered&nbsp;
+   196: &nbsp; &nbsp;&nbsp;signal&nbsp;sNear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   197: &nbsp; &nbsp;&nbsp;signal&nbsp;sMaxVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   198: &nbsp; &nbsp;&nbsp;signal&nbsp;sMaxP1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   199: &nbsp; &nbsp;&nbsp;signal&nbsp;sD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(CO_D_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   200: &nbsp; &nbsp;&nbsp;signal&nbsp;sRecip&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;+&nbsp;10&nbsp;downto&nbsp;0);&nbsp;
+   201: &nbsp; &nbsp;&nbsp;signal&nbsp;sRange&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BITNESS&nbsp;downto&nbsp;0);&nbsp;
+   202: &nbsp; &nbsp;&nbsp;signal&nbsp;sRangeD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   203: &nbsp; &nbsp;&nbsp;signal&nbsp;sHalf&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;downto&nbsp;0);&nbsp;
+   204: &nbsp; &nbsp;&nbsp;signal&nbsp;sRangeMHalf&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(BITNESS&nbsp;downto&nbsp;0);&nbsp;
+   205: &nbsp; &nbsp;
+   206: &nbsp; &nbsp;&nbsp;signal&nbsp;sValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(0&nbsp;to&nbsp;STAGES)&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   207: &nbsp; &nbsp;&nbsp;signal&nbsp;r&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_pipe_array;&nbsp;
+   208: &nbsp; &nbsp;
+   209: &nbsp; &nbsp;&nbsp;function&nbsp;bool2sl&nbsp;(&nbsp;
+   210: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;b&nbsp;:&nbsp;boolean&nbsp;
+   211: &nbsp; &nbsp;&nbsp;)&nbsp;return&nbsp;std_logic&nbsp;is&nbsp;
+   212: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   213: &nbsp; &nbsp;
+   214: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(b)&nbsp;then&nbsp;
+   215: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;'1';&nbsp;
+   216: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   217: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;'0';&nbsp;
+   218: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   219: &nbsp; &nbsp;
+   220: &nbsp; &nbsp;&nbsp;end&nbsp;function&nbsp;bool2sl;&nbsp;
+   221: &nbsp; &nbsp;
+   222: &nbsp; begin&nbsp;
+   223: &nbsp; &nbsp;
+   224: &nbsp; &nbsp;&nbsp;pipe_proc&nbsp;:&nbsp;process&nbsp;(iClk)&nbsp;is&nbsp;
+   225: &nbsp; &nbsp;
+   226: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_pipe;&nbsp;
+   227: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vSt&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_early;&nbsp;
+   228: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vRa&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   229: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;range&nbsp;0&nbsp;to&nbsp;8;&nbsp;
+   230: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vMatch&nbsp;:&nbsp;std_logic_vector(0&nbsp;to&nbsp;8);&nbsp;
+   231: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vRaLeRb&nbsp;:&nbsp;boolean;&nbsp;
+   232: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vMed&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   233: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vCs&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   234: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vDiff&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   235: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vMA&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   236: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vMB&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   237: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;[0,&nbsp;MAXVAL+NEAR]&nbsp;
+   238: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vDd&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(DW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   239: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vQs&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(BITNESS&nbsp;+&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   240: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vRxRaw&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   241: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vOvT&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   242: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;unsigned(NW&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   243: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vSum&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   244: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vN1&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   245: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vB1&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;signed(W&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   246: &nbsp; &nbsp;
+   247: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   248: &nbsp; &nbsp;
+   249: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;rising_edge(iClk)&nbsp;then&nbsp;
+   250: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Config&nbsp;------------------------------------------------------------------------------&nbsp;
+   251: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sNear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;signed(resize(iNear,&nbsp;W));&nbsp;
+   252: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sMaxVal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;signed(resize(iMaxVal,&nbsp;W));&nbsp;
+   253: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sMaxP1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;signed(resize(iMaxVal,&nbsp;W))&nbsp;+&nbsp;1;&nbsp;
+   254: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;resize(iNear&nbsp;&amp;&nbsp;'1',&nbsp;CO_D_WIDTH);&nbsp;
+   255: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRecip&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;iRecip;&nbsp;
+   256: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRange&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;signed(iRange);&nbsp;
+   257: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRangeD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;signed(resize(iRangeD,&nbsp;W));&nbsp;
+   258: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sHalf&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;shift_right(iRange&nbsp;+&nbsp;1,&nbsp;1);&nbsp;
+   259: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sRangeMHalf&nbsp;&lt;=&nbsp;iRange&nbsp;-&nbsp;shift_right(iRange&nbsp;+&nbsp;1,&nbsp;1);&nbsp;
+   260: &nbsp; &nbsp;
+   261: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sValid&nbsp;&lt;=&nbsp;iValid&nbsp;&amp;&nbsp;sValid(0&nbsp;to&nbsp;STAGES&nbsp;-&nbsp;1);&nbsp;
+   262: &nbsp; &nbsp;
+   263: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S0:&nbsp;input&nbsp;register&nbsp;and&nbsp;precompute&nbsp;---------------------------------------------------&nbsp;
+   264: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;r(0);&nbsp;
+   265: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.firstPix&nbsp;&nbsp;:=&nbsp;iFirstPix;&nbsp;
+   266: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.firstCol&nbsp;&nbsp;:=&nbsp;iFirstCol;&nbsp;
+   267: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.eol&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iEol;&nbsp;
+   268: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.q12Zero&nbsp;&nbsp;&nbsp;:=&nbsp;iQ12Zero;&nbsp;
+   269: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.ix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;signed(resize(iIx,&nbsp;W));&nbsp;
+   270: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;signed(resize(iRb,&nbsp;W));&nbsp;
+   271: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;signed(resize(iRc,&nbsp;W));&nbsp;
+   272: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rbRc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.rb&nbsp;-&nbsp;v.rc;&nbsp;
+   273: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.ixN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.ix&nbsp;+&nbsp;sNear;&nbsp;
+   274: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.ixM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.ix&nbsp;-&nbsp;sNear;&nbsp;
+   275: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rbN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.rb&nbsp;+&nbsp;sNear;&nbsp;
+   276: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rbM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.rb&nbsp;-&nbsp;sNear;&nbsp;
+   277: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.magMax&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;sMaxVal&nbsp;-&nbsp;v.ix&nbsp;+&nbsp;sNear;&nbsp;
+   278: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rcGeRb&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;bool2sl(v.rc&nbsp;&gt;=&nbsp;v.rb);&nbsp;
+   279: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rcLeRb&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;bool2sl(v.rc&nbsp;&lt;=&nbsp;v.rb);&nbsp;
+   280: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.bound&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iQ3Bound;&nbsp;
+   281: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cCtx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iCandCtx;&nbsp;
+   282: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cSign&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iCandSign;&nbsp;
+   283: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iCandC;&nbsp;
+   284: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iCandB;&nbsp;
+   285: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;iCandN;&nbsp;
+   286: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;0&nbsp;to&nbsp;8&nbsp;loop&nbsp;
+   287: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iCandSign(k)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   288: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cCs(k)&nbsp;:=&nbsp;-resize(iCandC(k),&nbsp;CW);&nbsp;
+   289: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   290: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cCs(k)&nbsp;:=&nbsp;resize(iCandC(k),&nbsp;CW);&nbsp;
+   291: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   292: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   293: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(0)&nbsp;&lt;=&nbsp;v;&nbsp;
+   294: &nbsp; &nbsp;
+   295: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S1:&nbsp;Ra,&nbsp;Q3,&nbsp;context&nbsp;select,&nbsp;MED&nbsp;-----------------------------------------------------&nbsp;
+   296: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;:=&nbsp;r(0);&nbsp;
+   297: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSt&nbsp;:=&nbsp;r(4).st;&nbsp;
+   298: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.firstPix&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   299: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSt.inRun&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;'0';&nbsp;
+   300: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSt.lastValid&nbsp;:=&nbsp;'0';&nbsp;
+   301: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   302: &nbsp; &nbsp;
+   303: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.firstCol&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   304: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vRa&nbsp;:=&nbsp;v.rb;&nbsp;
+   305: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   306: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vRa&nbsp;:=&nbsp;signed(resize(vSt.ra,&nbsp;W));&nbsp;
+   307: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   308: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.ra&nbsp;:=&nbsp;unsigned(vRa(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0));&nbsp;
+   309: &nbsp; &nbsp;
+   310: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vT&nbsp;:=&nbsp;0;&nbsp;
+   311: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;0&nbsp;to&nbsp;7&nbsp;loop&nbsp;
+   312: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vRa&nbsp;&lt;&nbsp;resize(v.bound(k),&nbsp;W))&nbsp;then&nbsp;
+   313: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vT&nbsp;:=&nbsp;vT&nbsp;+&nbsp;1;&nbsp;
+   314: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   315: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   316: &nbsp; &nbsp;
+   317: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;0&nbsp;to&nbsp;8&nbsp;loop&nbsp;
+   318: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMatch(k)&nbsp;:=&nbsp;vSt.lastValid&nbsp;and&nbsp;bool2sl(vSt.lastCtx&nbsp;=&nbsp;v.cCtx(k));&nbsp;
+   319: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   320: &nbsp; &nbsp;
+   321: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.run&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;vSt.inRun&nbsp;or&nbsp;bool2sl(v.q12Zero&nbsp;=&nbsp;'1'&nbsp;and&nbsp;vT&nbsp;=&nbsp;4);&nbsp;
+   322: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.hit&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;bool2sl(vRa&nbsp;&gt;=&nbsp;v.ixM&nbsp;and&nbsp;vRa&nbsp;&lt;=&nbsp;v.ixN);&nbsp;
+   323: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.riType&nbsp;:=&nbsp;bool2sl(vRa&nbsp;&gt;=&nbsp;v.rbM&nbsp;and&nbsp;vRa&nbsp;&lt;=&nbsp;v.rbN);&nbsp;
+   324: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.ctx&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.cCtx(vT);&nbsp;
+   325: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.sign&nbsp;&nbsp;&nbsp;:=&nbsp;v.cSign(vT);&nbsp;
+   326: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.cCs(vT);&nbsp;
+   327: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.cC(vT);&nbsp;
+   328: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.cB(vT);&nbsp;
+   329: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.cN(vT);&nbsp;
+   330: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.match&nbsp;&nbsp;:=&nbsp;vMatch(vT)&nbsp;and&nbsp;not&nbsp;v.run;&nbsp;
+   331: &nbsp; &nbsp;
+   332: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vRaLeRb&nbsp;:=&nbsp;vRa&nbsp;&lt;=&nbsp;v.rb;&nbsp;
+   333: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.rc&nbsp;&gt;=&nbsp;vRa&nbsp;and&nbsp;v.rcGeRb&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   334: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vRaLeRb)&nbsp;then&nbsp;
+   335: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMed&nbsp;:=&nbsp;vRa;&nbsp;
+   336: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   337: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMed&nbsp;:=&nbsp;v.rb;&nbsp;
+   338: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   339: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(v.rc&nbsp;&lt;=&nbsp;vRa&nbsp;and&nbsp;v.rcLeRb&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   340: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vRaLeRb)&nbsp;then&nbsp;
+   341: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMed&nbsp;:=&nbsp;v.rb;&nbsp;
+   342: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   343: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMed&nbsp;:=&nbsp;vRa;&nbsp;
+   344: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   345: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   346: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMed&nbsp;:=&nbsp;vRa&nbsp;+&nbsp;v.rbRc;&nbsp;
+   347: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   348: &nbsp; &nbsp;
+   349: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.run&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   350: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.riType&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   351: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.pbase&nbsp;:=&nbsp;vRa;&nbsp;
+   352: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   353: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.pbase&nbsp;:=&nbsp;v.rb;&nbsp;
+   354: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   355: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cs&nbsp;&nbsp;&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   356: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.sign&nbsp;:=&nbsp;not&nbsp;v.riType&nbsp;and&nbsp;bool2sl(not&nbsp;vRaLeRb);&nbsp;
+   357: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   358: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.pbase&nbsp;:=&nbsp;vMed;&nbsp;
+   359: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   360: &nbsp; &nbsp;
+   361: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSt.inRun&nbsp;:=&nbsp;v.run&nbsp;and&nbsp;v.hit&nbsp;and&nbsp;not&nbsp;v.eol;&nbsp;
+   362: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.run&nbsp;=&nbsp;'0')&nbsp;then&nbsp;
+   363: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSt.lastValid&nbsp;:=&nbsp;'1';&nbsp;
+   364: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSt.lastCtx&nbsp;&nbsp;&nbsp;:=&nbsp;v.ctx;&nbsp;
+   365: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   366: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(0)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   367: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.st&nbsp;:=&nbsp;vSt;&nbsp;
+   368: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   369: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.st&nbsp;:=&nbsp;r(4).st;&nbsp;
+   370: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   371: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(1)&nbsp;&lt;=&nbsp;v;&nbsp;
+   372: &nbsp; &nbsp;
+   373: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S2:&nbsp;forward&nbsp;C,&nbsp;Px,&nbsp;error&nbsp;magnitude&nbsp;--------------------------------------------------&nbsp;
+   374: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;r(1);&nbsp;
+   375: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastC&nbsp;&nbsp;:=&nbsp;r(5).lastC;&nbsp;
+   376: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastCn&nbsp;:=&nbsp;r(5).lastCn;&nbsp;
+   377: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.match&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   378: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.c&nbsp;:=&nbsp;v.lastC;&nbsp;
+   379: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.sign&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   380: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vCs&nbsp;:=&nbsp;resize(v.lastCn,&nbsp;W);&nbsp;
+   381: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   382: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vCs&nbsp;:=&nbsp;resize(v.lastC,&nbsp;W);&nbsp;
+   383: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   384: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   385: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vCs&nbsp;:=&nbsp;resize(v.cs,&nbsp;W);&nbsp;
+   386: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   387: &nbsp; &nbsp;
+   388: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vDiff&nbsp;:=&nbsp;v.ix&nbsp;-&nbsp;v.pbase&nbsp;-&nbsp;vCs;&nbsp;
+   389: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMA&nbsp;&nbsp;&nbsp;:=&nbsp;v.ixN&nbsp;-&nbsp;v.pbase&nbsp;-&nbsp;vCs;&nbsp;
+   390: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vMB&nbsp;&nbsp;&nbsp;:=&nbsp;v.pbase&nbsp;+&nbsp;vCs&nbsp;-&nbsp;v.ixM;&nbsp;
+   391: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.pbase&nbsp;+&nbsp;vCs&nbsp;&lt;&nbsp;0)&nbsp;then&nbsp;
+   392: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.px&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   393: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.ixN;&nbsp;
+   394: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dirPos&nbsp;:=&nbsp;'1';&nbsp;
+   395: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(v.pbase&nbsp;+&nbsp;vCs&nbsp;-&nbsp;sMaxP1&nbsp;&gt;=&nbsp;0)&nbsp;then&nbsp;
+   396: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.px&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;sMaxVal;&nbsp;
+   397: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.magMax;&nbsp;
+   398: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dirPos&nbsp;:=&nbsp;'0';&nbsp;
+   399: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   400: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.px&nbsp;:=&nbsp;v.pbase&nbsp;+&nbsp;vCs;&nbsp;
+   401: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vDiff&nbsp;&gt;=&nbsp;0)&nbsp;then&nbsp;
+   402: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;vMA;&nbsp;
+   403: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dirPos&nbsp;:=&nbsp;'1';&nbsp;
+   404: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   405: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;vMB;&nbsp;
+   406: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dirPos&nbsp;:=&nbsp;'0';&nbsp;
+   407: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   408: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   409: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;sValid(1)&nbsp;/=&nbsp;'1'&nbsp;or&nbsp;(vM&nbsp;&gt;=&nbsp;0&nbsp;and&nbsp;vM&nbsp;&lt;=&nbsp;sMaxVal&nbsp;+&nbsp;sNear)&nbsp;
+   410: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;|Errval|+NEAR&nbsp;outside&nbsp;[0,&nbsp;MAXVAL+NEAR]"&nbsp;severity&nbsp;failure;&nbsp;
+   411: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.m&nbsp;:=&nbsp;unsigned(vM(BITNESS&nbsp;downto&nbsp;0));&nbsp;
+   412: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.ePos&nbsp;:=&nbsp;v.dirPos&nbsp;xor&nbsp;v.sign;&nbsp;
+   413: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(2)&nbsp;&lt;=&nbsp;v;&nbsp;
+   414: &nbsp; &nbsp;
+   415: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S3:&nbsp;q&nbsp;=&nbsp;m&nbsp;/&nbsp;(2*NEAR+1),&nbsp;forward&nbsp;B/N,&nbsp;C&nbsp;+-1&nbsp;------------------------------------------&nbsp;
+   416: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;:=&nbsp;r(2);&nbsp;
+   417: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.q&nbsp;:=&nbsp;resize(shift_right(v.m&nbsp;*&nbsp;sRecip,&nbsp;SH),&nbsp;BITNESS&nbsp;+&nbsp;1);&nbsp;
+   418: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vDd&nbsp;:=&nbsp;signed(resize(sD,&nbsp;DW));&nbsp;
+   419: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.dirPos&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   420: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dS&nbsp;:=&nbsp;vDd;&nbsp;
+   421: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   422: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dS&nbsp;:=&nbsp;-vDd;&nbsp;
+   423: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   424: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.ePos&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   425: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dE&nbsp;:=&nbsp;vDd;&nbsp;
+   426: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   427: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dE&nbsp;:=&nbsp;-vDd;&nbsp;
+   428: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   429: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.pxOv&nbsp;:=&nbsp;v.px&nbsp;-&nbsp;sMaxP1;&nbsp;
+   430: &nbsp; &nbsp;
+   431: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cP1&nbsp;:=&nbsp;v.c;&nbsp;
+   432: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cM1&nbsp;:=&nbsp;v.c;&nbsp;
+   433: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.c&nbsp;&lt;&nbsp;CO_MAX_C)&nbsp;then&nbsp;
+   434: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cP1&nbsp;:=&nbsp;v.c&nbsp;+&nbsp;1;&nbsp;
+   435: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   436: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.c&nbsp;&gt;&nbsp;CO_MIN_C)&nbsp;then&nbsp;
+   437: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cM1&nbsp;:=&nbsp;v.c&nbsp;-&nbsp;1;&nbsp;
+   438: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   439: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cNeg&nbsp;&nbsp;&nbsp;:=&nbsp;-resize(v.c,&nbsp;CW);&nbsp;
+   440: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cP1Neg&nbsp;:=&nbsp;-resize(v.cP1,&nbsp;CW);&nbsp;
+   441: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.cM1Neg&nbsp;:=&nbsp;-resize(v.cM1,&nbsp;CW);&nbsp;
+   442: &nbsp; &nbsp;
+   443: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastB&nbsp;:=&nbsp;r(6).lastB;&nbsp;
+   444: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastN&nbsp;:=&nbsp;r(6).lastN;&nbsp;
+   445: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.match&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   446: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.b&nbsp;:=&nbsp;v.lastB;&nbsp;
+   447: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.n&nbsp;:=&nbsp;v.lastN;&nbsp;
+   448: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   449: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.nRes&nbsp;:=&nbsp;bool2sl(v.n&nbsp;=&nbsp;RESET);&nbsp;
+   450: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;v.n;&nbsp;
+   451: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.nRes&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   452: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vN&nbsp;:=&nbsp;shift_right(vN,&nbsp;1);&nbsp;
+   453: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   454: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.n1&nbsp;:=&nbsp;vN&nbsp;+&nbsp;1;&nbsp;
+   455: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(3)&nbsp;&lt;=&nbsp;v;&nbsp;
+   456: &nbsp; &nbsp;
+   457: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S4:&nbsp;Rx,&nbsp;Errval*(2*NEAR+1),&nbsp;modulo&nbsp;flags&nbsp;---------------------------------------------&nbsp;
+   458: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;r(3);&nbsp;
+   459: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vQs&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;signed('0'&nbsp;&amp;&nbsp;v.q);&nbsp;
+   460: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vRxRaw&nbsp;:=&nbsp;v.px&nbsp;+&nbsp;resize(vQs&nbsp;*&nbsp;v.dS,&nbsp;W);&nbsp;
+   461: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vOvT&nbsp;&nbsp;&nbsp;:=&nbsp;v.pxOv&nbsp;+&nbsp;resize(vQs&nbsp;*&nbsp;v.dS,&nbsp;W);&nbsp;
+   462: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.qdE&nbsp;&nbsp;:=&nbsp;resize(vQs&nbsp;*&nbsp;v.dE,&nbsp;W);&nbsp;
+   463: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vRxRaw&nbsp;&lt;&nbsp;0)&nbsp;then&nbsp;
+   464: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rx&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   465: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(vOvT&nbsp;&gt;=&nbsp;0)&nbsp;then&nbsp;
+   466: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rx&nbsp;:=&nbsp;unsigned(sMaxVal(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0));&nbsp;
+   467: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   468: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rx&nbsp;:=&nbsp;unsigned(vRxRaw(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0));&nbsp;
+   469: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   470: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.run&nbsp;=&nbsp;'1'&nbsp;and&nbsp;v.hit&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   471: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.rx&nbsp;:=&nbsp;v.ra;&nbsp;
+   472: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   473: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(3)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   474: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.st.ra&nbsp;:=&nbsp;v.rx;&nbsp;
+   475: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   476: &nbsp; &nbsp;
+   477: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.wrapDn&nbsp;:=&nbsp;v.ePos&nbsp;and&nbsp;bool2sl(v.q&nbsp;&gt;=&nbsp;sHalf);&nbsp;
+   478: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.wrapUp&nbsp;:=&nbsp;not&nbsp;v.ePos&nbsp;and&nbsp;bool2sl(v.q&nbsp;&gt;&nbsp;sRangeMHalf);&nbsp;
+   479: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.wrapDn&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   480: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.x&nbsp;:=&nbsp;resize(v.b,&nbsp;W)&nbsp;-&nbsp;sRangeD;&nbsp;
+   481: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(v.wrapUp&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   482: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.x&nbsp;:=&nbsp;resize(v.b,&nbsp;W)&nbsp;+&nbsp;sRangeD;&nbsp;
+   483: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   484: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.x&nbsp;:=&nbsp;resize(v.b,&nbsp;W);&nbsp;
+   485: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   486: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(4)&nbsp;&lt;=&nbsp;v;&nbsp;
+   487: &nbsp; &nbsp;
+   488: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S5:&nbsp;B&nbsp;+&nbsp;Errval*(2*NEAR+1),&nbsp;C&nbsp;update,&nbsp;Errval&nbsp;-----------------------------------------&nbsp;
+   489: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;r(4);&nbsp;
+   490: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSum&nbsp;:=&nbsp;v.x&nbsp;+&nbsp;v.qdE;&nbsp;
+   491: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.nRes&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   492: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.t&nbsp;:=&nbsp;shift_right(vSum,&nbsp;1);&nbsp;
+   493: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   494: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.t&nbsp;:=&nbsp;vSum;&nbsp;
+   495: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   496: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vN1&nbsp;&nbsp;&nbsp;:=&nbsp;signed(resize(v.n1,&nbsp;W));&nbsp;
+   497: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.dec&nbsp;:=&nbsp;bool2sl(v.t&nbsp;+&nbsp;vN1&nbsp;&lt;=&nbsp;0);&nbsp;
+   498: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.inc&nbsp;:=&nbsp;bool2sl(v.t&nbsp;&gt;&nbsp;0);&nbsp;
+   499: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.dec&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   500: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.c1&nbsp;:=&nbsp;v.cM1;&nbsp;
+   501: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(v.inc&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   502: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.c1&nbsp;:=&nbsp;v.cP1;&nbsp;
+   503: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   504: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.c1&nbsp;:=&nbsp;v.c;&nbsp;
+   505: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   506: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(4)&nbsp;=&nbsp;'1'&nbsp;and&nbsp;v.run&nbsp;=&nbsp;'0')&nbsp;then&nbsp;
+   507: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastC&nbsp;:=&nbsp;v.c1;&nbsp;
+   508: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.dec&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   509: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastCn&nbsp;:=&nbsp;v.cM1Neg;&nbsp;
+   510: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(v.inc&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   511: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastCn&nbsp;:=&nbsp;v.cP1Neg;&nbsp;
+   512: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   513: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastCn&nbsp;:=&nbsp;v.cNeg;&nbsp;
+   514: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   515: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   516: &nbsp; &nbsp;
+   517: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.ePos&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   518: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.wrapDn&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   519: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.errq&nbsp;:=&nbsp;resize(signed('0'&nbsp;&amp;&nbsp;v.q),&nbsp;BITNESS&nbsp;+&nbsp;1)&nbsp;-&nbsp;sRange;&nbsp;
+   520: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   521: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.errq&nbsp;:=&nbsp;resize(signed('0'&nbsp;&amp;&nbsp;v.q),&nbsp;BITNESS&nbsp;+&nbsp;1);&nbsp;
+   522: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   523: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   524: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.wrapUp&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   525: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.errq&nbsp;:=&nbsp;sRange&nbsp;-&nbsp;resize(signed('0'&nbsp;&amp;&nbsp;v.q),&nbsp;BITNESS&nbsp;+&nbsp;1);&nbsp;
+   526: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   527: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.errq&nbsp;:=&nbsp;-resize(signed('0'&nbsp;&amp;&nbsp;v.q),&nbsp;BITNESS&nbsp;+&nbsp;1);&nbsp;
+   528: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   529: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   530: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(5)&nbsp;&lt;=&nbsp;v;&nbsp;
+   531: &nbsp; &nbsp;
+   532: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;S6:&nbsp;B&nbsp;update&nbsp;------------------------------------------------------------------------&nbsp;
+   533: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;:=&nbsp;r(5);&nbsp;
+   534: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vN1&nbsp;:=&nbsp;signed(resize(v.n1,&nbsp;W));&nbsp;
+   535: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(v.dec&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   536: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vB1&nbsp;:=&nbsp;v.t&nbsp;+&nbsp;vN1;&nbsp;
+   537: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vB1&nbsp;+&nbsp;vN1&nbsp;&lt;=&nbsp;0)&nbsp;then&nbsp;
+   538: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vB1&nbsp;:=&nbsp;1&nbsp;-&nbsp;vN1;&nbsp;
+   539: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   540: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(v.inc&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   541: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vB1&nbsp;:=&nbsp;v.t&nbsp;-&nbsp;vN1;&nbsp;
+   542: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vB1&nbsp;&gt;&nbsp;0)&nbsp;then&nbsp;
+   543: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vB1&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   544: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   545: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   546: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vB1&nbsp;:=&nbsp;v.t;&nbsp;
+   547: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   548: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;sValid(5)&nbsp;/=&nbsp;'1'&nbsp;or&nbsp;(vB1&nbsp;&lt;=&nbsp;0&nbsp;and&nbsp;vB1&nbsp;+&nbsp;vN1&nbsp;&gt;&nbsp;0)&nbsp;
+   549: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;updated&nbsp;B&nbsp;outside&nbsp;[1-N,&nbsp;0]"&nbsp;severity&nbsp;failure;&nbsp;
+   550: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.b1&nbsp;:=&nbsp;resize(vB1,&nbsp;BW);&nbsp;
+   551: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(5)&nbsp;=&nbsp;'1'&nbsp;and&nbsp;v.run&nbsp;=&nbsp;'0')&nbsp;then&nbsp;
+   552: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastB&nbsp;:=&nbsp;v.b1;&nbsp;
+   553: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.lastN&nbsp;:=&nbsp;v.n1;&nbsp;
+   554: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   555: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(6)&nbsp;&lt;=&nbsp;v;&nbsp;
+   556: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   557: &nbsp; &nbsp;
+   558: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;pipe_proc;&nbsp;
+   559: &nbsp; &nbsp;
+   560: &nbsp; &nbsp;&nbsp;--&nbsp;Loop&nbsp;exit&nbsp;----------------------------------------------------------------------------------&nbsp;
+   561: &nbsp; &nbsp;&nbsp;oValid&nbsp;&nbsp;&lt;=&nbsp;sValid(STAGES);&nbsp;
+   562: &nbsp; &nbsp;&nbsp;oMode&nbsp;&nbsp;&nbsp;&lt;=&nbsp;"00"&nbsp;when&nbsp;r(STAGES).run&nbsp;=&nbsp;'0'&nbsp;else&nbsp;
+   563: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"01"&nbsp;when&nbsp;r(STAGES).hit&nbsp;=&nbsp;'1'&nbsp;else&nbsp;
+   564: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"10";&nbsp;
+   565: &nbsp; &nbsp;&nbsp;oRiType&nbsp;&lt;=&nbsp;r(STAGES).riType;&nbsp;
+   566: &nbsp; &nbsp;&nbsp;oRx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).rx;&nbsp;
+   567: &nbsp; &nbsp;&nbsp;oErrval&nbsp;&lt;=&nbsp;r(STAGES).errq;&nbsp;
+   568: &nbsp; &nbsp;&nbsp;oCtx&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).ctx;&nbsp;
+   569: &nbsp; &nbsp;&nbsp;oCq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).c1;&nbsp;
+   570: &nbsp; &nbsp;&nbsp;oBq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).b1;&nbsp;
+   571: &nbsp; &nbsp;&nbsp;oNq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).n1;&nbsp;
+   572: &nbsp; &nbsp;&nbsp;oBpre&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).b;&nbsp;
+   573: &nbsp; &nbsp;&nbsp;oNpre&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).n;&nbsp;
+   574: &nbsp; &nbsp;&nbsp;oNRes&nbsp;&nbsp;&nbsp;&lt;=&nbsp;r(STAGES).nRes;&nbsp;
+   575: &nbsp; &nbsp;&nbsp;oPx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;unsigned(r(STAGES).px(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0));&nbsp;
+   576: &nbsp; &nbsp;
+   577: &nbsp; &nbsp;&nbsp;--&nbsp;ASSERTIONS&nbsp;-------------------------------------------------------------------------------&nbsp;
+   578: &nbsp; &nbsp;&nbsp;--&nbsp;G2&nbsp;ranges&nbsp;of&nbsp;the&nbsp;registered&nbsp;pipeline&nbsp;nodes,&nbsp;on&nbsp;valid&nbsp;slots&nbsp;only&nbsp;(idle&nbsp;slots&nbsp;carry&nbsp;
+   579: &nbsp; &nbsp;&nbsp;--&nbsp;whatever&nbsp;the&nbsp;input&nbsp;held,&nbsp;U&nbsp;before&nbsp;the&nbsp;first&nbsp;pixel).&nbsp;
+   580: &nbsp; &nbsp;&nbsp;range_assert_proc&nbsp;:&nbsp;process&nbsp;(iClk)&nbsp;is&nbsp;
+   581: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vD&nbsp;&nbsp;&nbsp;:&nbsp;integer;&nbsp;
+   582: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vSum&nbsp;:&nbsp;integer;&nbsp;
+   583: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   584: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;rising_edge(iClk)&nbsp;then&nbsp;
+   585: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vD&nbsp;:=&nbsp;to_integer(sD);&nbsp;
+   586: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(1)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   587: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(1).ra&nbsp;&lt;=&nbsp;unsigned(sMaxVal(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0))&nbsp;
+   588: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;Ra&nbsp;above&nbsp;MAXVAL"&nbsp;severity&nbsp;failure;&nbsp;
+   589: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(1).pbase&nbsp;&gt;=&nbsp;0&nbsp;and&nbsp;r(1).pbase&nbsp;&lt;=&nbsp;sMaxVal&nbsp;
+   590: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;MED&nbsp;/&nbsp;run&nbsp;Px&nbsp;outside&nbsp;[0,&nbsp;MAXVAL]"&nbsp;severity&nbsp;failure;&nbsp;
+   591: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   592: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(2)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   593: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(2).px&nbsp;&gt;=&nbsp;0&nbsp;and&nbsp;r(2).px&nbsp;&lt;=&nbsp;sMaxVal&nbsp;
+   594: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;Px&nbsp;outside&nbsp;[0,&nbsp;MAXVAL]"&nbsp;severity&nbsp;failure;&nbsp;
+   595: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   596: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(3)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   597: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;to_integer(r(3).q)&nbsp;*&nbsp;vD&nbsp;&lt;=&nbsp;to_integer(r(3).m)&nbsp;and&nbsp;
+   598: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to_integer(r(3).m)&nbsp;&lt;&nbsp;(to_integer(r(3).q)&nbsp;+&nbsp;1)&nbsp;*&nbsp;vD&nbsp;
+   599: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;reciprocal&nbsp;quotient&nbsp;q&nbsp;/=&nbsp;m&nbsp;/&nbsp;(2*NEAR+1)"&nbsp;severity&nbsp;failure;&nbsp;
+   600: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(3).n&nbsp;&gt;=&nbsp;1&nbsp;and&nbsp;r(3).n&nbsp;&lt;=&nbsp;RESET&nbsp;and&nbsp;r(3).n1&nbsp;&gt;=&nbsp;2&nbsp;and&nbsp;r(3).n1&nbsp;&lt;=&nbsp;RESET&nbsp;
+   601: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;N&nbsp;outside&nbsp;[1,&nbsp;RESET]"&nbsp;severity&nbsp;failure;&nbsp;
+   602: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(3).b&nbsp;&lt;=&nbsp;0&nbsp;and&nbsp;to_integer(r(3).b)&nbsp;+&nbsp;to_integer(r(3).n)&nbsp;&gt;&nbsp;0&nbsp;
+   603: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;B&nbsp;outside&nbsp;[1-N,&nbsp;0]"&nbsp;severity&nbsp;failure;&nbsp;
+   604: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   605: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(4)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   606: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(4).rx&nbsp;&lt;=&nbsp;unsigned(sMaxVal(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0))&nbsp;
+   607: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;Rx&nbsp;above&nbsp;MAXVAL"&nbsp;severity&nbsp;failure;&nbsp;
+   608: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   609: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(sValid(5)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   610: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;r(5).errq&nbsp;&gt;=&nbsp;-signed(resize(sRangeMHalf,&nbsp;BITNESS&nbsp;+&nbsp;1))&nbsp;and&nbsp;
+   611: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r(5).errq&nbsp;&lt;&nbsp;signed(resize(sHalf,&nbsp;BITNESS&nbsp;+&nbsp;1))&nbsp;
+   612: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;Errval&nbsp;outside&nbsp;the&nbsp;A.9&nbsp;range"&nbsp;severity&nbsp;failure;&nbsp;
+   613: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSum&nbsp;:=&nbsp;to_integer(r(5).b)&nbsp;+&nbsp;to_integer(r(5).errq)&nbsp;*&nbsp;vD;&nbsp;
+   614: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(r(5).nRes&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   615: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSum&nbsp;:=&nbsp;(vSum&nbsp;-&nbsp;(vSum&nbsp;mod&nbsp;2))&nbsp;/&nbsp;2;&nbsp;
+   616: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   617: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;to_integer(r(5).t)&nbsp;=&nbsp;vSum&nbsp;
+   618: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"nl_loop:&nbsp;B&nbsp;+&nbsp;Errval*(2*NEAR+1)&nbsp;does&nbsp;not&nbsp;match&nbsp;the&nbsp;modulo-reduced&nbsp;Errval"&nbsp;severity&nbsp;failure;&nbsp;
+   619: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   620: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   621: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;range_assert_proc;&nbsp;
+   622: &nbsp; &nbsp;
+   623: &nbsp; end&nbsp;architecture&nbsp;behavioral;&nbsp;
+</code></pre>

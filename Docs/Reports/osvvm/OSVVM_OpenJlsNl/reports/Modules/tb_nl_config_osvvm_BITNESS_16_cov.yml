@@ -1,0 +1,253 @@
+Version: "0.1"
+Coverage: 100.00
+Settings: 
+  WritePassFail: 0
+Models: 
+  - Name: "Reset phase"
+    TestCases: 
+      - "tb_nl_config_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1144280738, 1484235242]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 4
+      TotalCovGoal: 4
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "phase"
+      NumBins: 4
+    Bins: 
+      - Name: "RECIP divide"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 19
+        AtLeast: 1
+        PercentCov: 1900.0000
+      - Name: "RANGE divide"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 19
+        AtLeast: 1
+        PercentCov: 1900.0000
+      - Name: "POST"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "DONE"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+
+  - Name: "Ranges (G2/G3)"
+    TestCases: 
+      - "tb_nl_config_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [154699623, 974475436]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 2
+      TotalCovGoal: 2
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "node"
+      NumBins: 2
+    Bins: 
+      - Name: "NEAR code MSB set"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 147
+        AtLeast: 1
+        PercentCov: 14700.0000
+      - Name: "T3 no clamp"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+        Count: 296
+        AtLeast: 1
+        PercentCov: 29600.0000
+
+  - Name: "NEAR"
+    TestCases: 
+      - "tb_nl_config_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1207074421, 907618086]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 3
+      TotalCovGoal: 3
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "NEAR"
+      NumBins: 3
+    Bins: 
+      - Name: "lossless"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "NEAR=1..NMAX-1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 254}
+        Count: 294
+        AtLeast: 1
+        PercentCov: 29400.0000
+      - Name: "NMAX"
+        Type: "COUNT"
+        Range: 
+          - {Min: 255, Max: 255}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+
+  - Name: "NEAR clamp"
+    TestCases: 
+      - "tb_nl_config_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1091541169, 1258041792]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 1
+      TotalCovGoal: 1
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "clamped"
+      NumBins: 1
+    Bins: 
+      - Name: "in range"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 296
+        AtLeast: 1
+        PercentCov: 29600.0000
+
+  - Name: "qbpp"
+    TestCases: 
+      - "tb_nl_config_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1207074421, 1804023927]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 9
+      TotalCovGoal: 9
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "qbpp"
+      NumBins: 9
+    Bins: 
+      - Name: "qbpp=8"
+        Type: "COUNT"
+        Range: 
+          - {Min: 8, Max: 8}
+        Count: 147
+        AtLeast: 1
+        PercentCov: 14700.0000
+      - Name: "qbpp=9"
+        Type: "COUNT"
+        Range: 
+          - {Min: 9, Max: 9}
+        Count: 71
+        AtLeast: 1
+        PercentCov: 7100.0000
+      - Name: "qbpp=10"
+        Type: "COUNT"
+        Range: 
+          - {Min: 10, Max: 10}
+        Count: 36
+        AtLeast: 1
+        PercentCov: 3600.0000
+      - Name: "qbpp=11"
+        Type: "COUNT"
+        Range: 
+          - {Min: 11, Max: 11}
+        Count: 22
+        AtLeast: 1
+        PercentCov: 2200.0000
+      - Name: "qbpp=12"
+        Type: "COUNT"
+        Range: 
+          - {Min: 12, Max: 12}
+        Count: 10
+        AtLeast: 1
+        PercentCov: 1000.0000
+      - Name: "qbpp=13"
+        Type: "COUNT"
+        Range: 
+          - {Min: 13, Max: 13}
+        Count: 6
+        AtLeast: 1
+        PercentCov: 600.0000
+      - Name: "qbpp=14"
+        Type: "COUNT"
+        Range: 
+          - {Min: 14, Max: 14}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "qbpp=15"
+        Type: "COUNT"
+        Range: 
+          - {Min: 15, Max: 15}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "qbpp=16"
+        Type: "COUNT"
+        Range: 
+          - {Min: 16, Max: 16}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+

@@ -1,0 +1,65 @@
+- Requirement: "T87.A10"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 99170, Errors: 0, Checked: 99170, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A11"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 61268, Errors: 0, Checked: 61268, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A11.1"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 99170, Errors: 0, Checked: 99170, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A12"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 61268, Errors: 0, Checked: 61268, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A15"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 38509, Errors: 0, Checked: 38509, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A16"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 76411, Errors: 0, Checked: 76411, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A20"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 37902, Errors: 0, Checked: 37902, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A21"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 37902, Errors: 0, Checked: 37902, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A22"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 37902, Errors: 0, Checked: 37902, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.A23"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 37902, Errors: 0, Checked: 37902, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.LaneState"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 137803, Errors: 0, Checked: 137803, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.WordTags"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 1000, Passed: 644710, Errors: 0, Checked: 644710, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Reset"
+  TestCases: 
+  - TestName: "tb_nl_backend_osvvm"
+    Status: PASSED
+    Results: {Goal: 20, Passed: 74, Errors: 0, Checked: 74, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

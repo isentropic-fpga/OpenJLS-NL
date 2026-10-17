@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NVC code coverage report</title>
+  <style>
+:root {
+    --table-row-color: #e8e8e8;
+    --margin-left: 20%;
+}
+
+body {
+    background-color: #f0f0e0ff;
+}
+
+header {
+    padding: 0.5em;
+    text-align: center;
+    font-size: 14pt;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    word-wrap: break-word;
+}
+
+h3 {
+    word-wrap: break-word;
+    margin-bottom: 0px;
+}
+
+hr {
+    border:none;
+    height: 2px;
+    background: black;
+}
+
+footer {
+    display: table;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav {
+    float: left;
+    background-color: var(--table-row-color);
+    width: 17%;
+    overflow: auto;
+    padding: 10px;
+    margin-top: -2px;
+    border: 2px solid black;
+}
+nav details details {
+    margin-left: 1rem;
+}
+nav details > a {
+    padding-left: 1.9rem;
+    display: block;
+}
+nav summary {
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+}
+nav summary::before {
+    content: '▶';
+    font-size: 0.7em;
+    margin-right: 0.4em;
+}
+nav details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+table {
+    table-layout: fixed;
+}
+
+table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+    word-wrap: break-word;
+}
+
+.tabcontent {
+    display: none;
+    padding: 0px 0px;
+    border: 2px solid #ccc;
+    border-top: none;
+    word-wrap: break-word;
+}
+
+.tab {
+    overflow: hidden;
+    border: 2px solid;
+    margin-left: var(--margin-left);
+    margin-top: 10px;
+}
+
+.cbg:hover {
+    background-color: #dddddd;
+}
+.cbg {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+
+.cbt {
+    margin-top: 8px;
+}
+.cbt th {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+.cbt td, .cbt th {
+    width: 50px;
+    text-align: center;
+}
+.cbt td + td, .cbt th + th {
+    width: 150px;
+}
+.cbt td + td + td, .cbt th + th + th {
+    width: 150px;
+}
+.cbt td + td + td + td, .cbt th + th + th + th {
+    width: 150px;
+}
+
+.percent100 {
+    background-color: #00cc00;
+}
+.percent90 {
+    background-color: #e6e600;
+}
+.percent80 {
+    background-color: #ff9900;
+}
+.percent0 {
+    background-color: #ff0000;
+}
+.percentna {
+    background-color: #cccccc;
+}
+
+.nav-sel {
+    font-weight: bold;
+}
+  </style>
+</head>
+<body style="font-family: verdana">
+
+<header><h1 style="text-align: center;">NVC code coverage report
+</h1></header>
+
+<h2 style="text-align: left;">
+   File:&nbsp; Top/tb_nl_top_osvvm.vhd
+</h2><pre><code>     0: &nbsp; --&nbsp;Copyright&nbsp;(C)&nbsp;2026&nbsp;Vitor&nbsp;Mendes&nbsp;Camilo&nbsp;
+     1: &nbsp; --&nbsp;SPDX-License-Identifier:&nbsp;GPL-3.0-only&nbsp;
+     2: &nbsp; --&nbsp;
+     3: &nbsp; --&nbsp;This&nbsp;file&nbsp;is&nbsp;part&nbsp;of&nbsp;OpenJLS.&nbsp;Available&nbsp;under&nbsp;GPLv3&nbsp;or&nbsp;a&nbsp;
+     4: &nbsp; --&nbsp;commercial&nbsp;license.&nbsp;See&nbsp;LICENSE&nbsp;and&nbsp;README&nbsp;for&nbsp;details.&nbsp;
+     5: &nbsp; --&nbsp;
+     6: &nbsp; &nbsp;
+     7: &nbsp; --------------------------------------------------------------------------------&nbsp;
+     8: &nbsp; --&nbsp;OSVVM&nbsp;testbench:&nbsp;nl_top&nbsp;(4&nbsp;vertical&nbsp;stripes,&nbsp;4&nbsp;output&nbsp;streams).&nbsp;
+     9: &nbsp; --&nbsp;
+    10: &nbsp; --&nbsp;Port&nbsp;of&nbsp;OpenJLS&nbsp;tb_openjls_top_osvvm&nbsp;to&nbsp;the&nbsp;4-lane&nbsp;core.&nbsp;The&nbsp;golden&nbsp;suite&nbsp;
+    11: &nbsp; --&nbsp;(Verification/Golden&nbsp;model)&nbsp;owns&nbsp;payload&nbsp;correctness&nbsp;on&nbsp;real&nbsp;images;&nbsp;here&nbsp;
+    12: &nbsp; --&nbsp;the&nbsp;payload&nbsp;oracle&nbsp;is&nbsp;small&nbsp;seeded&nbsp;images&nbsp;encoded&nbsp;per&nbsp;stripe&nbsp;by&nbsp;CharLS&nbsp;
+    13: &nbsp; --&nbsp;(tb_nl_top_golden_pkg,&nbsp;from&nbsp;gen_golden.py),&nbsp;and&nbsp;the&nbsp;TB&nbsp;proves&nbsp;the&nbsp;4&nbsp;streams&nbsp;
+    14: &nbsp; --&nbsp;stay&nbsp;byte-exact&nbsp;under&nbsp;stress:&nbsp;
+    15: &nbsp; --&nbsp;&nbsp;&nbsp;A&nbsp;&nbsp;every&nbsp;image&nbsp;alone,&nbsp;clean&nbsp;(all&nbsp;iReady&nbsp;high,&nbsp;no&nbsp;input&nbsp;gaps)&nbsp;
+    16: &nbsp; --&nbsp;&nbsp;&nbsp;B&nbsp;&nbsp;back&nbsp;to&nbsp;back:&nbsp;4&nbsp;images,&nbsp;no&nbsp;reset&nbsp;between&nbsp;them&nbsp;(context&nbsp;clear&nbsp;sweep&nbsp;
+    17: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;per-lane&nbsp;framer&nbsp;start&nbsp;in&nbsp;between)&nbsp;
+    18: &nbsp; --&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;every&nbsp;image&nbsp;under&nbsp;output&nbsp;backpressure&nbsp;(random&nbsp;per-lane&nbsp;iReady&nbsp;with&nbsp;
+    19: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not-ready&nbsp;bursts),&nbsp;input&nbsp;gaps,&nbsp;and&nbsp;both&nbsp;
+    20: &nbsp; --&nbsp;&nbsp;&nbsp;D&nbsp;&nbsp;back&nbsp;to&nbsp;back&nbsp;under&nbsp;both&nbsp;
+    21: &nbsp; --&nbsp;&nbsp;&nbsp;E&nbsp;&nbsp;stall&nbsp;propagation:&nbsp;a&nbsp;long&nbsp;iReady&nbsp;hold&nbsp;on&nbsp;one&nbsp;lane&nbsp;(each&nbsp;lane&nbsp;in&nbsp;
+    22: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;turn)&nbsp;and&nbsp;on&nbsp;all&nbsp;4&nbsp;must&nbsp;drop&nbsp;oReady&nbsp;(skid&nbsp;FIFO&nbsp;almost&nbsp;full&nbsp;-&gt;&nbsp;front&nbsp;
+    23: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;hold)&nbsp;while&nbsp;pixels&nbsp;are&nbsp;offered;&nbsp;nothing&nbsp;is&nbsp;lost&nbsp;after&nbsp;release&nbsp;
+    24: &nbsp; --&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;reset&nbsp;rounds:&nbsp;reset&nbsp;while&nbsp;idle,&nbsp;in&nbsp;the&nbsp;config&nbsp;divider,&nbsp;in&nbsp;the&nbsp;clear&nbsp;
+    25: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sweep,&nbsp;mid&nbsp;feed,&nbsp;while&nbsp;draining&nbsp;and&nbsp;with&nbsp;an&nbsp;output&nbsp;beat&nbsp;held.&nbsp;The&nbsp;
+    26: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;next&nbsp;config&nbsp;(NEAR,&nbsp;W,&nbsp;H)&nbsp;is&nbsp;drawn&nbsp;at&nbsp;random,&nbsp;so&nbsp;NEAR&nbsp;changes&nbsp;across&nbsp;
+    27: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reset;&nbsp;the&nbsp;aborted&nbsp;images&nbsp;are&nbsp;not&nbsp;scored,&nbsp;the&nbsp;recovery&nbsp;image&nbsp;is.&nbsp;
+    28: &nbsp; --&nbsp;
+    29: &nbsp; --&nbsp;Every&nbsp;lane&nbsp;checks&nbsp;byte-exact&nbsp;data,&nbsp;oKeep&nbsp;contiguous&nbsp;from&nbsp;the&nbsp;MSB&nbsp;with&nbsp;
+    30: &nbsp; --&nbsp;&gt;=&nbsp;1&nbsp;byte,&nbsp;oLast&nbsp;on&nbsp;the&nbsp;FF&nbsp;D9&nbsp;of&nbsp;each&nbsp;image,&nbsp;and&nbsp;the&nbsp;AXIS&nbsp;hold&nbsp;(valid,&nbsp;
+    31: &nbsp; --&nbsp;data,&nbsp;keep,&nbsp;last&nbsp;stable&nbsp;while&nbsp;iReady&nbsp;is&nbsp;low).&nbsp;
+    32: &nbsp; --&nbsp;
+    33: &nbsp; --&nbsp;Requirements:&nbsp;NL.StripeGolden,&nbsp;NL.BackToBack,&nbsp;NL.AxisOut,&nbsp;
+    34: &nbsp; --&nbsp;NL.StallPropagation,&nbsp;NL.NoStall,&nbsp;NL.ConfigInReset,&nbsp;NL.Reset&nbsp;(see&nbsp;
+    35: &nbsp; --&nbsp;Verification/OSVVM/README.md).&nbsp;
+    36: &nbsp; --&nbsp;
+    37: &nbsp; --&nbsp;Guideline&nbsp;notes:&nbsp;
+    38: &nbsp; --&nbsp;&nbsp;&nbsp;G1&nbsp;&nbsp;Reference&nbsp;bytes&nbsp;are&nbsp;CharLS&nbsp;(nl_charls.cpp)&nbsp;per&nbsp;stripe,&nbsp;generated&nbsp;
+    39: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;offline&nbsp;from&nbsp;the&nbsp;same&nbsp;pixels;&nbsp;nothing&nbsp;is&nbsp;derived&nbsp;from&nbsp;the&nbsp;RTL.&nbsp;
+    40: &nbsp; --&nbsp;&nbsp;&nbsp;G2&nbsp;&nbsp;covRange:&nbsp;W&nbsp;at&nbsp;32&nbsp;and&nbsp;at&nbsp;MAX_W,&nbsp;H&nbsp;at&nbsp;1&nbsp;and&nbsp;at&nbsp;MAX_H,&nbsp;NEAR&nbsp;at&nbsp;0&nbsp;and&nbsp;at&nbsp;
+    41: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min(255,&nbsp;MAXVAL/2).&nbsp;nl_top&nbsp;asserts&nbsp;the&nbsp;config&nbsp;ranges&nbsp;and&nbsp;the&nbsp;lane&nbsp;
+    42: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hand-off;&nbsp;its&nbsp;PSL&nbsp;checks&nbsp;the&nbsp;AXIS&nbsp;hold&nbsp;and&nbsp;reset&nbsp;per&nbsp;lane.&nbsp;
+    43: &nbsp; --&nbsp;&nbsp;&nbsp;G3&nbsp;&nbsp;N/A:&nbsp;no&nbsp;arithmetic&nbsp;in&nbsp;the&nbsp;TB&nbsp;beyond&nbsp;byte&nbsp;counts.&nbsp;
+    44: &nbsp; --&nbsp;&nbsp;&nbsp;G4&nbsp;&nbsp;covStress&nbsp;(image&nbsp;kind&nbsp;x&nbsp;stress&nbsp;mode),&nbsp;covB2B&nbsp;(clean&nbsp;/&nbsp;stressed),&nbsp;
+    45: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;covStall&nbsp;(hold&nbsp;per&nbsp;lane&nbsp;/&nbsp;all),&nbsp;covHold&nbsp;(per&nbsp;lane),&nbsp;covCfg&nbsp;(NEAR&nbsp;/&nbsp;
+    46: &nbsp; --&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dims&nbsp;change&nbsp;across&nbsp;reset).&nbsp;
+    47: &nbsp; --&nbsp;&nbsp;&nbsp;G5&nbsp;&nbsp;covRst:&nbsp;reset&nbsp;per&nbsp;phase,&nbsp;aborted&nbsp;output&nbsp;dropped,&nbsp;recovery&nbsp;scored.&nbsp;
+    48: &nbsp; --&nbsp;&nbsp;&nbsp;G6&nbsp;&nbsp;see&nbsp;the&nbsp;code&nbsp;coverage&nbsp;report.&nbsp;
+    49: &nbsp; --------------------------------------------------------------------------------&nbsp;
+    50: &nbsp; &nbsp;
+    51: &nbsp; library&nbsp;ieee;&nbsp;
+    52: &nbsp; &nbsp;&nbsp;use&nbsp;ieee.std_logic_1164.all;&nbsp;
+    53: &nbsp; &nbsp;&nbsp;use&nbsp;ieee.numeric_std.all;&nbsp;
+    54: &nbsp; &nbsp;&nbsp;use&nbsp;work.openjls_pkg.all;&nbsp;
+    55: &nbsp; &nbsp;&nbsp;use&nbsp;work.tb_nl_top_golden_pkg.all;&nbsp;
+    56: &nbsp; &nbsp;
+    57: &nbsp; library&nbsp;osvvm;&nbsp;
+    58: &nbsp; &nbsp;&nbsp;context&nbsp;osvvm.OsvvmContext;&nbsp;
+    59: &nbsp; &nbsp;&nbsp;use&nbsp;osvvm.ScoreboardPkg_slv.all;&nbsp;
+    60: &nbsp; &nbsp;
+    61: &nbsp; library&nbsp;tb_support;&nbsp;
+    62: &nbsp; &nbsp;&nbsp;use&nbsp;tb_support.tb_support_pkg.all;&nbsp;
+    63: &nbsp; &nbsp;
+    64: &nbsp; entity&nbsp;tb_nl_top_osvvm&nbsp;is&nbsp;
+    65: &nbsp; &nbsp;&nbsp;generic&nbsp;(&nbsp;
+    66: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;BITNESS&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;range&nbsp;8&nbsp;to&nbsp;16&nbsp;:=&nbsp;12;&nbsp;
+    67: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;OUT_WIDTH&nbsp;:&nbsp;natural&nbsp;:=&nbsp;64;&nbsp;
+    68: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Defaults&nbsp;equal&nbsp;the&nbsp;largest&nbsp;golden&nbsp;image&nbsp;(64&nbsp;x&nbsp;64),&nbsp;so&nbsp;W&nbsp;and&nbsp;H&nbsp;reach&nbsp;max.&nbsp;
+    69: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;MAX_W&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;64;&nbsp;
+    70: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;MAX_H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;64&nbsp;
+    71: &nbsp; &nbsp;&nbsp;);&nbsp;
+    72: &nbsp; end&nbsp;entity&nbsp;tb_nl_top_osvvm;&nbsp;
+    73: &nbsp; &nbsp;
+    74: &nbsp; architecture&nbsp;sim&nbsp;of&nbsp;tb_nl_top_osvvm&nbsp;is&nbsp;
+    75: &nbsp; &nbsp;
+    76: &nbsp; &nbsp;&nbsp;constant&nbsp;LANES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;4;&nbsp;
+    77: &nbsp; &nbsp;&nbsp;constant&nbsp;NB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;OUT_WIDTH&nbsp;/&nbsp;8;&nbsp;
+    78: &nbsp; &nbsp;&nbsp;constant&nbsp;CLK_PERIOD&nbsp;:&nbsp;time&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;CLK_PERIOD_DEFAULT;&nbsp;
+    79: &nbsp; &nbsp;&nbsp;constant&nbsp;NMAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;minimum(255,&nbsp;(2&nbsp;**&nbsp;BITNESS&nbsp;-&nbsp;1)&nbsp;/&nbsp;2);&nbsp;
+    80: &nbsp; &nbsp;
+    81: &nbsp; &nbsp;&nbsp;constant&nbsp;N_KIND&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;6;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;cases&nbsp;per&nbsp;BITNESS&nbsp;in&nbsp;the&nbsp;golden&nbsp;pkg&nbsp;
+    82: &nbsp; &nbsp;&nbsp;constant&nbsp;N_RST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;24;&nbsp;
+    83: &nbsp; &nbsp;&nbsp;constant&nbsp;HOLD_CYC&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;3500;&nbsp;
+    84: &nbsp; &nbsp;
+    85: &nbsp; &nbsp;&nbsp;--&nbsp;Stress&nbsp;modes.&nbsp;
+    86: &nbsp; &nbsp;&nbsp;constant&nbsp;M_CLEAN&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;
+    87: &nbsp; &nbsp;&nbsp;constant&nbsp;M_BP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;random&nbsp;per-lane&nbsp;iReady&nbsp;
+    88: &nbsp; &nbsp;&nbsp;constant&nbsp;M_GAP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;2;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;random&nbsp;input&nbsp;gaps&nbsp;
+    89: &nbsp; &nbsp;&nbsp;constant&nbsp;M_BOTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;3;&nbsp;
+    90: &nbsp; &nbsp;
+    91: &nbsp; &nbsp;&nbsp;--&nbsp;Reset&nbsp;phases.&nbsp;
+    92: &nbsp; &nbsp;&nbsp;constant&nbsp;RP_IDLE&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;
+    93: &nbsp; &nbsp;&nbsp;constant&nbsp;RP_CFG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;config&nbsp;divider&nbsp;running&nbsp;
+    94: &nbsp; &nbsp;&nbsp;constant&nbsp;RP_CLEAR&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;2;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;context&nbsp;clear&nbsp;sweep&nbsp;
+    95: &nbsp; &nbsp;&nbsp;constant&nbsp;RP_FEED&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;3;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;image&nbsp;partly&nbsp;fed&nbsp;
+    96: &nbsp; &nbsp;&nbsp;constant&nbsp;RP_DRAIN&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;4;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;all&nbsp;fed,&nbsp;oLast&nbsp;pending&nbsp;
+    97: &nbsp; &nbsp;&nbsp;constant&nbsp;RP_HOLD&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;5;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;output&nbsp;beat&nbsp;held&nbsp;
+    98: &nbsp; &nbsp;
+    99: &nbsp; &nbsp;&nbsp;signal&nbsp;clk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic&nbsp;:=&nbsp;'0';&nbsp;
+   100: &nbsp; &nbsp;&nbsp;signal&nbsp;rst&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic&nbsp;:=&nbsp;'1';&nbsp;
+   101: &nbsp; &nbsp;&nbsp;signal&nbsp;iNear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(7&nbsp;downto&nbsp;0)&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   102: &nbsp; &nbsp;&nbsp;signal&nbsp;iImageWidth&nbsp;&nbsp;:&nbsp;std_logic_vector(15&nbsp;downto&nbsp;0)&nbsp;:=&nbsp;x"0020";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;legal&nbsp;while&nbsp;the&nbsp;first&nbsp;reset&nbsp;runs&nbsp;
+   103: &nbsp; &nbsp;&nbsp;signal&nbsp;iImageHeight&nbsp;:&nbsp;std_logic_vector(15&nbsp;downto&nbsp;0)&nbsp;:=&nbsp;x"0001";&nbsp;
+   104: &nbsp; &nbsp;&nbsp;signal&nbsp;iValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic&nbsp;:=&nbsp;'0';&nbsp;
+   105: &nbsp; &nbsp;&nbsp;signal&nbsp;iPixel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(BITNESS&nbsp;-&nbsp;1&nbsp;downto&nbsp;0)&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   106: &nbsp; &nbsp;&nbsp;signal&nbsp;oReady&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic;&nbsp;
+   107: &nbsp; &nbsp;&nbsp;signal&nbsp;oData&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;*&nbsp;OUT_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   108: &nbsp; &nbsp;&nbsp;signal&nbsp;oValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   109: &nbsp; &nbsp;&nbsp;signal&nbsp;oKeep&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;*&nbsp;NB&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   110: &nbsp; &nbsp;&nbsp;signal&nbsp;oLast&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   111: &nbsp; &nbsp;&nbsp;signal&nbsp;iReady&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;-&nbsp;1&nbsp;downto&nbsp;0)&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'1');&nbsp;
+   112: &nbsp; &nbsp;
+   113: &nbsp; &nbsp;&nbsp;--&nbsp;First&nbsp;golden&nbsp;case&nbsp;of&nbsp;this&nbsp;BITNESS.&nbsp;
+   114: &nbsp; &nbsp;&nbsp;function&nbsp;first_case&nbsp;return&nbsp;natural&nbsp;is&nbsp;
+   115: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   116: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;c&nbsp;in&nbsp;CASES'range&nbsp;loop&nbsp;
+   117: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(CASES(c).bits&nbsp;=&nbsp;BITNESS)&nbsp;then&nbsp;
+   118: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;c;&nbsp;
+   119: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   120: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   121: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"tb_nl_top_osvvm:&nbsp;no&nbsp;golden&nbsp;cases&nbsp;for&nbsp;BITNESS&nbsp;"&nbsp;&amp;&nbsp;integer'image(BITNESS)&nbsp;severity&nbsp;failure;&nbsp;
+   122: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;&nbsp;
+   123: &nbsp; &nbsp;&nbsp;end&nbsp;function&nbsp;first_case;&nbsp;
+   124: &nbsp; &nbsp;
+   125: &nbsp; &nbsp;&nbsp;constant&nbsp;BASE&nbsp;:&nbsp;natural&nbsp;:=&nbsp;first_case;&nbsp;
+   126: &nbsp; &nbsp;
+   127: &nbsp; begin&nbsp;
+   128: &nbsp; &nbsp;
+   129: &nbsp; &nbsp;&nbsp;clk&nbsp;&lt;=&nbsp;not&nbsp;clk&nbsp;after&nbsp;CLK_PERIOD&nbsp;/&nbsp;2;&nbsp;
+   130: &nbsp; &nbsp;
+   131: &nbsp; &nbsp;&nbsp;dut&nbsp;:&nbsp;entity&nbsp;work.nl_top&nbsp;
+   132: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;generic&nbsp;map&nbsp;(&nbsp;
+   133: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BITNESS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;BITNESS,&nbsp;
+   134: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAX_IMAGE_WIDTH&nbsp;&nbsp;=&gt;&nbsp;MAX_W,&nbsp;
+   135: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAX_IMAGE_HEIGHT&nbsp;=&gt;&nbsp;MAX_H,&nbsp;
+   136: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OUT_WIDTH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;OUT_WIDTH&nbsp;
+   137: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;
+   138: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;port&nbsp;map&nbsp;(&nbsp;
+   139: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iClk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;clk,&nbsp;
+   140: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iRst&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;rst,&nbsp;
+   141: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iNear,&nbsp;
+   142: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iImageWidth&nbsp;&nbsp;=&gt;&nbsp;iImageWidth,&nbsp;
+   143: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iImageHeight&nbsp;=&gt;&nbsp;iImageHeight,&nbsp;
+   144: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iValid,&nbsp;
+   145: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iPixel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iPixel,&nbsp;
+   146: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oReady&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oReady,&nbsp;
+   147: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oData&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oData,&nbsp;
+   148: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oValid,&nbsp;
+   149: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oKeep&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oKeep,&nbsp;
+   150: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oLast&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;oLast,&nbsp;
+   151: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iReady&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;iReady&nbsp;
+   152: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;
+   153: &nbsp; &nbsp;
+   154: &nbsp; &nbsp;&nbsp;stim&nbsp;:&nbsp;process&nbsp;is&nbsp;
+   155: &nbsp; &nbsp;
+   156: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Phase&nbsp;probes&nbsp;(G5):&nbsp;config&nbsp;divider&nbsp;done,&nbsp;context&nbsp;clear&nbsp;sweep.&nbsp;
+   157: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;alias&nbsp;sCfgDone&nbsp;is&nbsp;&lt;&lt;&nbsp;signal&nbsp;.tb_nl_top_osvvm.dut.sCfgDone&nbsp;:&nbsp;std_logic&nbsp;&gt;&gt;;&nbsp;
+   158: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;alias&nbsp;sClr&nbsp;is&nbsp;&lt;&lt;&nbsp;signal&nbsp;.tb_nl_top_osvvm.dut.sClr&nbsp;:&nbsp;std_logic&nbsp;&gt;&gt;;&nbsp;
+   159: &nbsp; &nbsp;
+   160: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;t_int&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1)&nbsp;of&nbsp;integer;&nbsp;
+   161: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;t_bool&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1)&nbsp;of&nbsp;boolean;&nbsp;
+   162: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;t_data&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1)&nbsp;of&nbsp;std_logic_vector(OUT_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   163: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;t_keep&nbsp;is&nbsp;array&nbsp;(0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1)&nbsp;of&nbsp;std_logic_vector(NB&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   164: &nbsp; &nbsp;
+   165: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;constant&nbsp;SB&nbsp;:&nbsp;ScoreboardIDArrayType&nbsp;:=&nbsp;NewID("lane&nbsp;SB",&nbsp;LANES);&nbsp;
+   166: &nbsp; &nbsp;
+   167: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;rv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;RandomPType;&nbsp;
+   168: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqGold&nbsp;&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   169: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqB2B&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   170: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqAxis&nbsp;&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   171: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqStall&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   172: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqNoStl&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   173: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqCfg&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   174: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;reqRst&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;AlertLogIDType;&nbsp;
+   175: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covStress&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   176: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covB2B&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   177: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covStall&nbsp;&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   178: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covHold&nbsp;&nbsp;&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   179: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covRst&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   180: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covCfg&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   181: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;covRange&nbsp;&nbsp;:&nbsp;CoverageIDType;&nbsp;
+   182: &nbsp; &nbsp;
+   183: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Session:&nbsp;images&nbsp;queued&nbsp;since&nbsp;the&nbsp;last&nbsp;reset&nbsp;(all&nbsp;share&nbsp;its&nbsp;config).&nbsp;
+   184: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;cfgCase&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;BASE;&nbsp;
+   185: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;fq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;integer_vector(0&nbsp;to&nbsp;15);&nbsp;
+   186: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;nFq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;images&nbsp;queued&nbsp;
+   187: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;fedImg&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;images&nbsp;fully&nbsp;fed&nbsp;
+   188: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;pixIdx&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;next&nbsp;pixel&nbsp;of&nbsp;image&nbsp;fedImg&nbsp;
+   189: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;vld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;boolean&nbsp;:=&nbsp;false;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;pixel&nbsp;offered,&nbsp;not&nbsp;taken&nbsp;
+   190: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;gapLeft&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;
+   191: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;mode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;M_CLEAN;&nbsp;
+   192: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;holdMask&nbsp;&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;-&nbsp;1&nbsp;downto&nbsp;0)&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   193: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;newCfg&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;boolean&nbsp;:=&nbsp;false;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;config&nbsp;changed&nbsp;at&nbsp;the&nbsp;last&nbsp;reset&nbsp;
+   194: &nbsp; &nbsp;
+   195: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Per&nbsp;lane&nbsp;output&nbsp;state.&nbsp;
+   196: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;imgDone&nbsp;&nbsp;&nbsp;:&nbsp;t_int&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;0);&nbsp;
+   197: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;laneBytes&nbsp;:&nbsp;t_int&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;0);&nbsp;
+   198: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;sbErr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_int&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;0);&nbsp;
+   199: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;notRdy&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_int&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;0);&nbsp;
+   200: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;held&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;t_bool&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;false);&nbsp;
+   201: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;heldData&nbsp;&nbsp;:&nbsp;t_data;&nbsp;
+   202: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;heldKeep&nbsp;&nbsp;:&nbsp;t_keep;&nbsp;
+   203: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;heldLast&nbsp;&nbsp;:&nbsp;t_bool;&nbsp;
+   204: &nbsp; &nbsp;
+   205: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;oReady&nbsp;low&nbsp;while&nbsp;a&nbsp;pixel&nbsp;is&nbsp;offered,&nbsp;outside&nbsp;config&nbsp;/&nbsp;clear&nbsp;sweep.&nbsp;
+   206: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;stallCyc&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;
+   207: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;cycles&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural&nbsp;:=&nbsp;0;&nbsp;
+   208: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;dropped&nbsp;&nbsp;&nbsp;:&nbsp;std_logic_vector(8&nbsp;downto&nbsp;0);&nbsp;
+   209: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;stallSeen&nbsp;:&nbsp;boolean;&nbsp;
+   210: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;hit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;boolean;&nbsp;
+   211: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;ph&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural;&nbsp;
+   212: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural;&nbsp;
+   213: &nbsp; &nbsp;
+   214: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;impure&nbsp;function&nbsp;npix&nbsp;(cs&nbsp;:&nbsp;natural)&nbsp;return&nbsp;natural&nbsp;is&nbsp;
+   215: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   216: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;CASES(cs).w&nbsp;*&nbsp;CASES(cs).h;&nbsp;
+   217: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;function&nbsp;npix;&nbsp;
+   218: &nbsp; &nbsp;
+   219: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Queue&nbsp;image&nbsp;cs;&nbsp;its&nbsp;4&nbsp;lane&nbsp;streams&nbsp;go&nbsp;to&nbsp;the&nbsp;scoreboards.&nbsp;
+   220: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;enqueue&nbsp;(cs&nbsp;:&nbsp;natural)&nbsp;is&nbsp;
+   221: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   222: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;CASES(cs).w&nbsp;=&nbsp;CASES(cfgCase).w&nbsp;and&nbsp;CASES(cs).h&nbsp;=&nbsp;CASES(cfgCase).h&nbsp;and&nbsp;
+   223: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASES(cs).near&nbsp;=&nbsp;CASES(cfgCase).near&nbsp;
+   224: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"tb:&nbsp;enqueued&nbsp;image&nbsp;does&nbsp;not&nbsp;match&nbsp;the&nbsp;reset&nbsp;config"&nbsp;severity&nbsp;failure;&nbsp;
+   225: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fq(nFq)&nbsp;:=&nbsp;cs;&nbsp;
+   226: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nFq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;nFq&nbsp;+&nbsp;1;&nbsp;
+   227: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   228: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;0&nbsp;to&nbsp;CASES(cs).lane_len(l)&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   229: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Push(SB(SB'low&nbsp;+&nbsp;l),&nbsp;bool2bit(i&nbsp;=&nbsp;CASES(cs).lane_len(l)&nbsp;-&nbsp;1)&nbsp;&amp;&nbsp;
+   230: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std_logic_vector(to_unsigned(BYTES(CASES(cs).lane_off(l)&nbsp;+&nbsp;i),&nbsp;8)));&nbsp;
+   231: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   232: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   233: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;enqueue;&nbsp;
+   234: &nbsp; &nbsp;
+   235: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Reset&nbsp;with&nbsp;the&nbsp;config&nbsp;of&nbsp;case&nbsp;cs,&nbsp;dropping&nbsp;everything&nbsp;in&nbsp;flight.&nbsp;
+   236: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;do_reset&nbsp;(cs&nbsp;:&nbsp;natural;&nbsp;n&nbsp;:&nbsp;positive)&nbsp;is&nbsp;
+   237: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constant&nbsp;OLD&nbsp;:&nbsp;natural&nbsp;:=&nbsp;cfgCase;&nbsp;
+   238: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   239: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iNear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;std_logic_vector(to_unsigned(CASES(cs).near,&nbsp;8));&nbsp;
+   240: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iImageWidth&nbsp;&nbsp;&lt;=&nbsp;std_logic_vector(to_unsigned(CASES(cs).w,&nbsp;16));&nbsp;
+   241: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iImageHeight&nbsp;&lt;=&nbsp;std_logic_vector(to_unsigned(CASES(cs).h,&nbsp;16));&nbsp;
+   242: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iValid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;'0';&nbsp;
+   243: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rst&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;'1';&nbsp;
+   244: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;1&nbsp;to&nbsp;n&nbsp;loop&nbsp;
+   245: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait&nbsp;until&nbsp;rising_edge(clk);&nbsp;
+   246: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   247: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rst&nbsp;&lt;=&nbsp;'0';&nbsp;
+   248: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait&nbsp;for&nbsp;1&nbsp;ns;&nbsp;
+   249: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;oLast&nbsp;/&nbsp;oData&nbsp;are&nbsp;FIFO&nbsp;data&nbsp;(not&nbsp;reset);&nbsp;only&nbsp;oValid&nbsp;qualifies&nbsp;them.&nbsp;
+   250: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqRst,&nbsp;oValid&nbsp;=&nbsp;"0000",&nbsp;"reset:&nbsp;output&nbsp;streams&nbsp;cleared");&nbsp;
+   251: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   252: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;not&nbsp;IsEmpty(SB(SB'low&nbsp;+&nbsp;l))&nbsp;loop&nbsp;
+   253: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pop(SB(SB'low&nbsp;+&nbsp;l),&nbsp;dropped);&nbsp;
+   254: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   255: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;imgDone(l)&nbsp;&nbsp;&nbsp;:=&nbsp;0;&nbsp;
+   256: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;laneBytes(l)&nbsp;:=&nbsp;0;&nbsp;
+   257: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;held(l)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;false;&nbsp;
+   258: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;notRdy(l)&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;0;&nbsp;
+   259: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sbErr(l)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;GetErrorCount(SB(SB'low&nbsp;+&nbsp;l));&nbsp;
+   260: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   261: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cfgCase&nbsp;&nbsp;:=&nbsp;cs;&nbsp;
+   262: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nFq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;0;&nbsp;
+   263: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fedImg&nbsp;&nbsp;&nbsp;:=&nbsp;0;&nbsp;
+   264: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pixIdx&nbsp;&nbsp;&nbsp;:=&nbsp;0;&nbsp;
+   265: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;false;&nbsp;
+   266: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gapLeft&nbsp;&nbsp;:=&nbsp;0;&nbsp;
+   267: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;holdMask&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   268: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newCfg&nbsp;&nbsp;&nbsp;:=&nbsp;CASES(cs).near&nbsp;/=&nbsp;CASES(OLD).near&nbsp;or&nbsp;CASES(cs).w&nbsp;/=&nbsp;CASES(OLD).w&nbsp;or&nbsp;
+   269: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASES(cs).h&nbsp;/=&nbsp;CASES(OLD).h;&nbsp;
+   270: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(CASES(cs).near&nbsp;/=&nbsp;CASES(OLD).near)&nbsp;then&nbsp;
+   271: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covCfg,&nbsp;0);&nbsp;
+   272: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   273: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(CASES(cs).w&nbsp;/=&nbsp;CASES(OLD).w&nbsp;or&nbsp;CASES(cs).h&nbsp;/=&nbsp;CASES(OLD).h)&nbsp;then&nbsp;
+   274: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covCfg,&nbsp;1);&nbsp;
+   275: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   276: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(not&nbsp;newCfg)&nbsp;then&nbsp;
+   277: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covCfg,&nbsp;2);&nbsp;
+   278: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   279: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covRange,&nbsp;(0,&nbsp;CASES(cs).w));&nbsp;
+   280: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covRange,&nbsp;(1,&nbsp;CASES(cs).h));&nbsp;
+   281: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covRange,&nbsp;(2,&nbsp;CASES(cs).near));&nbsp;
+   282: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;do_reset;&nbsp;
+   283: &nbsp; &nbsp;
+   284: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Lane&nbsp;l's&nbsp;iReady&nbsp;this&nbsp;cycle.&nbsp;
+   285: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;lane_ready&nbsp;(l&nbsp;:&nbsp;natural;&nbsp;r&nbsp;:&nbsp;out&nbsp;std_logic)&nbsp;is&nbsp;
+   286: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   287: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(holdMask(l)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   288: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;:=&nbsp;'0';&nbsp;
+   289: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(mode&nbsp;/=&nbsp;M_BP&nbsp;and&nbsp;mode&nbsp;/=&nbsp;M_BOTH)&nbsp;then&nbsp;
+   290: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;:=&nbsp;'1';&nbsp;
+   291: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(notRdy(l)&nbsp;&gt;&nbsp;0)&nbsp;then&nbsp;
+   292: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;notRdy(l)&nbsp;:=&nbsp;notRdy(l)&nbsp;-&nbsp;1;&nbsp;
+   293: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;'0';&nbsp;
+   294: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(rv.DistValInt(((1,&nbsp;1),&nbsp;(0,&nbsp;15)))&nbsp;=&nbsp;1)&nbsp;then&nbsp;
+   295: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;notRdy(l)&nbsp;:=&nbsp;rv.RandInt(1,&nbsp;12);&nbsp;
+   296: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;'0';&nbsp;
+   297: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   298: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;:=&nbsp;bool2bit(rv.DistValInt(((1,&nbsp;3),&nbsp;(0,&nbsp;1)))&nbsp;=&nbsp;1);&nbsp;
+   299: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   300: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;lane_ready;&nbsp;
+   301: &nbsp; &nbsp;
+   302: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Check&nbsp;lane&nbsp;l's&nbsp;output&nbsp;at&nbsp;this&nbsp;edge.&nbsp;
+   303: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;check_lane&nbsp;(l&nbsp;:&nbsp;natural)&nbsp;is&nbsp;
+   304: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;data&nbsp;:&nbsp;std_logic_vector(OUT_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   305: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;keep&nbsp;:&nbsp;std_logic_vector(NB&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   306: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;n&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;natural;&nbsp;
+   307: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;ok&nbsp;&nbsp;&nbsp;:&nbsp;boolean;&nbsp;
+   308: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;cs&nbsp;&nbsp;&nbsp;:&nbsp;natural;&nbsp;
+   309: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   310: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;:=&nbsp;oData((l&nbsp;+&nbsp;1)&nbsp;*&nbsp;OUT_WIDTH&nbsp;-&nbsp;1&nbsp;downto&nbsp;l&nbsp;*&nbsp;OUT_WIDTH);&nbsp;
+   311: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keep&nbsp;:=&nbsp;oKeep((l&nbsp;+&nbsp;1)&nbsp;*&nbsp;NB&nbsp;-&nbsp;1&nbsp;downto&nbsp;l&nbsp;*&nbsp;NB);&nbsp;
+   312: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(held(l))&nbsp;then&nbsp;
+   313: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqAxis,&nbsp;oValid(l)&nbsp;=&nbsp;'1'&nbsp;and&nbsp;data&nbsp;=&nbsp;heldData(l)&nbsp;and&nbsp;keep&nbsp;=&nbsp;heldKeep(l)&nbsp;and&nbsp;
+   314: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(oLast(l)&nbsp;=&nbsp;'1')&nbsp;=&nbsp;heldLast(l),&nbsp;
+   315: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;":&nbsp;beat&nbsp;held&nbsp;while&nbsp;iReady&nbsp;is&nbsp;low");&nbsp;
+   316: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   317: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;held(l)&nbsp;:=&nbsp;oValid(l)&nbsp;=&nbsp;'1'&nbsp;and&nbsp;iReady(l)&nbsp;=&nbsp;'0';&nbsp;
+   318: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(held(l))&nbsp;then&nbsp;
+   319: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;heldData(l)&nbsp;:=&nbsp;data;&nbsp;
+   320: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;heldKeep(l)&nbsp;:=&nbsp;keep;&nbsp;
+   321: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;heldLast(l)&nbsp;:=&nbsp;oLast(l)&nbsp;=&nbsp;'1';&nbsp;
+   322: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covHold,&nbsp;l);&nbsp;
+   323: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   324: &nbsp; &nbsp;
+   325: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(oValid(l)&nbsp;=&nbsp;'1'&nbsp;and&nbsp;iReady(l)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   326: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;oKeep:&nbsp;n&nbsp;ones&nbsp;from&nbsp;the&nbsp;MSB,&nbsp;then&nbsp;zeros.&nbsp;
+   327: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;:=&nbsp;0;&nbsp;
+   328: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;n&nbsp;&lt;&nbsp;NB&nbsp;and&nbsp;keep(NB&nbsp;-&nbsp;1&nbsp;-&nbsp;n)&nbsp;=&nbsp;'1'&nbsp;loop&nbsp;
+   329: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;:=&nbsp;n&nbsp;+&nbsp;1;&nbsp;
+   330: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   331: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ok&nbsp;:=&nbsp;n&nbsp;&gt;=&nbsp;1;&nbsp;
+   332: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;n&nbsp;to&nbsp;NB&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   333: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ok&nbsp;:=&nbsp;ok&nbsp;and&nbsp;keep(NB&nbsp;-&nbsp;1&nbsp;-&nbsp;i)&nbsp;=&nbsp;'0';&nbsp;
+   334: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   335: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqAxis,&nbsp;ok,&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;":&nbsp;oKeep&nbsp;contiguous&nbsp;from&nbsp;the&nbsp;MSB,&nbsp;"&nbsp;&amp;&nbsp;to_hstring(keep));&nbsp;
+   336: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;0&nbsp;to&nbsp;n&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   337: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check(SB(SB'low&nbsp;+&nbsp;l),&nbsp;bool2bit(oLast(l)&nbsp;=&nbsp;'1'&nbsp;and&nbsp;i&nbsp;=&nbsp;n&nbsp;-&nbsp;1)&nbsp;&amp;&nbsp;
+   338: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data(OUT_WIDTH&nbsp;-&nbsp;1&nbsp;-&nbsp;8&nbsp;*&nbsp;i&nbsp;downto&nbsp;OUT_WIDTH&nbsp;-&nbsp;8&nbsp;*&nbsp;(i&nbsp;+&nbsp;1)));&nbsp;
+   339: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;laneBytes(l)&nbsp;:=&nbsp;laneBytes(l)&nbsp;+&nbsp;1;&nbsp;
+   340: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   341: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(oLast(l)&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   342: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqAxis,&nbsp;imgDone(l)&nbsp;&lt;&nbsp;nFq,&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;":&nbsp;oLast&nbsp;only&nbsp;for&nbsp;a&nbsp;queued&nbsp;image");&nbsp;
+   343: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(imgDone(l)&nbsp;&lt;&nbsp;nFq)&nbsp;then&nbsp;
+   344: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cs&nbsp;:=&nbsp;fq(imgDone(l));&nbsp;
+   345: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqGold,&nbsp;laneBytes(l)&nbsp;=&nbsp;CASES(cs).lane_len(l)&nbsp;and&nbsp;GetErrorCount(SB(SB'low&nbsp;+&nbsp;l))&nbsp;=&nbsp;sbErr(l),&nbsp;
+   346: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;":&nbsp;image&nbsp;"&nbsp;&amp;&nbsp;to_string(imgDone(l))&nbsp;&amp;&nbsp;"&nbsp;(case&nbsp;"&nbsp;&amp;&nbsp;to_string(cs)&nbsp;&amp;&nbsp;
+   347: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")&nbsp;byte-exact,&nbsp;"&nbsp;&amp;&nbsp;to_string(laneBytes(l))&nbsp;&amp;&nbsp;"&nbsp;of&nbsp;"&nbsp;&amp;&nbsp;to_string(CASES(cs).lane_len(l))&nbsp;&amp;&nbsp;"&nbsp;bytes");&nbsp;
+   348: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(imgDone(l)&nbsp;&gt;&nbsp;0)&nbsp;then&nbsp;
+   349: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqB2B,&nbsp;GetErrorCount(SB(SB'low&nbsp;+&nbsp;l))&nbsp;=&nbsp;sbErr(l),&nbsp;
+   350: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;":&nbsp;back-to-back&nbsp;image&nbsp;"&nbsp;&amp;&nbsp;to_string(imgDone(l))&nbsp;&amp;&nbsp;"&nbsp;byte-exact");&nbsp;
+   351: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;(newCfg)&nbsp;then&nbsp;
+   352: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqCfg,&nbsp;GetErrorCount(SB(SB'low&nbsp;+&nbsp;l))&nbsp;=&nbsp;sbErr(l),&nbsp;
+   353: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;":&nbsp;first&nbsp;image&nbsp;after&nbsp;a&nbsp;config&nbsp;change&nbsp;byte-exact");&nbsp;
+   354: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   355: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   356: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sbErr(l)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;GetErrorCount(SB(SB'low&nbsp;+&nbsp;l));&nbsp;
+   357: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;imgDone(l)&nbsp;&nbsp;&nbsp;:=&nbsp;imgDone(l)&nbsp;+&nbsp;1;&nbsp;
+   358: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;laneBytes(l)&nbsp;:=&nbsp;0;&nbsp;
+   359: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   360: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   361: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;check_lane;&nbsp;
+   362: &nbsp; &nbsp;
+   363: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;One&nbsp;clock:&nbsp;drive&nbsp;just&nbsp;after&nbsp;an&nbsp;edge,&nbsp;check&nbsp;at&nbsp;the&nbsp;next.&nbsp;
+   364: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;step&nbsp;is&nbsp;
+   365: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variable&nbsp;rdy&nbsp;:&nbsp;std_logic_vector(LANES&nbsp;-&nbsp;1&nbsp;downto&nbsp;0);&nbsp;
+   366: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   367: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(not&nbsp;vld&nbsp;and&nbsp;fedImg&nbsp;&lt;&nbsp;nFq)&nbsp;then&nbsp;
+   368: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(gapLeft&nbsp;&gt;&nbsp;0)&nbsp;then&nbsp;
+   369: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gapLeft&nbsp;:=&nbsp;gapLeft&nbsp;-&nbsp;1;&nbsp;
+   370: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elsif&nbsp;((mode&nbsp;=&nbsp;M_GAP&nbsp;or&nbsp;mode&nbsp;=&nbsp;M_BOTH)&nbsp;and&nbsp;rv.DistValInt(((1,&nbsp;1),&nbsp;(0,&nbsp;7)))&nbsp;=&nbsp;1)&nbsp;then&nbsp;
+   371: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gapLeft&nbsp;:=&nbsp;rv.RandInt(0,&nbsp;20);&nbsp;
+   372: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   373: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vld&nbsp;:=&nbsp;true;&nbsp;
+   374: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iPixel&nbsp;&lt;=&nbsp;std_logic_vector(to_unsigned(PIX(CASES(fq(fedImg)).pix_off&nbsp;+&nbsp;pixIdx),&nbsp;BITNESS));&nbsp;
+   375: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   376: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   377: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iValid&nbsp;&lt;=&nbsp;bool2bit(vld);&nbsp;
+   378: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   379: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lane_ready(l,&nbsp;rdy(l));&nbsp;
+   380: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   381: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iReady&nbsp;&lt;=&nbsp;rdy;&nbsp;
+   382: &nbsp; &nbsp;
+   383: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait&nbsp;until&nbsp;rising_edge(clk);&nbsp;
+   384: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cycles&nbsp;:=&nbsp;cycles&nbsp;+&nbsp;1;&nbsp;
+   385: &nbsp; &nbsp;
+   386: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Not&nbsp;a&nbsp;stall:&nbsp;the&nbsp;wait&nbsp;at&nbsp;pixel&nbsp;2*W.&nbsp;Both&nbsp;row&nbsp;buffers&nbsp;filled&nbsp;during&nbsp;the&nbsp;
+   387: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;clear&nbsp;sweep,&nbsp;and&nbsp;the&nbsp;first&nbsp;one&nbsp;frees&nbsp;once&nbsp;row&nbsp;0&nbsp;is&nbsp;issued&nbsp;(D3).&nbsp;
+   388: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vld&nbsp;and&nbsp;oReady&nbsp;=&nbsp;'0'&nbsp;and&nbsp;sCfgDone&nbsp;=&nbsp;'1'&nbsp;and&nbsp;sClr&nbsp;=&nbsp;'0'&nbsp;and&nbsp;
+   389: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pixIdx&nbsp;/=&nbsp;2&nbsp;*&nbsp;CASES(fq(fedImg)).w)&nbsp;then&nbsp;
+   390: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stallCyc&nbsp;:=&nbsp;stallCyc&nbsp;+&nbsp;1;&nbsp;
+   391: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   392: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(vld&nbsp;and&nbsp;oReady&nbsp;=&nbsp;'1')&nbsp;then&nbsp;
+   393: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vld&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;false;&nbsp;
+   394: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pixIdx&nbsp;:=&nbsp;pixIdx&nbsp;+&nbsp;1;&nbsp;
+   395: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(pixIdx&nbsp;=&nbsp;npix(fq(fedImg)))&nbsp;then&nbsp;
+   396: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pixIdx&nbsp;:=&nbsp;0;&nbsp;
+   397: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fedImg&nbsp;:=&nbsp;fedImg&nbsp;+&nbsp;1;&nbsp;
+   398: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   399: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   400: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   401: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;check_lane(l);&nbsp;
+   402: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   403: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wait&nbsp;for&nbsp;1&nbsp;ns;&nbsp;
+   404: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;step;&nbsp;
+   405: &nbsp; &nbsp;
+   406: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;impure&nbsp;function&nbsp;all_done&nbsp;return&nbsp;boolean&nbsp;is&nbsp;
+   407: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   408: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   409: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(imgDone(l)&nbsp;&lt;&nbsp;nFq)&nbsp;then&nbsp;
+   410: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;false;&nbsp;
+   411: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   412: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   413: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;fedImg&nbsp;=&nbsp;nFq;&nbsp;
+   414: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;function&nbsp;all_done;&nbsp;
+   415: &nbsp; &nbsp;
+   416: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;run_done&nbsp;(what&nbsp;:&nbsp;string)&nbsp;is&nbsp;
+   417: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constant&nbsp;START&nbsp;:&nbsp;natural&nbsp;:=&nbsp;cycles;&nbsp;
+   418: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   419: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;not&nbsp;all_done&nbsp;loop&nbsp;
+   420: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;step;&nbsp;
+   421: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit&nbsp;when&nbsp;cycles&nbsp;-&nbsp;START&nbsp;&gt;&nbsp;200_000;&nbsp;
+   422: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   423: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("Completion"),&nbsp;all_done,&nbsp;what&nbsp;&amp;&nbsp;":&nbsp;every&nbsp;lane&nbsp;framed&nbsp;every&nbsp;image");&nbsp;
+   424: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;run_done;&nbsp;
+   425: &nbsp; &nbsp;
+   426: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;One&nbsp;session:&nbsp;reset&nbsp;into&nbsp;case&nbsp;cs,&nbsp;queue&nbsp;it&nbsp;(and&nbsp;partners),&nbsp;run.&nbsp;
+   427: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;procedure&nbsp;session&nbsp;(cs&nbsp;:&nbsp;natural;&nbsp;m&nbsp;:&nbsp;natural;&nbsp;n&nbsp;:&nbsp;positive&nbsp;:=&nbsp;1)&nbsp;is&nbsp;
+   428: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   429: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do_reset(cs,&nbsp;rv.RandInt(1,&nbsp;4));&nbsp;
+   430: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;:=&nbsp;m;&nbsp;
+   431: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;0&nbsp;to&nbsp;n&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   432: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Back&nbsp;to&nbsp;back:&nbsp;the&nbsp;struct&nbsp;/&nbsp;smooth&nbsp;pair&nbsp;alternates&nbsp;(same&nbsp;dims,&nbsp;NEAR&nbsp;0).&nbsp;
+   433: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(n&nbsp;&gt;&nbsp;1)&nbsp;then&nbsp;
+   434: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enqueue(BASE&nbsp;+&nbsp;i&nbsp;mod&nbsp;2);&nbsp;
+   435: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   436: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enqueue(cs);&nbsp;
+   437: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   438: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   439: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_done("case&nbsp;"&nbsp;&amp;&nbsp;to_string(cs)&nbsp;&amp;&nbsp;"&nbsp;mode&nbsp;"&nbsp;&amp;&nbsp;to_string(m));&nbsp;
+   440: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;procedure&nbsp;session;&nbsp;
+   441: &nbsp; &nbsp;
+   442: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;impure&nbsp;function&nbsp;phase_hit&nbsp;(p&nbsp;:&nbsp;natural)&nbsp;return&nbsp;boolean&nbsp;is&nbsp;
+   443: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;begin&nbsp;
+   444: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;p&nbsp;is&nbsp;
+   445: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when&nbsp;RP_IDLE&nbsp;&nbsp;=&gt;&nbsp;return&nbsp;all_done;&nbsp;
+   446: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when&nbsp;RP_CFG&nbsp;&nbsp;&nbsp;=&gt;&nbsp;return&nbsp;sCfgDone&nbsp;=&nbsp;'0';&nbsp;
+   447: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when&nbsp;RP_CLEAR&nbsp;=&gt;&nbsp;return&nbsp;sClr&nbsp;=&nbsp;'1';&nbsp;
+   448: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when&nbsp;RP_FEED&nbsp;&nbsp;=&gt;&nbsp;return&nbsp;fedImg&nbsp;&lt;&nbsp;nFq&nbsp;and&nbsp;pixIdx&nbsp;&gt;&nbsp;0&nbsp;and&nbsp;sClr&nbsp;=&nbsp;'0';&nbsp;
+   449: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when&nbsp;RP_DRAIN&nbsp;=&gt;&nbsp;return&nbsp;fedImg&nbsp;=&nbsp;nFq&nbsp;and&nbsp;not&nbsp;all_done;&nbsp;
+   450: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when&nbsp;others&nbsp;&nbsp;&nbsp;=&gt;&nbsp;
+   451: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   452: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(held(l))&nbsp;then&nbsp;
+   453: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;true;&nbsp;
+   454: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   455: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   456: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;false;&nbsp;
+   457: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;case;&nbsp;
+   458: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;function&nbsp;phase_hit;&nbsp;
+   459: &nbsp; &nbsp;
+   460: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   461: &nbsp; &nbsp;
+   462: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SetAlertLogName("tb_nl_top_osvvm");&nbsp;
+   463: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SetLogEnable(PASSED,&nbsp;FALSE);&nbsp;
+   464: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;rv.InitSeed(rv'instance_name);&nbsp;
+   465: &nbsp; &nbsp;
+   466: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqGold&nbsp;&nbsp;:=&nbsp;GetReqID("NL.StripeGolden",&nbsp;LANES&nbsp;*&nbsp;(N_KIND&nbsp;*&nbsp;4&nbsp;+&nbsp;4&nbsp;+&nbsp;3&nbsp;+&nbsp;5&nbsp;+&nbsp;N_RST));&nbsp;
+   467: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqB2B&nbsp;&nbsp;&nbsp;:=&nbsp;GetReqID("NL.BackToBack",&nbsp;LANES&nbsp;*&nbsp;(3&nbsp;+&nbsp;2));&nbsp;
+   468: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqAxis&nbsp;&nbsp;:=&nbsp;GetReqID("NL.AxisOut",&nbsp;1000);&nbsp;
+   469: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqStall&nbsp;:=&nbsp;GetReqID("NL.StallPropagation",&nbsp;5);&nbsp;
+   470: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqNoStl&nbsp;:=&nbsp;GetReqID("NL.NoStall",&nbsp;N_KIND&nbsp;+&nbsp;1);&nbsp;
+   471: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqCfg&nbsp;&nbsp;&nbsp;:=&nbsp;GetReqID("NL.ConfigInReset",&nbsp;LANES&nbsp;*&nbsp;N_KIND);&nbsp;
+   472: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;reqRst&nbsp;&nbsp;&nbsp;:=&nbsp;GetReqID("NL.Reset",&nbsp;2&nbsp;*&nbsp;N_RST);&nbsp;
+   473: &nbsp; &nbsp;
+   474: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covStress&nbsp;:=&nbsp;NewID("image&nbsp;kind&nbsp;x&nbsp;stress&nbsp;mode");&nbsp;
+   475: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SetFieldName(covStress,&nbsp;"case",&nbsp;"mode");&nbsp;
+   476: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;0&nbsp;to&nbsp;N_KIND&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   477: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddCross(covStress,&nbsp;"case&nbsp;"&nbsp;&amp;&nbsp;to_string(k)&nbsp;&amp;&nbsp;"&nbsp;/&nbsp;clean",&nbsp;GenBin(k),&nbsp;GenBin(M_CLEAN));&nbsp;
+   478: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddCross(covStress,&nbsp;"case&nbsp;"&nbsp;&amp;&nbsp;to_string(k)&nbsp;&amp;&nbsp;"&nbsp;/&nbsp;backpressure",&nbsp;GenBin(k),&nbsp;GenBin(M_BP));&nbsp;
+   479: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddCross(covStress,&nbsp;"case&nbsp;"&nbsp;&amp;&nbsp;to_string(k)&nbsp;&amp;&nbsp;"&nbsp;/&nbsp;input&nbsp;gaps",&nbsp;GenBin(k),&nbsp;GenBin(M_GAP));&nbsp;
+   480: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddCross(covStress,&nbsp;"case&nbsp;"&nbsp;&amp;&nbsp;to_string(k)&nbsp;&amp;&nbsp;"&nbsp;/&nbsp;both",&nbsp;GenBin(k),&nbsp;GenBin(M_BOTH));&nbsp;
+   481: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   482: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covB2B&nbsp;:=&nbsp;NewID("back&nbsp;to&nbsp;back");&nbsp;
+   483: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covB2B,&nbsp;"clean",&nbsp;GenBin(0));&nbsp;
+   484: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covB2B,&nbsp;"stressed",&nbsp;GenBin(1));&nbsp;
+   485: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covStall&nbsp;:=&nbsp;NewID("stall&nbsp;propagation");&nbsp;
+   486: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covHold&nbsp;&nbsp;:=&nbsp;NewID("lane&nbsp;backpressure&nbsp;hold");&nbsp;
+   487: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   488: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddBins(covStall,&nbsp;"hold&nbsp;lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l),&nbsp;GenBin(l));&nbsp;
+   489: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddBins(covHold,&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l),&nbsp;GenBin(l));&nbsp;
+   490: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   491: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covStall,&nbsp;"hold&nbsp;all&nbsp;lanes",&nbsp;GenBin(LANES));&nbsp;
+   492: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covRst&nbsp;:=&nbsp;NewID("reset&nbsp;phase");&nbsp;
+   493: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covRst,&nbsp;"reset&nbsp;while&nbsp;idle",&nbsp;2,&nbsp;GenBin(RP_IDLE));&nbsp;
+   494: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covRst,&nbsp;"reset&nbsp;in&nbsp;the&nbsp;config&nbsp;divider",&nbsp;2,&nbsp;GenBin(RP_CFG));&nbsp;
+   495: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covRst,&nbsp;"reset&nbsp;in&nbsp;the&nbsp;clear&nbsp;sweep",&nbsp;2,&nbsp;GenBin(RP_CLEAR));&nbsp;
+   496: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covRst,&nbsp;"reset&nbsp;mid&nbsp;feed",&nbsp;2,&nbsp;GenBin(RP_FEED));&nbsp;
+   497: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covRst,&nbsp;"reset&nbsp;while&nbsp;draining",&nbsp;2,&nbsp;GenBin(RP_DRAIN));&nbsp;
+   498: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covRst,&nbsp;"reset&nbsp;with&nbsp;output&nbsp;held",&nbsp;2,&nbsp;GenBin(RP_HOLD));&nbsp;
+   499: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covCfg&nbsp;:=&nbsp;NewID("config&nbsp;across&nbsp;reset");&nbsp;
+   500: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covCfg,&nbsp;"NEAR&nbsp;changed",&nbsp;3,&nbsp;GenBin(0));&nbsp;
+   501: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covCfg,&nbsp;"W/H&nbsp;changed",&nbsp;3,&nbsp;GenBin(1));&nbsp;
+   502: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddBins(covCfg,&nbsp;"same&nbsp;config",&nbsp;3,&nbsp;GenBin(2));&nbsp;
+   503: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;covRange&nbsp;:=&nbsp;NewID("config&nbsp;ranges");&nbsp;
+   504: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SetFieldName(covRange,&nbsp;"field",&nbsp;"value");&nbsp;
+   505: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddCross(covRange,&nbsp;"W&nbsp;=&nbsp;32",&nbsp;GenBin(0),&nbsp;GenBin(32));&nbsp;
+   506: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(MAX_W&nbsp;=&nbsp;64)&nbsp;then&nbsp;
+   507: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddCross(covRange,&nbsp;"W&nbsp;=&nbsp;MAX_W",&nbsp;GenBin(0),&nbsp;GenBin(MAX_W));&nbsp;
+   508: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   509: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddCross(covRange,&nbsp;"H&nbsp;=&nbsp;1",&nbsp;GenBin(1),&nbsp;GenBin(1));&nbsp;
+   510: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(MAX_H&nbsp;=&nbsp;64)&nbsp;then&nbsp;
+   511: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddCross(covRange,&nbsp;"H&nbsp;=&nbsp;MAX_H",&nbsp;GenBin(1),&nbsp;GenBin(MAX_H));&nbsp;
+   512: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   513: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddCross(covRange,&nbsp;"NEAR&nbsp;=&nbsp;0",&nbsp;GenBin(2),&nbsp;GenBin(0));&nbsp;
+   514: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AddCross(covRange,&nbsp;"NEAR&nbsp;=&nbsp;max",&nbsp;GenBin(2),&nbsp;GenBin(NMAX));&nbsp;
+   515: &nbsp; &nbsp;
+   516: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;A:&nbsp;every&nbsp;image&nbsp;alone,&nbsp;clean.&nbsp;oReady&nbsp;may&nbsp;only&nbsp;drop&nbsp;in&nbsp;the&nbsp;config&nbsp;
+   517: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;divider,&nbsp;the&nbsp;clear&nbsp;sweep,&nbsp;and&nbsp;while&nbsp;row&nbsp;0&nbsp;is&nbsp;issued&nbsp;(see&nbsp;step).&nbsp;
+   518: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;0&nbsp;to&nbsp;N_KIND&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   519: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stallCyc&nbsp;:=&nbsp;0;&nbsp;
+   520: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;session(BASE&nbsp;+&nbsp;k,&nbsp;M_CLEAN);&nbsp;
+   521: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covStress,&nbsp;(k,&nbsp;M_CLEAN));&nbsp;
+   522: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIfEqual(reqNoStl,&nbsp;stallCyc,&nbsp;0,&nbsp;"case&nbsp;"&nbsp;&amp;&nbsp;to_string(k)&nbsp;&amp;&nbsp;":&nbsp;oReady&nbsp;held&nbsp;high&nbsp;outside&nbsp;the&nbsp;clear&nbsp;sweep");&nbsp;
+   523: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   524: &nbsp; &nbsp;
+   525: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;B:&nbsp;back&nbsp;to&nbsp;back,&nbsp;clean.&nbsp;
+   526: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;stallCyc&nbsp;:=&nbsp;0;&nbsp;
+   527: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;session(BASE,&nbsp;M_CLEAN,&nbsp;4);&nbsp;
+   528: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ICover(covB2B,&nbsp;0);&nbsp;
+   529: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIfEqual(reqNoStl,&nbsp;stallCyc,&nbsp;0,&nbsp;"back&nbsp;to&nbsp;back:&nbsp;oReady&nbsp;held&nbsp;high&nbsp;outside&nbsp;the&nbsp;clear&nbsp;sweep");&nbsp;
+   530: &nbsp; &nbsp;
+   531: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;C:&nbsp;every&nbsp;image&nbsp;stressed.&nbsp;
+   532: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;m&nbsp;in&nbsp;M_BP&nbsp;to&nbsp;M_BOTH&nbsp;loop&nbsp;
+   533: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;0&nbsp;to&nbsp;N_KIND&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   534: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;session(BASE&nbsp;+&nbsp;k,&nbsp;m);&nbsp;
+   535: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covStress,&nbsp;(k,&nbsp;m));&nbsp;
+   536: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   537: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   538: &nbsp; &nbsp;
+   539: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;D:&nbsp;back&nbsp;to&nbsp;back,&nbsp;stressed.&nbsp;
+   540: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;session(BASE,&nbsp;M_BOTH,&nbsp;3);&nbsp;
+   541: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;ICover(covB2B,&nbsp;1);&nbsp;
+   542: &nbsp; &nbsp;
+   543: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;E:&nbsp;long&nbsp;iReady&nbsp;hold&nbsp;on&nbsp;the&nbsp;noise&nbsp;image:&nbsp;one&nbsp;lane&nbsp;at&nbsp;a&nbsp;time,&nbsp;then&nbsp;all.&nbsp;
+   544: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;t&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;loop&nbsp;
+   545: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do_reset(BASE&nbsp;+&nbsp;N_KIND&nbsp;-&nbsp;1,&nbsp;2);&nbsp;
+   546: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;:=&nbsp;M_CLEAN;&nbsp;
+   547: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enqueue(BASE&nbsp;+&nbsp;N_KIND&nbsp;-&nbsp;1);&nbsp;
+   548: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;not&nbsp;(fedImg&nbsp;=&nbsp;0&nbsp;and&nbsp;pixIdx&nbsp;&gt;&nbsp;2&nbsp;*&nbsp;CASES(BASE&nbsp;+&nbsp;N_KIND&nbsp;-&nbsp;1).w&nbsp;and&nbsp;sClr&nbsp;=&nbsp;'0')&nbsp;loop&nbsp;
+   549: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;step;&nbsp;
+   550: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   551: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(t&nbsp;=&nbsp;LANES)&nbsp;then&nbsp;
+   552: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;holdMask&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'1');&nbsp;
+   553: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   554: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;holdMask&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   555: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;holdMask(t)&nbsp;:=&nbsp;'1';&nbsp;
+   556: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   557: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stallCyc&nbsp;:=&nbsp;0;&nbsp;
+   558: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Until&nbsp;oReady&nbsp;has&nbsp;dropped&nbsp;for&nbsp;a&nbsp;while&nbsp;(OUT_WIDTH&nbsp;1024&nbsp;needs&nbsp;~2.5k&nbsp;
+   559: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;cycles&nbsp;to&nbsp;fill&nbsp;the&nbsp;output&nbsp;FIFOs),&nbsp;or&nbsp;HOLD_CYC.&nbsp;
+   560: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;i&nbsp;in&nbsp;1&nbsp;to&nbsp;HOLD_CYC&nbsp;loop&nbsp;
+   561: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;step;&nbsp;
+   562: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit&nbsp;when&nbsp;stallCyc&nbsp;&gt;=&nbsp;16;&nbsp;
+   563: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   564: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stallSeen&nbsp;:=&nbsp;stallCyc&nbsp;&gt;&nbsp;0;&nbsp;
+   565: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqStall,&nbsp;stallSeen,&nbsp;"hold&nbsp;"&nbsp;&amp;&nbsp;to_hstring(holdMask)&nbsp;&amp;&nbsp;":&nbsp;oReady&nbsp;dropped&nbsp;("&nbsp;&amp;&nbsp;
+   566: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to_string(stallCyc)&nbsp;&amp;&nbsp;"&nbsp;stalled&nbsp;cycles)");&nbsp;
+   567: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(stallSeen)&nbsp;then&nbsp;
+   568: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covStall,&nbsp;t);&nbsp;
+   569: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   570: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;holdMask&nbsp;:=&nbsp;(others&nbsp;=&gt;&nbsp;'0');&nbsp;
+   571: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_done("stall&nbsp;propagation&nbsp;"&nbsp;&amp;&nbsp;to_string(t));&nbsp;
+   572: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   573: &nbsp; &nbsp;
+   574: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;F:&nbsp;reset&nbsp;rounds.&nbsp;Traffic,&nbsp;reset&nbsp;in&nbsp;the&nbsp;target&nbsp;phase,&nbsp;then&nbsp;a&nbsp;scored&nbsp;
+   575: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;recovery&nbsp;image&nbsp;at&nbsp;a&nbsp;random&nbsp;config.&nbsp;
+   576: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;r&nbsp;in&nbsp;0&nbsp;to&nbsp;N_RST&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   577: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(r&nbsp;&lt;&nbsp;2&nbsp;*&nbsp;6)&nbsp;then&nbsp;
+   578: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ph&nbsp;:=&nbsp;r&nbsp;mod&nbsp;6;&nbsp;
+   579: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   580: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ph&nbsp;:=&nbsp;rv.RandInt(RP_IDLE,&nbsp;RP_HOLD);&nbsp;
+   581: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   582: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(ph&nbsp;=&nbsp;RP_DRAIN&nbsp;or&nbsp;ph&nbsp;=&nbsp;RP_HOLD)&nbsp;then&nbsp;
+   583: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;:=&nbsp;BASE&nbsp;+&nbsp;N_KIND&nbsp;-&nbsp;1;&nbsp;
+   584: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   585: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;:=&nbsp;BASE&nbsp;+&nbsp;rv.RandInt(0,&nbsp;N_KIND&nbsp;-&nbsp;1);&nbsp;
+   586: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   587: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do_reset(c,&nbsp;rv.RandInt(1,&nbsp;4));&nbsp;
+   588: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(ph&nbsp;=&nbsp;RP_HOLD)&nbsp;then&nbsp;
+   589: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;:=&nbsp;M_BOTH;&nbsp;
+   590: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;
+   591: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;:=&nbsp;rv.RandInt(M_CLEAN,&nbsp;M_BOTH);&nbsp;
+   592: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   593: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enqueue(c);&nbsp;
+   594: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(c&nbsp;-&nbsp;BASE&nbsp;&lt;&nbsp;2&nbsp;and&nbsp;rv.DistValInt(((1,&nbsp;1),&nbsp;(0,&nbsp;1)))&nbsp;=&nbsp;1)&nbsp;then&nbsp;
+   595: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enqueue(BASE&nbsp;+&nbsp;1&nbsp;-&nbsp;(c&nbsp;-&nbsp;BASE));&nbsp;
+   596: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;
+   597: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hit&nbsp;:=&nbsp;phase_hit(ph);&nbsp;
+   598: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;not&nbsp;hit&nbsp;loop&nbsp;
+   599: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;step;&nbsp;
+   600: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hit&nbsp;:=&nbsp;phase_hit(ph)&nbsp;and&nbsp;(ph&nbsp;=&nbsp;RP_IDLE&nbsp;or&nbsp;ph&nbsp;=&nbsp;RP_CFG&nbsp;or&nbsp;rv.DistValInt(((1,&nbsp;1),&nbsp;(0,&nbsp;3)))&nbsp;=&nbsp;1);&nbsp;
+   601: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit&nbsp;when&nbsp;all_done&nbsp;and&nbsp;ph&nbsp;/=&nbsp;RP_IDLE;&nbsp;
+   602: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   603: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(reqRst,&nbsp;hit,&nbsp;"reset&nbsp;round&nbsp;"&nbsp;&amp;&nbsp;to_string(r)&nbsp;&amp;&nbsp;":&nbsp;phase&nbsp;"&nbsp;&amp;&nbsp;to_string(ph)&nbsp;&amp;&nbsp;"&nbsp;reached");&nbsp;
+   604: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ICover(covRst,&nbsp;ph);&nbsp;
+   605: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;:=&nbsp;BASE&nbsp;+&nbsp;rv.RandInt(0,&nbsp;N_KIND&nbsp;-&nbsp;1);&nbsp;
+   606: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;session(c,&nbsp;rv.RandInt(M_CLEAN,&nbsp;M_BOTH));&nbsp;
+   607: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   608: &nbsp; &nbsp;
+   609: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;l&nbsp;in&nbsp;0&nbsp;to&nbsp;LANES&nbsp;-&nbsp;1&nbsp;loop&nbsp;
+   610: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("ScoreboardCompletion"),&nbsp;IsEmpty(SB(SB'low&nbsp;+&nbsp;l)),&nbsp;
+   611: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;"&nbsp;scoreboard&nbsp;drained");&nbsp;
+   612: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AffirmIfEqual(GetAlertLogID("ScoreboardCompletion"),&nbsp;GetErrorCount(SB(SB'low&nbsp;+&nbsp;l)),&nbsp;0,&nbsp;
+   613: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"lane&nbsp;"&nbsp;&amp;&nbsp;to_string(l)&nbsp;&amp;&nbsp;"&nbsp;scoreboard&nbsp;mismatches");&nbsp;
+   614: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;loop;&nbsp;
+   615: &nbsp; &nbsp;
+   616: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covStress);&nbsp;
+   617: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covB2B);&nbsp;
+   618: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covStall);&nbsp;
+   619: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covHold);&nbsp;
+   620: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covRst);&nbsp;
+   621: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covCfg);&nbsp;
+   622: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;WriteBin(covRange);&nbsp;
+   623: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covStress),&nbsp;"image&nbsp;x&nbsp;stress&nbsp;coverage&nbsp;closed");&nbsp;
+   624: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covB2B),&nbsp;"back-to-back&nbsp;coverage&nbsp;closed");&nbsp;
+   625: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covStall),&nbsp;"stall&nbsp;propagation&nbsp;coverage&nbsp;closed");&nbsp;
+   626: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covHold),&nbsp;"lane&nbsp;hold&nbsp;coverage&nbsp;closed");&nbsp;
+   627: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covRst),&nbsp;"reset-phase&nbsp;coverage&nbsp;closed");&nbsp;
+   628: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covCfg),&nbsp;"config&nbsp;change&nbsp;coverage&nbsp;closed");&nbsp;
+   629: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;AffirmIf(GetAlertLogID("CoverageClosure"),&nbsp;IsCovered(covRange),&nbsp;"config&nbsp;range&nbsp;coverage&nbsp;closed");&nbsp;
+   630: &nbsp; &nbsp;
+   631: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;end_of_test("tb_nl_top_osvvm");&nbsp;
+   632: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;wait;&nbsp;
+   633: &nbsp; &nbsp;
+   634: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;stim;&nbsp;
+   635: &nbsp; &nbsp;
+   636: &nbsp; &nbsp;&nbsp;watchdog&nbsp;:&nbsp;process&nbsp;is&nbsp;
+   637: &nbsp; &nbsp;&nbsp;begin&nbsp;
+   638: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;wait&nbsp;for&nbsp;100&nbsp;ms;&nbsp;
+   639: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;Alert(GetAlertLogID("Watchdog"),&nbsp;"tb_nl_top_osvvm:&nbsp;watchdog&nbsp;timeout",&nbsp;FAILURE);&nbsp;
+   640: &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;std.env.stop;&nbsp;
+   641: &nbsp; &nbsp;&nbsp;end&nbsp;process&nbsp;watchdog;&nbsp;
+   642: &nbsp; &nbsp;
+   643: &nbsp; end&nbsp;architecture&nbsp;sim;&nbsp;
+</code></pre>

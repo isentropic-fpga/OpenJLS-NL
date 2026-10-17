@@ -1,0 +1,26 @@
+Version: "0.1"
+TestCaseName: "tb_nl_loop_osvvm"
+TestCaseFile:  "../../../Modules/tb_nl_loop_osvvm.vhd"
+TestSuiteName: "Loop"
+BuildName: "OSVVM_OpenJlsNl"
+Generics:
+  BITNESS: "8"
+  NEAR: "3"
+  STRIPES: "1"
+ReportsTestSuiteDirectory:  "reports/Loop"
+RequirementsYamlFile:  "reports/Loop/tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_1_req.yml"
+AlertYamlFile:  "reports/Loop/tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_1_alerts.yml"
+CovYamlFile:  "reports/Loop/tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_1_cov.yml"
+ScoreboardDict:           null
+TranscriptFiles: ""
+TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_1"
+GenericNames: "_BITNESS_8_NEAR_3_STRIPES_1"
+OsvvmSettingsInfo:
+  ReportsSubdirectory:  "reports"
+  SimulationLogFile: "logs/OSVVM_OpenJlsNl.log"
+  SimulationHtmlLogFile: "logs/OSVVM_OpenJlsNl_log.html"
+  RequirementsSubdirectory: ""
+  CoverageSubdirectory:    "CodeCoverage/OSVVM_OpenJlsNl_code_cov.html"
+  Report2CssFiles:
+    - "reports/CssOsvvmStyle.css"
+  Report2PngFile:  "reports/OsvvmLogo.png"

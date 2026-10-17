@@ -1,0 +1,25 @@
+- Requirement: "T87.A2.1"
+  TestCases: 
+  - TestName: "tb_nl_config_osvvm"
+    Status: PASSED
+    Results: {Goal: 768, Passed: 888, Errors: 0, Checked: 888, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "T87.C2.4.1.1"
+  TestCases: 
+  - TestName: "tb_nl_config_osvvm"
+    Status: PASSED
+    Results: {Goal: 768, Passed: 888, Errors: 0, Checked: 888, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.NearClamp"
+  TestCases: 
+  - TestName: "tb_nl_config_osvvm"
+    Status: PASSED
+    Results: {Goal: 128, Passed: 147, Errors: 0, Checked: 147, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Config"
+  TestCases: 
+  - TestName: "tb_nl_config_osvvm"
+    Status: PASSED
+    Results: {Goal: 1024, Passed: 1333, Errors: 0, Checked: 1333, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Reset"
+  TestCases: 
+  - TestName: "tb_nl_config_osvvm"
+    Status: PASSED
+    Results: {Goal: 260, Passed: 336, Errors: 0, Checked: 336, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

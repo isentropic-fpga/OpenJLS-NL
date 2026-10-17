@@ -1,0 +1,35 @@
+Version: "0.1"
+TestCase: "tb_nl_top_osvvm"
+Scoreboards: 
+  - Name:         "lane SB(1)"
+    ParentName:   "OSVVM"
+    ItemCount:    51584
+    ErrorCount:   0
+    ItemsChecked: 34671
+    ItemsPopped:  51584
+    ItemsDropped: 0
+    FifoCount:    0
+  - Name:         "lane SB(2)"
+    ParentName:   "OSVVM"
+    ItemCount:    52923
+    ErrorCount:   0
+    ItemsChecked: 35888
+    ItemsPopped:  52923
+    ItemsDropped: 0
+    FifoCount:    0
+  - Name:         "lane SB(3)"
+    ParentName:   "OSVVM"
+    ItemCount:    51931
+    ErrorCount:   0
+    ItemsChecked: 34600
+    ItemsPopped:  51931
+    ItemsDropped: 0
+    FifoCount:    0
+  - Name:         "lane SB(4)"
+    ParentName:   "OSVVM"
+    ItemCount:    53888
+    ErrorCount:   0
+    ItemsChecked: 36172
+    ItemsPopped:  53888
+    ItemsDropped: 0
+    FifoCount:    0

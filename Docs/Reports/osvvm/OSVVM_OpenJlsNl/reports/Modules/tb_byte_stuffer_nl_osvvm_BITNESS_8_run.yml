@@ -1,0 +1,25 @@
+Version: "0.1"
+TestCaseName: "tb_byte_stuffer_nl_osvvm"
+TestCaseFile:  "../../../Modules/tb_byte_stuffer_nl_osvvm.vhd"
+TestSuiteName: "Modules"
+BuildName: "OSVVM_OpenJlsNl"
+Generics:
+  BITNESS: "8"
+ReportsTestSuiteDirectory:  "reports/Modules"
+RequirementsYamlFile:  "reports/Modules/tb_byte_stuffer_nl_osvvm_BITNESS_8_req.yml"
+AlertYamlFile:  "reports/Modules/tb_byte_stuffer_nl_osvvm_BITNESS_8_alerts.yml"
+CovYamlFile:  "reports/Modules/tb_byte_stuffer_nl_osvvm_BITNESS_8_cov.yml"
+ScoreboardDict:
+  slv: "reports/Modules/tb_byte_stuffer_nl_osvvm_BITNESS_8_sb_slv.yml"
+TranscriptFiles: ""
+TestCaseFileName: "tb_byte_stuffer_nl_osvvm_BITNESS_8"
+GenericNames: "_BITNESS_8"
+OsvvmSettingsInfo:
+  ReportsSubdirectory:  "reports"
+  SimulationLogFile: "logs/OSVVM_OpenJlsNl.log"
+  SimulationHtmlLogFile: "logs/OSVVM_OpenJlsNl_log.html"
+  RequirementsSubdirectory: ""
+  CoverageSubdirectory:    "CodeCoverage/OSVVM_OpenJlsNl_code_cov.html"
+  Report2CssFiles:
+    - "reports/CssOsvvmStyle.css"
+  Report2PngFile:  "reports/OsvvmLogo.png"

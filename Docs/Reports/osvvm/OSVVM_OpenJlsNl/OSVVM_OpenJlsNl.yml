@@ -1,0 +1,746 @@
+Version: "0.1"
+Date: 2026-10-16T22:30:01-03:00
+TestSuites: 
+  - Name: Loop
+    TestCases:
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "793642000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 570966, AffirmCount: 570966, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_0_STRIPES_1"
+        Generics:
+          BITNESS: "8"
+          NEAR: "0"
+          STRIPES: "1"
+        ElapsedTime: 2.183
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 467589, AffirmCount: 467589, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_0_STRIPES_4"
+        Generics:
+          BITNESS: "8"
+          NEAR: "0"
+          STRIPES: "4"
+        ElapsedTime: 0.915
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "667690000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 431874, AffirmCount: 431874, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_1_STRIPES_1"
+        Generics:
+          BITNESS: "8"
+          NEAR: "1"
+          STRIPES: "1"
+        ElapsedTime: 1.890
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "171050000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 444850, AffirmCount: 444850, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_1_STRIPES_4"
+        Generics:
+          BITNESS: "8"
+          NEAR: "1"
+          STRIPES: "4"
+        ElapsedTime: 0.961
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "499754000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 322689, AffirmCount: 322689, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_1"
+        Generics:
+          BITNESS: "8"
+          NEAR: "3"
+          STRIPES: "1"
+        ElapsedTime: 1.760
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "173098000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 440053, AffirmCount: 440053, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_4"
+        Generics:
+          BITNESS: "8"
+          NEAR: "3"
+          STRIPES: "4"
+        ElapsedTime: 0.988
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "180266000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 112663, AffirmCount: 112663, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_7_STRIPES_1"
+        Generics:
+          BITNESS: "8"
+          NEAR: "7"
+          STRIPES: "1"
+        ElapsedTime: 0.672
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "372778000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 928422, AffirmCount: 928422, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_7_STRIPES_4"
+        Generics:
+          BITNESS: "8"
+          NEAR: "7"
+          STRIPES: "4"
+        ElapsedTime: 1.851
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "366634000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 209076, AffirmCount: 209076, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_31_STRIPES_1"
+        Generics:
+          BITNESS: "8"
+          NEAR: "31"
+          STRIPES: "1"
+        ElapsedTime: 1.163
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "509994000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1193164, AffirmCount: 1193164, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_31_STRIPES_4"
+        Generics:
+          BITNESS: "8"
+          NEAR: "31"
+          STRIPES: "4"
+        ElapsedTime: 2.450
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 95749, AffirmCount: 95749, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_127_STRIPES_1"
+        Generics:
+          BITNESS: "8"
+          NEAR: "127"
+          STRIPES: "1"
+        ElapsedTime: 0.626
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 252390, AffirmCount: 252390, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_8_NEAR_127_STRIPES_4"
+        Generics:
+          BITNESS: "8"
+          NEAR: "127"
+          STRIPES: "4"
+        ElapsedTime: 0.860
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "553002000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 405171, AffirmCount: 405171, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_0_STRIPES_1"
+        Generics:
+          BITNESS: "12"
+          NEAR: "0"
+          STRIPES: "1"
+        ElapsedTime: 1.672
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 464634, AffirmCount: 464634, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_0_STRIPES_4"
+        Generics:
+          BITNESS: "12"
+          NEAR: "0"
+          STRIPES: "4"
+        ElapsedTime: 0.949
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "277546000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 186275, AffirmCount: 186275, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_1_STRIPES_1"
+        Generics:
+          BITNESS: "12"
+          NEAR: "1"
+          STRIPES: "1"
+        ElapsedTime: 0.956
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 429273, AffirmCount: 429273, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_1_STRIPES_4"
+        Generics:
+          BITNESS: "12"
+          NEAR: "1"
+          STRIPES: "4"
+        ElapsedTime: 0.964
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "253994000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 165819, AffirmCount: 165819, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_3_STRIPES_1"
+        Generics:
+          BITNESS: "12"
+          NEAR: "3"
+          STRIPES: "1"
+        ElapsedTime: 0.906
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 428109, AffirmCount: 428109, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_3_STRIPES_4"
+        Generics:
+          BITNESS: "12"
+          NEAR: "3"
+          STRIPES: "4"
+        ElapsedTime: 0.964
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "991274000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 643021, AffirmCount: 643021, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_7_STRIPES_1"
+        Generics:
+          BITNESS: "12"
+          NEAR: "7"
+          STRIPES: "1"
+        ElapsedTime: 2.880
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "176170000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 456673, AffirmCount: 456673, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_7_STRIPES_4"
+        Generics:
+          BITNESS: "12"
+          NEAR: "7"
+          STRIPES: "4"
+        ElapsedTime: 1.044
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "374826000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 234299, AffirmCount: 234299, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_31_STRIPES_1"
+        Generics:
+          BITNESS: "12"
+          NEAR: "31"
+          STRIPES: "1"
+        ElapsedTime: 1.224
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 420699, AffirmCount: 420699, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_31_STRIPES_4"
+        Generics:
+          BITNESS: "12"
+          NEAR: "31"
+          STRIPES: "4"
+        ElapsedTime: 0.970
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "734250000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 443981, AffirmCount: 443981, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_255_STRIPES_1"
+        Generics:
+          BITNESS: "12"
+          NEAR: "255"
+          STRIPES: "1"
+        ElapsedTime: 2.219
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 390154, AffirmCount: 390154, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_12_NEAR_255_STRIPES_4"
+        Generics:
+          BITNESS: "12"
+          NEAR: "255"
+          STRIPES: "4"
+        ElapsedTime: 1.023
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "370730000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 271943, AffirmCount: 271943, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_0_STRIPES_1"
+        Generics:
+          BITNESS: "16"
+          NEAR: "0"
+          STRIPES: "1"
+        ElapsedTime: 1.230
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 468127, AffirmCount: 468127, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_0_STRIPES_4"
+        Generics:
+          BITNESS: "16"
+          NEAR: "0"
+          STRIPES: "4"
+        ElapsedTime: 0.976
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "233514000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 160939, AffirmCount: 160939, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_1_STRIPES_1"
+        Generics:
+          BITNESS: "16"
+          NEAR: "1"
+          STRIPES: "1"
+        ElapsedTime: 0.866
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 427575, AffirmCount: 427575, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_1_STRIPES_4"
+        Generics:
+          BITNESS: "16"
+          NEAR: "1"
+          STRIPES: "4"
+        ElapsedTime: 0.988
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "279594000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 185626, AffirmCount: 185626, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_3_STRIPES_1"
+        Generics:
+          BITNESS: "16"
+          NEAR: "3"
+          STRIPES: "1"
+        ElapsedTime: 1.001
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 421602, AffirmCount: 421602, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_3_STRIPES_4"
+        Generics:
+          BITNESS: "16"
+          NEAR: "3"
+          STRIPES: "4"
+        ElapsedTime: 0.992
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 104965, AffirmCount: 104965, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_7_STRIPES_1"
+        Generics:
+          BITNESS: "16"
+          NEAR: "7"
+          STRIPES: "1"
+        ElapsedTime: 0.712
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 417668, AffirmCount: 417668, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_7_STRIPES_4"
+        Generics:
+          BITNESS: "16"
+          NEAR: "7"
+          STRIPES: "4"
+        ElapsedTime: 1.000
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "398378000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 252071, AffirmCount: 252071, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_31_STRIPES_1"
+        Generics:
+          BITNESS: "16"
+          NEAR: "31"
+          STRIPES: "1"
+        ElapsedTime: 1.335
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 413495, AffirmCount: 413495, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_31_STRIPES_4"
+        Generics:
+          BITNESS: "16"
+          NEAR: "31"
+          STRIPES: "4"
+        ElapsedTime: 0.991
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "193578000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 123235, AffirmCount: 123235, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_255_STRIPES_1"
+        Generics:
+          BITNESS: "16"
+          NEAR: "255"
+          STRIPES: "1"
+        ElapsedTime: 0.751
+      - TestCaseName: "tb_nl_loop_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "160810000000 fs"
+        Name: "tb_nl_loop_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 403886, AffirmCount: 403886, RequirementsPassed: 14, RequirementsGoal: 14, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_loop_osvvm_BITNESS_16_NEAR_255_STRIPES_4"
+        Generics:
+          BITNESS: "16"
+          NEAR: "255"
+          STRIPES: "4"
+        ElapsedTime: 0.991
+    ElapsedTime: 45.145
+  - Name: Modules
+    TestCases:
+      - TestCaseName: "tb_a11_1_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "40630000000 fs"
+        Name: "tb_a11_1_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 121894, AffirmCount: 121894, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_a11_1_nl_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 0.204
+      - TestCaseName: "tb_a15_a16_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "3340935000000 fs"
+        Name: "tb_a15_a16_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 53646, AffirmCount: 53646, RequirementsPassed: 3, RequirementsGoal: 3, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_a15_a16_nl_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 0.619
+      - TestCaseName: "tb_nl_config_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "153396000000 fs"
+        Name: "tb_nl_config_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 3597, AffirmCount: 3597, RequirementsPassed: 5, RequirementsGoal: 5, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_config_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 0.093
+      - TestCaseName: "tb_byte_stuffer_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "300275000000 fs"
+        Name: "tb_byte_stuffer_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 15001, AffirmCount: 15001, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_byte_stuffer_nl_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 0.436
+      - TestCaseName: "tb_nl_framer_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "71455000000 fs"
+        Name: "tb_nl_framer_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 26767, AffirmCount: 26767, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_framer_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 0.159
+      - TestCaseName: "tb_nl_frontend_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1102227000000 fs"
+        Name: "tb_nl_frontend_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 2757893, AffirmCount: 2757893, RequirementsPassed: 11, RequirementsGoal: 11, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_frontend_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 2.343
+      - TestCaseName: "tb_nl_backend_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "4873246000000 fs"
+        Name: "tb_nl_backend_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1370029, AffirmCount: 1370029, RequirementsPassed: 13, RequirementsGoal: 13, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_backend_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 4.149
+      - TestCaseName: "tb_a11_1_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "53145000000 fs"
+        Name: "tb_a11_1_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 159439, AffirmCount: 159439, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_a11_1_nl_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 0.243
+      - TestCaseName: "tb_a15_a16_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "3340935000000 fs"
+        Name: "tb_a15_a16_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 53646, AffirmCount: 53646, RequirementsPassed: 3, RequirementsGoal: 3, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_a15_a16_nl_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 0.614
+      - TestCaseName: "tb_nl_config_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "178686000000 fs"
+        Name: "tb_nl_config_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 3597, AffirmCount: 3597, RequirementsPassed: 4, RequirementsGoal: 4, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_config_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 0.092
+      - TestCaseName: "tb_byte_stuffer_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "469805000000 fs"
+        Name: "tb_byte_stuffer_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 22629, AffirmCount: 22629, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_byte_stuffer_nl_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 0.571
+      - TestCaseName: "tb_nl_framer_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "71455000000 fs"
+        Name: "tb_nl_framer_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 26767, AffirmCount: 26767, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_framer_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 0.157
+      - TestCaseName: "tb_nl_frontend_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1016387000000 fs"
+        Name: "tb_nl_frontend_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 2433012, AffirmCount: 2433012, RequirementsPassed: 11, RequirementsGoal: 11, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_frontend_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 2.184
+      - TestCaseName: "tb_nl_backend_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "4885286000000 fs"
+        Name: "tb_nl_backend_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1402580, AffirmCount: 1402580, RequirementsPassed: 13, RequirementsGoal: 13, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_backend_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 4.241
+      - TestCaseName: "tb_a11_1_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "64357000000 fs"
+        Name: "tb_a11_1_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 193075, AffirmCount: 193075, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_a11_1_nl_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 0.266
+      - TestCaseName: "tb_a15_a16_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "3340935000000 fs"
+        Name: "tb_a15_a16_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 53646, AffirmCount: 53646, RequirementsPassed: 3, RequirementsGoal: 3, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_a15_a16_nl_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 0.609
+      - TestCaseName: "tb_nl_config_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "203956000000 fs"
+        Name: "tb_nl_config_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 3597, AffirmCount: 3597, RequirementsPassed: 4, RequirementsGoal: 4, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_config_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 0.094
+      - TestCaseName: "tb_byte_stuffer_nl_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "501565000000 fs"
+        Name: "tb_byte_stuffer_nl_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 30431, AffirmCount: 30431, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_byte_stuffer_nl_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 0.603
+      - TestCaseName: "tb_nl_framer_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "71455000000 fs"
+        Name: "tb_nl_framer_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 26767, AffirmCount: 26767, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_framer_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 0.152
+      - TestCaseName: "tb_nl_frontend_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1129227000000 fs"
+        Name: "tb_nl_frontend_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 3013053, AffirmCount: 3013053, RequirementsPassed: 11, RequirementsGoal: 11, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_frontend_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 2.579
+      - TestCaseName: "tb_nl_backend_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "4293106000000 fs"
+        Name: "tb_nl_backend_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 1117411, AffirmCount: 1117411, RequirementsPassed: 13, RequirementsGoal: 13, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_backend_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 4.082
+      - TestCaseName: "tb_nl_framer_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "103575000000 fs"
+        Name: "tb_nl_framer_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 28918, AffirmCount: 28918, RequirementsPassed: 2, RequirementsGoal: 2, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200"
+        Generics:
+          BITNESS: "12"
+          OUT_WIDTH: "200"
+        ElapsedTime: 0.161
+    ElapsedTime: 25.158
+  - Name: Top
+    TestCases:
+      - TestCaseName: "tb_nl_top_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1523486000000 fs"
+        Name: "tb_nl_top_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 129061, AffirmCount: 129061, RequirementsPassed: 7, RequirementsGoal: 7, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_top_osvvm_BITNESS_8"
+        Generics:
+          BITNESS: "8"
+        ElapsedTime: 8.224
+      - TestCaseName: "tb_nl_top_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1373986000000 fs"
+        Name: "tb_nl_top_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 141255, AffirmCount: 141255, RequirementsPassed: 7, RequirementsGoal: 7, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_top_osvvm_BITNESS_12"
+        Generics:
+          BITNESS: "12"
+        ElapsedTime: 8.812
+      - TestCaseName: "tb_nl_top_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1676236000000 fs"
+        Name: "tb_nl_top_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 208732, AffirmCount: 208732, RequirementsPassed: 7, RequirementsGoal: 7, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_top_osvvm_BITNESS_16"
+        Generics:
+          BITNESS: "16"
+        ElapsedTime: 10.861
+      - TestCaseName: "tb_nl_top_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1813496000000 fs"
+        Name: "tb_nl_top_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 186885, AffirmCount: 186885, RequirementsPassed: 7, RequirementsGoal: 7, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_top_osvvm_OUT_WIDTH_48"
+        Generics:
+          OUT_WIDTH: "48"
+        ElapsedTime: 11.360
+      - TestCaseName: "tb_nl_top_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1684606000000 fs"
+        Name: "tb_nl_top_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 157511, AffirmCount: 157511, RequirementsPassed: 7, RequirementsGoal: 7, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_top_osvvm_OUT_WIDTH_1024"
+        Generics:
+          OUT_WIDTH: "1024"
+        ElapsedTime: 14.989
+      - TestCaseName: "tb_nl_top_osvvm"
+        FunctionalCoverage: 100.00
+        SimulationTime: "1373986000000 fs"
+        Name: "tb_nl_top_osvvm"
+        Status: PASSED
+        Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 141255, AffirmCount: 141255, RequirementsPassed: 7, RequirementsGoal: 7, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}, ExpectedCount: {Failure: 0, Error: 0, Warning: 0}}
+        TestCaseFileName: "tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096"
+        Generics:
+          MAX_W: "4096"
+          MAX_H: "4096"
+        ElapsedTime: 10.257
+    ElapsedTime: 64.706
+Name:     "OSVVM_OpenJlsNl"
+BuildInfo:
+  StartTime:            2026-10-16T22:30:01-03:00
+  FinishTime:           2026-10-16T22:32:17-03:00
+  ElapsedTime:              136.639
+  Simulator:            "NVC"
+  SimulatorVersion:     "1.23.0"
+  OsvvmVersion:         "2026.01"
+  BuildErrorCode:       0
+  AnalyzeErrorCount:    0
+  SimulateErrorCount:   0
+OsvvmSettingsInfo:
+  ReportsSubdirectory:  "reports"
+  SimulationLogFile: "logs/OSVVM_OpenJlsNl.log"
+  SimulationHtmlLogFile: "logs/OSVVM_OpenJlsNl_log.html"
+  RequirementsSubdirectory: "reports"
+  CoverageSubdirectory:    "CodeCoverage/OSVVM_OpenJlsNl_code_cov.html"
+  Report2CssFiles:
+    - "reports/CssOsvvmStyle.css"
+  Report2PngFile:  "reports/OsvvmLogo.png"

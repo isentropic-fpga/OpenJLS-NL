@@ -16,6 +16,8 @@ here.
 | `Modules/` | One OSVVM TB per NL block |
 | `Top/` | `nl_top` stress TB, its CharLS golden package and `gen_golden.py` |
 | `Golden/` | CharLS golden suite on the image corpus (`build_run.sh`, `ref/nl_charls.cpp`) |
+| `PostSynth/` | Gate-level smoke test of the synthesized netlist (`build_run.sh`) |
+| `publish_reports.sh` | Assembles all suite results into `Docs/Reports/` |
 | `NVC_CodeCoverage/` | Coverage databases and HTML (generated) |
 | `OSVVM_OpenJlsNl/` | OSVVM logs and reports (generated) |
 
@@ -58,6 +60,24 @@ RERUN=1 BATCH=nl ./build_run.sh         # force one batch
 - **Status**: 10919/10919 jobs PASS, 250 images skipped (over the cap or
   W < 32). The full run takes ~1.5 h; an incremental run only re-runs what
   changed.
+
+## Post-synth smoke test
+
+`PostSynth/build_run.sh` synthesizes nl_top out of context (Vivado,
+xczu7eg-1; BITNESS 8, 4096 x 4096, OUT_WIDTH 64) and runs the funcsim netlist
+under NVC (`tb_nl_postsynth.vhd`). It uses the 8-bit golden images
+≤ `MAX_MP` (0.01), each at one NEAR rotating over 0, 3 and NMAX. Every lane
+must match CharLS per stripe, byte-exact.
+
+- The netlist is rebuilt only when the RTL hash changes (`--synth` forces).
+- Images run in 16 shards, each capped at 1.5 GB.
+- **Status**: 57/57 PASS, ~3 min.
+
+## Reports
+
+`./publish_reports.sh` builds `Docs/Reports/index.html` from the OSVVM HTML,
+coverage HTML and each suite's `Output/report_status.env`. Suites that have
+not been run show as "not run".
 
 ## Suites
 

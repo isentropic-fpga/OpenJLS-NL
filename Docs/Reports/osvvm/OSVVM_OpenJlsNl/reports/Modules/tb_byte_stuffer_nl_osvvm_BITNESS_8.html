@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../../reports/CssOsvvmStyle.css">
+  <title>tb_byte_stuffer_nl_osvvm Test Case Report</title>
+</head>
+<body>
+<header>
+  <h1>tb_byte_stuffer_nl_osvvm Test Case Report</h1>
+</header>
+<main>
+  <div class="summary-parent">
+    <div  class="summary-table">
+      <table  class="summary-table">
+        <thead>
+          <tr class="column-header"><th>Available Reports</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Generic: BITNESS = 8</td></tr>
+          <tr><td><a href="#AlertSummary">Alert Report</a></td></tr>
+          <tr><td><a href="#FunctionalCoverage">Functional Coverage Report(s)</a></td></tr>
+          <tr><td><a href="#Scoreboard_slv">ScoreboardPkg_slv Report(s)</a></td></tr>
+          <tr><td><a href="../../logs/OSVVM_OpenJlsNl_log.html#Modules_tb_byte_stuffer_nl_osvvm_BITNESS_8">Link to Simulation Results</a></td></tr>
+          <tr><td><a href="../../../Modules/tb_byte_stuffer_nl_osvvm.vhd">tb_byte_stuffer_nl_osvvm.vhd</a></td></tr>
+          <tr><td><a href="../../OSVVM_OpenJlsNl.html">OSVVM_OpenJlsNl Build Summary</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="summary-logo">
+    	 <img id="logo" src="../../reports/OsvvmLogo.png" alt="OSVVM logo">
+    </div>
+  </div>
+  <hr />
+  <div class="AlertSummary">
+    <h2 id="AlertSummary">tb_byte_stuffer_nl_osvvm Alert Report</h2>
+    <div class="AlertSettings">
+      <details open><summary class="subtitle">tb_byte_stuffer_nl_osvvm Alert Settings</summary>
+        <table class="AlertSettings">
+          <thead>
+            <tr>
+                <th colspan="2">Setting</th>
+                <th>Value</th>
+                <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <td colspan="2">FailOnWarning</td>
+                <td>true</td>
+                <td>If true, warnings are a test error</td>
+            </tr>
+            <tr>
+                <td colspan="2">FailOnDisabledErrors</td>
+                <td>true</td>
+                <td>If true, Disabled Alert Counts are a test error</td>
+            </tr>
+            <tr>
+                <td colspan="2">FailOnRequirementErrors</td>
+                <td>true</td>
+                <td>If true, Requirements Errors are a test error</td>
+            </tr>
+            <tr>
+                <td rowspan="3">External</td>
+                <td>Failures</td>
+                <td>0</td>
+                <td rowspan="3">Added to Alert Counts in determine total errors</td>
+            </tr>
+            <tr>
+                <td>Errors</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Warnings</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td rowspan="3">Expected</td>
+                <td>Failures</td>
+                <td>0</td>
+                <td rowspan="3">Subtracted from Alert Counts in determine total errors</td>
+            </tr>
+            <tr>
+                <td>Errors</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Warnings</td>
+                <td>0</td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
+    </div>
+    <div class="AlertResults">
+      <details open><summary class="subtitle">tb_byte_stuffer_nl_osvvm Alert Results</summary>
+        <table class="AlertResults">
+          <thead>
+            <tr>
+              <th rowspan="2">Name</th>
+              <th rowspan="2">Status</th>
+              <th colspan="3">Checks</th>
+              <th colspan="2">Requirements</th>
+              <th colspan="3">Alert Counts</th>
+              <th colspan="3">Disabled Alert Counts</th>
+            </tr>
+            <tr>
+              <th>Total</th>
+              <th>Passed</th>
+              <th>Failed</th>
+              <th>Goal</th>
+              <th>Passed</th>
+              <th>Failures</th>
+              <th>Errors</th>
+              <th>Warnings</th>
+              <th>Failures</th>
+              <th>Errors</th>
+              <th>Warnings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>tb_byte_stuffer_nl_osvvm</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">15001</td>
+              <td class="passed">15001</td>
+              <td class="passed">0</td>
+              <td >2</td>
+              <td >2</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; Default</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; OSVVM</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane SB(1)</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">3597</td>
+              <td class="passed">3597</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane SB(2)</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">3447</td>
+              <td class="passed">3447</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane SB(3)</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">3433</td>
+              <td class="passed">3433</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane SB(4)</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">3303</td>
+              <td class="passed">3303</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; reset phase</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane x emitBytes</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane x flushType</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane x data x almostFull</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; lane x stuffEvent</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; Requirements</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; NL.LaneStuff</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">1160</td>
+              <td class="passed">1160</td>
+              <td class="passed">0</td>
+              <td >880</td>
+              <td >1160</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; &emsp; NL.Reset</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">48</td>
+              <td class="passed">48</td>
+              <td class="passed">0</td>
+              <td >48</td>
+              <td >48</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; KnownOutputs</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; ScoreboardCompletion</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">8</td>
+              <td class="passed">8</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+            <tr>
+              <td>&emsp; CoverageClosure</td>
+              <td class="passed">PASSED</td>
+              <td class="passed">5</td>
+              <td class="passed">5</td>
+              <td class="passed">0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+              <td >0</td>
+            </tr>
+          <tbody>
+        </table>
+      </details>
+    </div>
+  </div>
+  <hr />
+  <div class="FunctionalCoverage">
+    <h2 id="FunctionalCoverage">tb_byte_stuffer_nl_osvvm Coverage Report</h2>
+    <p>Total Coverage: 100.00</p>
+    <details open><summary class="subtitle">reset phase Coverage Model &emsp; &emsp; Coverage: 100.0</summary>
+      <div class="CoverageSettings">
+        <details><summary class="subindented">reset phase Coverage Settings</summary>
+          <table class="CoverageSettings">
+            <thead>
+              <tr>
+                  <th>Settings</th>
+                  <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>CovWeight</td><td>1</td></tr>
+              <tr><td>Goal</td><td>100.0</td></tr>
+              <tr><td>WeightMode</td><td>REMAIN</td></tr>
+              <tr><td>Seeds</td><td>1144280738, &nbsp;1485537386</td></tr>
+              <tr><td>CountMode</td><td>COUNT_FIRST</td></tr>
+              <tr><td>IllegalMode</td><td>ILLEGAL_ON</td></tr>
+              <tr><td>Threshold</td><td>45.0</td></tr>
+              <tr><td>ThresholdEnable</td><td>FALSE</td></tr>
+              <tr><td>IsRequirement</td><td>FALSE</td></tr>
+              <tr><td>TotalCovCount</td><td>12</td></tr>
+              <tr><td>TotalCovGoal</td><td>12</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+      <div class="CoverageTable">
+        <details open><summary class="subindented">reset phase Coverage Bins</summary>
+          <table class="CoverageTable">
+            <thead>
+              <tr>
+                <th rowspan="2">Name</th>
+                <th rowspan="2">Type</th>
+                <th rowspan="2">Bin1</th>
+                <th rowspan="2">Count</th>
+                <th rowspan="2">AtLeast</th>
+                <th rowspan="2">Percent<br>Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>reset while idle</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>6</td>
+                <td>3</td>
+                <td>200.0</td>
+              </tr>
+              <tr>
+                <td>reset mid-image</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>7</td>
+                <td>3</td>
+                <td>233.3</td>
+              </tr>
+              <tr>
+                <td>reset awaiting oFlushDone</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>4</td>
+                <td>3</td>
+                <td>133.3</td>
+              </tr>
+              <tr>
+                <td>reset with FIFO backed up (almostFull)</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>7</td>
+                <td>3</td>
+                <td>233.3</td>
+              </tr>
+              <tr>
+                <td style="text-align: left" colspan="6"><strong>Total Percent Coverage:</strong> &emsp; 100.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </details>
+    <details open><summary class="subtitle">lane x emitBytes Coverage Model &emsp; &emsp; Coverage: 100.0</summary>
+      <div class="CoverageSettings">
+        <details><summary class="subindented">lane x emitBytes Coverage Settings</summary>
+          <table class="CoverageSettings">
+            <thead>
+              <tr>
+                  <th>Settings</th>
+                  <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>CovWeight</td><td>1</td></tr>
+              <tr><td>Goal</td><td>100.0</td></tr>
+              <tr><td>WeightMode</td><td>REMAIN</td></tr>
+              <tr><td>Seeds</td><td>2122506579, &nbsp;1647990037</td></tr>
+              <tr><td>CountMode</td><td>COUNT_FIRST</td></tr>
+              <tr><td>IllegalMode</td><td>ILLEGAL_ON</td></tr>
+              <tr><td>Threshold</td><td>45.0</td></tr>
+              <tr><td>ThresholdEnable</td><td>FALSE</td></tr>
+              <tr><td>IsRequirement</td><td>FALSE</td></tr>
+              <tr><td>TotalCovCount</td><td>20</td></tr>
+              <tr><td>TotalCovGoal</td><td>20</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+      <div class="CoverageTable">
+        <details open><summary class="subindented">lane x emitBytes Coverage Bins</summary>
+          <table class="CoverageTable">
+            <thead>
+              <tr>
+                <th rowspan="2">Name</th>
+                <th rowspan="2">Type</th>
+                <th rowspan="2">lane</th>
+                <th rowspan="2">emitBytes</th>
+                <th rowspan="2">Count</th>
+                <th rowspan="2">AtLeast</th>
+                <th rowspan="2">Percent<br>Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>lane=0 / emitted bytes=0</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>0</td>
+                <td>19</td>
+                <td>1</td>
+                <td>1900.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / emitted bytes=1</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>1</td>
+                <td>198</td>
+                <td>1</td>
+                <td>19800.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / emitted bytes=2</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>2</td>
+                <td>41</td>
+                <td>1</td>
+                <td>4100.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / emitted bytes=3</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>3</td>
+                <td>31</td>
+                <td>1</td>
+                <td>3100.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / emitted bytes=4</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>4</td>
+                <td>806</td>
+                <td>1</td>
+                <td>80600.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / emitted bytes=0</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>0</td>
+                <td>16</td>
+                <td>1</td>
+                <td>1600.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / emitted bytes=1</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>1</td>
+                <td>196</td>
+                <td>1</td>
+                <td>19600.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / emitted bytes=2</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>2</td>
+                <td>40</td>
+                <td>1</td>
+                <td>4000.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / emitted bytes=3</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>3</td>
+                <td>33</td>
+                <td>1</td>
+                <td>3300.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / emitted bytes=4</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>4</td>
+                <td>768</td>
+                <td>1</td>
+                <td>76800.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / emitted bytes=0</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>0</td>
+                <td>14</td>
+                <td>1</td>
+                <td>1400.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / emitted bytes=1</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>1</td>
+                <td>194</td>
+                <td>1</td>
+                <td>19400.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / emitted bytes=2</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>2</td>
+                <td>32</td>
+                <td>1</td>
+                <td>3200.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / emitted bytes=3</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>3</td>
+                <td>29</td>
+                <td>1</td>
+                <td>2900.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / emitted bytes=4</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>4</td>
+                <td>772</td>
+                <td>1</td>
+                <td>77200.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / emitted bytes=0</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>0</td>
+                <td>12</td>
+                <td>1</td>
+                <td>1200.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / emitted bytes=1</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>1</td>
+                <td>198</td>
+                <td>1</td>
+                <td>19800.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / emitted bytes=2</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>2</td>
+                <td>27</td>
+                <td>1</td>
+                <td>2700.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / emitted bytes=3</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>3</td>
+                <td>41</td>
+                <td>1</td>
+                <td>4100.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / emitted bytes=4</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>4</td>
+                <td>732</td>
+                <td>1</td>
+                <td>73200.0</td>
+              </tr>
+              <tr>
+                <td style="text-align: left" colspan="7"><strong>Total Percent Coverage:</strong> &emsp; 100.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </details>
+    <details open><summary class="subtitle">lane x flushType Coverage Model &emsp; &emsp; Coverage: 100.0</summary>
+      <div class="CoverageSettings">
+        <details><summary class="subindented">lane x flushType Coverage Settings</summary>
+          <table class="CoverageSettings">
+            <thead>
+              <tr>
+                  <th>Settings</th>
+                  <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>CovWeight</td><td>1</td></tr>
+              <tr><td>Goal</td><td>100.0</td></tr>
+              <tr><td>WeightMode</td><td>REMAIN</td></tr>
+              <tr><td>Seeds</td><td>155212492, &nbsp;117030829</td></tr>
+              <tr><td>CountMode</td><td>COUNT_FIRST</td></tr>
+              <tr><td>IllegalMode</td><td>ILLEGAL_ON</td></tr>
+              <tr><td>Threshold</td><td>45.0</td></tr>
+              <tr><td>ThresholdEnable</td><td>FALSE</td></tr>
+              <tr><td>IsRequirement</td><td>FALSE</td></tr>
+              <tr><td>TotalCovCount</td><td>12</td></tr>
+              <tr><td>TotalCovGoal</td><td>12</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+      <div class="CoverageTable">
+        <details open><summary class="subindented">lane x flushType Coverage Bins</summary>
+          <table class="CoverageTable">
+            <thead>
+              <tr>
+                <th rowspan="2">Name</th>
+                <th rowspan="2">Type</th>
+                <th rowspan="2">lane</th>
+                <th rowspan="2">flushType</th>
+                <th rowspan="2">Count</th>
+                <th rowspan="2">AtLeast</th>
+                <th rowspan="2">Percent<br>Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>lane=0 / byte aligned</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>1</td>
+                <td>19</td>
+                <td>1</td>
+                <td>1900.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / padded residue</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>2</td>
+                <td>123</td>
+                <td>1</td>
+                <td>12300.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / dangling FF</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>3</td>
+                <td>5</td>
+                <td>1</td>
+                <td>500.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / byte aligned</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>1</td>
+                <td>16</td>
+                <td>1</td>
+                <td>1600.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / padded residue</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>2</td>
+                <td>127</td>
+                <td>1</td>
+                <td>12700.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / dangling FF</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>3</td>
+                <td>4</td>
+                <td>1</td>
+                <td>400.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / byte aligned</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>1</td>
+                <td>14</td>
+                <td>1</td>
+                <td>1400.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / padded residue</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>2</td>
+                <td>125</td>
+                <td>1</td>
+                <td>12500.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / dangling FF</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>3</td>
+                <td>6</td>
+                <td>1</td>
+                <td>600.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / byte aligned</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>1</td>
+                <td>12</td>
+                <td>1</td>
+                <td>1200.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / padded residue</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>2</td>
+                <td>131</td>
+                <td>1</td>
+                <td>13100.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / dangling FF</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>3</td>
+                <td>4</td>
+                <td>1</td>
+                <td>400.0</td>
+              </tr>
+              <tr>
+                <td style="text-align: left" colspan="7"><strong>Total Percent Coverage:</strong> &emsp; 100.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </details>
+    <details open><summary class="subtitle">lane x data x almostFull Coverage Model &emsp; &emsp; Coverage: 100.0</summary>
+      <div class="CoverageSettings">
+        <details><summary class="subindented">lane x data x almostFull Coverage Settings</summary>
+          <table class="CoverageSettings">
+            <thead>
+              <tr>
+                  <th>Settings</th>
+                  <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>CovWeight</td><td>1</td></tr>
+              <tr><td>Goal</td><td>100.0</td></tr>
+              <tr><td>WeightMode</td><td>REMAIN</td></tr>
+              <tr><td>Seeds</td><td>492053561, &nbsp;1869209024</td></tr>
+              <tr><td>CountMode</td><td>COUNT_FIRST</td></tr>
+              <tr><td>IllegalMode</td><td>ILLEGAL_ON</td></tr>
+              <tr><td>Threshold</td><td>45.0</td></tr>
+              <tr><td>ThresholdEnable</td><td>FALSE</td></tr>
+              <tr><td>IsRequirement</td><td>FALSE</td></tr>
+              <tr><td>TotalCovCount</td><td>8</td></tr>
+              <tr><td>TotalCovGoal</td><td>8</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+      <div class="CoverageTable">
+        <details open><summary class="subindented">lane x data x almostFull Coverage Bins</summary>
+          <table class="CoverageTable">
+            <thead>
+              <tr>
+                <th rowspan="2">Name</th>
+                <th rowspan="2">Type</th>
+                <th rowspan="2">lane</th>
+                <th rowspan="2">almostFull</th>
+                <th rowspan="2">Count</th>
+                <th rowspan="2">AtLeast</th>
+                <th rowspan="2">Percent<br>Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>lane=0 / data beat / almostFull=0</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1061</td>
+                <td>1</td>
+                <td>106100.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / data beat / almostFull=1</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>1</td>
+                <td>15</td>
+                <td>1</td>
+                <td>1500.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / data beat / almostFull=0</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>0</td>
+                <td>1020</td>
+                <td>1</td>
+                <td>102000.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / data beat / almostFull=1</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>1</td>
+                <td>17</td>
+                <td>1</td>
+                <td>1700.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / data beat / almostFull=0</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>0</td>
+                <td>1012</td>
+                <td>1</td>
+                <td>101200.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / data beat / almostFull=1</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>1</td>
+                <td>15</td>
+                <td>1</td>
+                <td>1500.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / data beat / almostFull=0</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>0</td>
+                <td>988</td>
+                <td>1</td>
+                <td>98800.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / data beat / almostFull=1</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>1</td>
+                <td>10</td>
+                <td>1</td>
+                <td>1000.0</td>
+              </tr>
+              <tr>
+                <td style="text-align: left" colspan="7"><strong>Total Percent Coverage:</strong> &emsp; 100.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </details>
+    <details open><summary class="subtitle">lane x stuffEvent Coverage Model &emsp; &emsp; Coverage: 100.0</summary>
+      <div class="CoverageSettings">
+        <details><summary class="subindented">lane x stuffEvent Coverage Settings</summary>
+          <table class="CoverageSettings">
+            <thead>
+              <tr>
+                  <th>Settings</th>
+                  <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>CovWeight</td><td>1</td></tr>
+              <tr><td>Goal</td><td>100.0</td></tr>
+              <tr><td>WeightMode</td><td>REMAIN</td></tr>
+              <tr><td>Seeds</td><td>1256593996, &nbsp;59676991</td></tr>
+              <tr><td>CountMode</td><td>COUNT_FIRST</td></tr>
+              <tr><td>IllegalMode</td><td>ILLEGAL_ON</td></tr>
+              <tr><td>Threshold</td><td>45.0</td></tr>
+              <tr><td>ThresholdEnable</td><td>FALSE</td></tr>
+              <tr><td>IsRequirement</td><td>FALSE</td></tr>
+              <tr><td>TotalCovCount</td><td>12</td></tr>
+              <tr><td>TotalCovGoal</td><td>12</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+      <div class="CoverageTable">
+        <details open><summary class="subindented">lane x stuffEvent Coverage Bins</summary>
+          <table class="CoverageTable">
+            <thead>
+              <tr>
+                <th rowspan="2">Name</th>
+                <th rowspan="2">Type</th>
+                <th rowspan="2">lane</th>
+                <th rowspan="2">stuffEvent</th>
+                <th rowspan="2">Count</th>
+                <th rowspan="2">AtLeast</th>
+                <th rowspan="2">Percent<br>Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>lane=0 / noStuff</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3100</td>
+                <td>1</td>
+                <td>310000.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / firstStuff</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>1</td>
+                <td>111</td>
+                <td>1</td>
+                <td>11100.0</td>
+              </tr>
+              <tr>
+                <td>lane=0 / runStuff</td>
+                <td>COUNT</td>
+                <td>0</td>
+                <td>2</td>
+                <td>642</td>
+                <td>1</td>
+                <td>64200.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / noStuff</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>0</td>
+                <td>3021</td>
+                <td>1</td>
+                <td>302100.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / firstStuff</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>1</td>
+                <td>110</td>
+                <td>1</td>
+                <td>11000.0</td>
+              </tr>
+              <tr>
+                <td>lane=1 / runStuff</td>
+                <td>COUNT</td>
+                <td>1</td>
+                <td>2</td>
+                <td>614</td>
+                <td>1</td>
+                <td>61400.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / noStuff</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>0</td>
+                <td>2997</td>
+                <td>1</td>
+                <td>299700.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / firstStuff</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>1</td>
+                <td>114</td>
+                <td>1</td>
+                <td>11400.0</td>
+              </tr>
+              <tr>
+                <td>lane=2 / runStuff</td>
+                <td>COUNT</td>
+                <td>2</td>
+                <td>2</td>
+                <td>594</td>
+                <td>1</td>
+                <td>59400.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / noStuff</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>0</td>
+                <td>2859</td>
+                <td>1</td>
+                <td>285900.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / firstStuff</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>1</td>
+                <td>112</td>
+                <td>1</td>
+                <td>11200.0</td>
+              </tr>
+              <tr>
+                <td>lane=3 / runStuff</td>
+                <td>COUNT</td>
+                <td>3</td>
+                <td>2</td>
+                <td>594</td>
+                <td>1</td>
+                <td>59400.0</td>
+              </tr>
+              <tr>
+                <td style="text-align: left" colspan="7"><strong>Total Percent Coverage:</strong> &emsp; 100.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </details>
+  </div>
+  <hr />
+  <div class="ScoreboardSummary">
+    <h2 id="Scoreboard_slv">tb_byte_stuffer_nl_osvvm Scoreboard Report for Scoreboard_slv</h2>
+    <div class="Scoreboard_slv">
+      <table class="ScoreboardSummary">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>ParentName</th>
+              <th>ItemCount</th>
+              <th>ErrorCount</th>
+              <th>ItemsChecked</th>
+              <th>ItemsPopped</th>
+              <th>ItemsDropped</th>
+              <th>FifoCount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>lane SB(1)</td>
+              <td>OSVVM</td>
+              <td>3981</td>
+              <td>0</td>
+              <td>3597</td>
+              <td>3981</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>lane SB(2)</td>
+              <td>OSVVM</td>
+              <td>3876</td>
+              <td>0</td>
+              <td>3447</td>
+              <td>3876</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>lane SB(3)</td>
+              <td>OSVVM</td>
+              <td>3836</td>
+              <td>0</td>
+              <td>3433</td>
+              <td>3836</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>lane SB(4)</td>
+              <td>OSVVM</td>
+              <td>3700</td>
+              <td>0</td>
+              <td>3303</td>
+              <td>3700</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+          </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>
+  <hr />
+  <p class="generated-by-osvvm">Generated by OSVVM-Scripts 2026.01 on 2026-10-16 - 22:30:47 (-03).</p>
+</footer>
+</body>
+</html>

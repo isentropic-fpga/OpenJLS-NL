@@ -1,0 +1,548 @@
+Version: "0.1"
+Coverage: 100.00
+Settings: 
+  WritePassFail: 0
+Models: 
+  - Name: "image kind x stress mode"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1776091860, 1066838588]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 24
+      TotalCovGoal: 24
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "case"
+        - "mode"
+      NumBins: 24
+    Bins: 
+      - Name: "case 0 / clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 0 / backpressure"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 0 / input gaps"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 0 / both"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 1 / clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 1 / backpressure"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 1 / input gaps"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 1 / both"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 2 / clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 2 / backpressure"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 2 / input gaps"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 2 / both"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 3 / clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 3 / backpressure"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 3 / input gaps"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 3 / both"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 4 / clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 4, Max: 4}
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 4 / backpressure"
+        Type: "COUNT"
+        Range: 
+          - {Min: 4, Max: 4}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 4 / input gaps"
+        Type: "COUNT"
+        Range: 
+          - {Min: 4, Max: 4}
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 4 / both"
+        Type: "COUNT"
+        Range: 
+          - {Min: 4, Max: 4}
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 5 / clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 5, Max: 5}
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 5 / backpressure"
+        Type: "COUNT"
+        Range: 
+          - {Min: 5, Max: 5}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 5 / input gaps"
+        Type: "COUNT"
+        Range: 
+          - {Min: 5, Max: 5}
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "case 5 / both"
+        Type: "COUNT"
+        Range: 
+          - {Min: 5, Max: 5}
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+
+  - Name: "back to back"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1384604822, 1879903460]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 2
+      TotalCovGoal: 2
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "Bin1"
+      NumBins: 2
+    Bins: 
+      - Name: "clean"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "stressed"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+
+  - Name: "stall propagation"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [183637858, 968005498]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 5
+      TotalCovGoal: 5
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "Bin1"
+      NumBins: 5
+    Bins: 
+      - Name: "hold lane 0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "hold lane 1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "hold lane 2"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "hold lane 3"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "hold all lanes"
+        Type: "COUNT"
+        Range: 
+          - {Min: 4, Max: 4}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+
+  - Name: "lane backpressure hold"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1065416532, 1157217621]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 4
+      TotalCovGoal: 4
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "Bin1"
+      NumBins: 4
+    Bins: 
+      - Name: "lane 0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 5013
+        AtLeast: 1
+        PercentCov: 501300.0000
+      - Name: "lane 1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 5001
+        AtLeast: 1
+        PercentCov: 500100.0000
+      - Name: "lane 2"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+        Count: 5019
+        AtLeast: 1
+        PercentCov: 501900.0000
+      - Name: "lane 3"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+        Count: 5347
+        AtLeast: 1
+        PercentCov: 534700.0000
+
+  - Name: "reset phase"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1144280738, 1485537386]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 12
+      TotalCovGoal: 12
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "Bin1"
+      NumBins: 6
+    Bins: 
+      - Name: "reset while idle"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 4
+        AtLeast: 2
+        PercentCov: 200.0000
+      - Name: "reset in the config divider"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 4
+        AtLeast: 2
+        PercentCov: 200.0000
+      - Name: "reset in the clear sweep"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+        Count: 4
+        AtLeast: 2
+        PercentCov: 200.0000
+      - Name: "reset mid feed"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+        Count: 3
+        AtLeast: 2
+        PercentCov: 150.0000
+      - Name: "reset while draining"
+        Type: "COUNT"
+        Range: 
+          - {Min: 4, Max: 4}
+        Count: 4
+        AtLeast: 2
+        PercentCov: 200.0000
+      - Name: "reset with output held"
+        Type: "COUNT"
+        Range: 
+          - {Min: 5, Max: 5}
+        Count: 5
+        AtLeast: 2
+        PercentCov: 250.0000
+
+  - Name: "config across reset"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [559540070, 1675420758]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 9
+      TotalCovGoal: 9
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "Bin1"
+      NumBins: 3
+    Bins: 
+      - Name: "NEAR changed"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 44
+        AtLeast: 3
+        PercentCov: 1466.6667
+      - Name: "W/H changed"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 42
+        AtLeast: 3
+        PercentCov: 1400.0000
+      - Name: "same config"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+        Count: 20
+        AtLeast: 3
+        PercentCov: 666.6667
+
+  - Name: "config ranges"
+    TestCases: 
+      - "tb_nl_top_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1414810171, 1600087986]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 6
+      TotalCovGoal: 6
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "field"
+        - "value"
+      NumBins: 6
+    Bins: 
+      - Name: "W = 32"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 32, Max: 32}
+        Count: 56
+        AtLeast: 1
+        PercentCov: 5600.0000
+      - Name: "W = MAX_W"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 64, Max: 64}
+        Count: 23
+        AtLeast: 1
+        PercentCov: 2300.0000
+      - Name: "H = 1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 11
+        AtLeast: 1
+        PercentCov: 1100.0000
+      - Name: "H = MAX_H"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 64, Max: 64}
+        Count: 23
+        AtLeast: 1
+        PercentCov: 2300.0000
+      - Name: "NEAR = 0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 45
+        AtLeast: 1
+        PercentCov: 4500.0000
+      - Name: "NEAR = max"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 255, Max: 255}
+        Count: 13
+        AtLeast: 1
+        PercentCov: 1300.0000
+

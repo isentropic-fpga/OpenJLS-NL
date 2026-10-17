@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NVC code coverage report</title>
+  <style>
+:root {
+    --table-row-color: #e8e8e8;
+    --margin-left: 20%;
+}
+
+body {
+    background-color: #f0f0e0ff;
+}
+
+header {
+    padding: 0.5em;
+    text-align: center;
+    font-size: 14pt;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    word-wrap: break-word;
+}
+
+h3 {
+    word-wrap: break-word;
+    margin-bottom: 0px;
+}
+
+hr {
+    border:none;
+    height: 2px;
+    background: black;
+}
+
+footer {
+    display: table;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav {
+    float: left;
+    background-color: var(--table-row-color);
+    width: 17%;
+    overflow: auto;
+    padding: 10px;
+    margin-top: -2px;
+    border: 2px solid black;
+}
+nav details details {
+    margin-left: 1rem;
+}
+nav details > a {
+    padding-left: 1.9rem;
+    display: block;
+}
+nav summary {
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+}
+nav summary::before {
+    content: '▶';
+    font-size: 0.7em;
+    margin-right: 0.4em;
+}
+nav details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+table {
+    table-layout: fixed;
+}
+
+table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+    word-wrap: break-word;
+}
+
+.tabcontent {
+    display: none;
+    padding: 0px 0px;
+    border: 2px solid #ccc;
+    border-top: none;
+    word-wrap: break-word;
+}
+
+.tab {
+    overflow: hidden;
+    border: 2px solid;
+    margin-left: var(--margin-left);
+    margin-top: 10px;
+}
+
+.cbg:hover {
+    background-color: #dddddd;
+}
+.cbg {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+
+.cbt {
+    margin-top: 8px;
+}
+.cbt th {
+    background-color: #bbbbbb;
+    text-align: center;
+}
+.cbt td, .cbt th {
+    width: 50px;
+    text-align: center;
+}
+.cbt td + td, .cbt th + th {
+    width: 150px;
+}
+.cbt td + td + td, .cbt th + th + th {
+    width: 150px;
+}
+.cbt td + td + td + td, .cbt th + th + th + th {
+    width: 150px;
+}
+
+.percent100 {
+    background-color: #00cc00;
+}
+.percent90 {
+    background-color: #e6e600;
+}
+.percent80 {
+    background-color: #ff9900;
+}
+.percent0 {
+    background-color: #ff0000;
+}
+.percentna {
+    background-color: #cccccc;
+}
+
+.nav-sel {
+    font-weight: bold;
+}
+  </style>
+</head>
+<body style="font-family: verdana">
+
+<header><h1 style="text-align: center;">NVC code coverage report
+</h1></header>
+
+<h2 style="float: left; margin-bottom: 0px; margin-top: 0px;"><a href=../index.html>Back to summary</a></h2>
+<h2 style="float: left; clear: left;">Coverage report for file:</h2>
+<nav style="clear: left">
+<p style="margin-left: 10px"><a href=A15_A16_nl_encode_run.vhd.html>A15_A16_nl_encode_run.vhd</a></p>
+<p style="margin-left: 10px"><a href=A20_compute_temp.vhd.html>A20_compute_temp.vhd</a></p>
+<p style="margin-left: 10px"><a href=A22_errval_mapping.vhd.html>A22_errval_mapping.vhd</a></p>
+<p style="margin-left: 10px"><a href=nl_top.vhd.html>nl_top.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_nl_framer_osvvm.vhd.html>tb_nl_framer_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=nl_backend.vhd.html>nl_backend.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_a15_a16_nl_osvvm.vhd.html>tb_a15_a16_nl_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_nl_top_osvvm.vhd.html>tb_nl_top_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_a11_1_nl_osvvm.vhd.html>tb_a11_1_nl_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=A10_compute_k.vhd.html>A10_compute_k.vhd</a></p>
+<p style="margin-left: 10px"><a href=A11_2_bit_packer.vhd.html>A11_2_bit_packer.vhd</a></p>
+<p style="margin-left: 10px"><a href=nl_frontend.vhd.html>nl_frontend.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_nl_backend_osvvm.vhd.html>tb_nl_backend_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=byte_stuffer_nl.vhd.html>byte_stuffer_nl.vhd</a></p>
+<p style="margin-left: 10px"><a href=olo_base_ram_sdp.vhd.html>olo_base_ram_sdp.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_nl_frontend_osvvm.vhd.html>tb_nl_frontend_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=A12_variables_update.vhd.html>A12_variables_update.vhd</a></p>
+<p style="margin-left: 10px"><a href=A11_error_mapping.vhd.html>A11_error_mapping.vhd</a></p>
+<p style="margin-left: 10px"><a href=nl_config.vhd.html>nl_config.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_byte_stuffer_nl_osvvm.vhd.html>tb_byte_stuffer_nl_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=nl_loop.vhd.html>nl_loop.vhd</a></p>
+<p style="margin-left: 10px"><a href=A11_1_nl_golomb_encoder.vhd.html>A11_1_nl_golomb_encoder.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_nl_config_osvvm.vhd.html>tb_nl_config_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=olo_base_fifo_sync.vhd.html>olo_base_fifo_sync.vhd</a></p>
+<p style="margin-left: 10px"><a href=A23_run_interruption_update.vhd.html>A23_run_interruption_update.vhd</a></p>
+<p style="margin-left: 10px"><a href=A21_compute_map.vhd.html>A21_compute_map.vhd</a></p>
+<p style="margin-left: 10px"><a href=tb_nl_loop_osvvm.vhd.html>tb_nl_loop_osvvm.vhd</a></p>
+<p style="margin-left: 10px"><a href=nl_framer.vhd.html>nl_framer.vhd</a></p>
+</nav>
+
+<h2 style="margin-left: var(--margin-left); width: 76%;">
+   File:&nbsp; <a href="../source/54dc23906a19dbfecc574b2f009194f4060141a4.html">../../Sources/A11_1_nl_golomb_encoder.vhd</a>
+</h2>
+
+<h2 style="margin-left: var(--margin-left);">
+  Current File:
+</h2>
+
+<table id="cur_file_table" style="width: 76%;margin-left:var(--margin-left);margin-right:auto;"> 
+  <tr style="height:40px">
+    <th class="cbg" onclick="sortTable(0, &quot;cur_file_table&quot;)"  style="width:30%">File</th>
+    <th class="cbg" onclick="sortTable(1, &quot;cur_file_table&quot;)"  style="width:8%">Statement</th>
+    <th class="cbg" onclick="sortTable(2, &quot;cur_file_table&quot;)"  style="width:8%">Branch</th>
+    <th class="cbg" onclick="sortTable(3, &quot;cur_file_table&quot;)"  style="width:8%">Toggle</th>
+    <th class="cbg" onclick="sortTable(4, &quot;cur_file_table&quot;)"  style="width:8%">Expression</th>
+    <th class="cbg" onclick="sortTable(5, &quot;cur_file_table&quot;)"  style="width:8%">FSM state</th>
+    <th class="cbg" onclick="sortTable(6, &quot;cur_file_table&quot;)"  style="width:8%">Functional</th>
+    <th class="cbg" onclick="sortTable(7, &quot;cur_file_table&quot;)"  style="width:8%">Average</th>
+  </tr>
+  <tr>
+    <td style="background-color:var(--table-row-color)">
+<a href="A11_1_nl_golomb_encoder.vhd.html">A11_1_nl_golomb_encoder.vhd</a></td>
+    <td class="percent100">100.0 % (24/24)</td>
+    <td class="percent100">100.0 % (4/4)</td>
+    <td class="percentna">N.A.</td>
+    <td class="percentna">N.A.</td>
+    <td class="percentna">N.A.</td>
+    <td class="percentna">N.A.</td>
+    <td class="percent100">100.0 % (28/28)</td>
+  </tr>
+</table>
+
+<h2 style="margin-left: var(--margin-left);">
+  Details:
+</h2>
+
+<table style="width:76%;margin-left:var(--margin-left);margin-right:auto;"> 
+   <tr style="height:40px">
+      <th class="cbg" onclick="selectCoverage(event, 'Statement')" id="defaultOpen">Statement</th>
+      <th class="cbg" onclick="selectCoverage(event, 'Branch')">Branch</th>
+      <th class="cbg" onclick="selectCoverage(event, 'Toggle')">Toggle</th>
+      <th class="cbg" onclick="selectCoverage(event, 'Expression')">Expression</th>
+      <th class="cbg" onclick="selectCoverage(event, 'FSM_state')">FSM state</th>
+      <th class="cbg" onclick="selectCoverage(event, 'Functional')">Functional</th>
+   </tr>
+</table>
+
+<div id="Statement" class="tabcontent" style="width:76%;margin-left:var(--margin-left); margin-right:auto; margin-top:-2px; border: 2px solid black;">
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ffcccc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Uncovered statements:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#d6eaf8;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Excluded statements:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ccffcc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Covered statements:</h2>
+  <div style="padding:0px 10px;">
+<h3>Variable assignment statement on line 80:</h3><code>80:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vQbpp&nbsp;:=&nbsp;to_integer(iQbpp);</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>If statement on lines 82 to 87:</h3><code>82:&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(iRiMode&nbsp;=&nbsp;'1')&nbsp;then&nbsp;<br>83:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;CO_J_TABLE(to_integer(iRunIndex));&nbsp;<br>84:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vThreshold&nbsp;:=&nbsp;LIMIT&nbsp;-&nbsp;vJ&nbsp;-&nbsp;vQbpp&nbsp;-&nbsp;2;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL&nbsp;<br>85:&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;<br>86:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vThreshold&nbsp;:=&nbsp;LIMIT&nbsp;-&nbsp;vQbpp&nbsp;-&nbsp;1;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL&nbsp;<br>87:&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 83:</h3><code>83:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:=&nbsp;CO_J_TABLE(to_integer(iRunIndex));</code>&nbsp;</code><br><b>Count:</b> 428079<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 84:</h3><code>84:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vThreshold&nbsp;:=&nbsp;LIMIT&nbsp;-&nbsp;vJ&nbsp;-&nbsp;vQbpp&nbsp;-&nbsp;2;</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL&nbsp;</code><br><b>Count:</b> 428079<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 86:</h3><code>86:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vThreshold&nbsp;:=&nbsp;LIMIT&nbsp;-&nbsp;vQbpp&nbsp;-&nbsp;1;</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL&nbsp;</code><br><b>Count:</b> 1844926<br><b>Threshold:</b> 1<hr/>
+<h3>Assertion statement on lines 92 to 94:</h3><code>92:&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iValid&nbsp;/=&nbsp;'1'&nbsp;or&nbsp;Is_X(iQbpp)&nbsp;or&nbsp;(vQbpp&nbsp;&gt;=&nbsp;1&nbsp;and&nbsp;vQbpp&nbsp;&lt;=&nbsp;SUFFIX_WIDTH&nbsp;and&nbsp;vQbpp&nbsp;&lt;=&nbsp;MAPPED_ERROR_VAL_WIDTH)&nbsp;<br>93:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"a11_1_nl:&nbsp;qbpp&nbsp;out&nbsp;of&nbsp;[1&nbsp;..&nbsp;min(SUFFIX_WIDTH,&nbsp;MAPPED_ERROR_VAL_WIDTH)]"&nbsp;<br>94:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;severity&nbsp;failure;&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Assertion statement on lines 95 to 97:</h3><code>95:&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iValid&nbsp;/=&nbsp;'1'&nbsp;or&nbsp;Is_X(iQbpp)&nbsp;or&nbsp;(vThreshold&nbsp;&gt;=&nbsp;1&nbsp;and&nbsp;vThreshold&nbsp;&lt;&nbsp;2&nbsp;**&nbsp;oUnaryZeros'length)&nbsp;<br>96:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"a11_1_nl:&nbsp;escape&nbsp;threshold&nbsp;out&nbsp;of&nbsp;[1&nbsp;..&nbsp;2^UNARY_WIDTH-1]"&nbsp;<br>97:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;severity&nbsp;failure;&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Assertion statement on lines 98 to 100:</h3><code>98:&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;iValid&nbsp;/=&nbsp;'1'&nbsp;or&nbsp;Is_X(iK)&nbsp;or&nbsp;(to_integer(iK)&nbsp;&lt;=&nbsp;SUFFIX_WIDTH&nbsp;and&nbsp;to_integer(iK)&nbsp;&lt;=&nbsp;MAPPED_ERROR_VAL_WIDTH)&nbsp;<br>99:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"a11_1_nl:&nbsp;k&nbsp;out&nbsp;of&nbsp;[0&nbsp;..&nbsp;min(SUFFIX_WIDTH,&nbsp;MAPPED_ERROR_VAL_WIDTH)]"&nbsp;<br>100:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;severity&nbsp;failure;&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 103:</h3><code>103:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vKInt&nbsp;:=&nbsp;to_integer(iK);</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 105:</h3><code>105:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vHighOrder&nbsp;:=&nbsp;shift_right(iMappedErrorVal,&nbsp;vKInt);</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 107:</h3><code>107:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vLowOrder&nbsp;:=&nbsp;iMappedErrorVal&nbsp;-&nbsp;shift_left(vHighOrder,&nbsp;vKInt);</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 109:</h3><code>109:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vIsEscape&nbsp;:=&nbsp;(vHighOrder&nbsp;&gt;=&nbsp;vThreshold);</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>If statement on lines 111 to 129:</h3><code>111:&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(not&nbsp;vIsEscape)&nbsp;then&nbsp;<br>112:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vUnaryZeros&nbsp;:=&nbsp;resize(vHighOrder,&nbsp;vUnaryZeros'length);&nbsp;<br>...<br>128:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vSuffixVal&nbsp;:=&nbsp;resize(vMappedErrorDec,&nbsp;vSuffixVal'length);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL:&nbsp;packer&nbsp;masks&nbsp;to&nbsp;QBPP&nbsp;bits&nbsp;<br>129:&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if;&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 112:</h3><code>112:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vUnaryZeros&nbsp;:=&nbsp;resize(vHighOrder,&nbsp;vUnaryZeros'length);</code>&nbsp;</code><br><b>Count:</b> 1776735<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 113:</h3><code>113:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vSuffixLen&nbsp;&nbsp;:=&nbsp;resize(iK,&nbsp;vSuffixLen'length);</code>&nbsp;</code><br><b>Count:</b> 1776735<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 115:</h3><code>115:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vSuffixVal&nbsp;:=&nbsp;resize(vLowOrder,&nbsp;vSuffixVal'length);</code>&nbsp;</code><br><b>Count:</b> 1776735<br><b>Threshold:</b> 1<hr/>
+<h3>Assertion statement on lines 118 to 120:</h3><code>118:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;(iMappedErrorVal&nbsp;/=&nbsp;0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;Catch&nbsp;impossible&nbsp;case&nbsp;on&nbsp;simulation&nbsp;set&nbsp;<br>119:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;report&nbsp;"LG(k,LIMIT)&nbsp;escape&nbsp;with&nbsp;MErrval=0&nbsp;is&nbsp;impossible&nbsp;per&nbsp;T.87/14495-1"&nbsp;<br>120:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;severity&nbsp;failure;&nbsp;</code><br><b>Count:</b> 496270<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 123:</h3><code>123:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vUnaryZeros&nbsp;:=&nbsp;to_unsigned(vThreshold,&nbsp;vUnaryZeros'length);</code>&nbsp;</code><br><b>Count:</b> 496270<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 124:</h3><code>124:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vSuffixLen&nbsp;&nbsp;:=&nbsp;to_unsigned(vQbpp,&nbsp;vSuffixLen'length);</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL&nbsp;</code><br><b>Count:</b> 496270<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 126:</h3><code>126:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vMappedErrorDec&nbsp;:=&nbsp;iMappedErrorVal&nbsp;-&nbsp;1;</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;MErrval&nbsp;is&nbsp;guaranteed&nbsp;to&nbsp;be&nbsp;greater&nbsp;than&nbsp;1&nbsp;when&nbsp;escape&nbsp;</code><br><b>Count:</b> 496270<br><b>Threshold:</b> 1<hr/>
+<h3>Variable assignment statement on line 128:</h3><code>128:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">vSuffixVal&nbsp;:=&nbsp;resize(vMappedErrorDec,&nbsp;vSuffixVal'length);</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;NL:&nbsp;packer&nbsp;masks&nbsp;to&nbsp;QBPP&nbsp;bits&nbsp;</code><br><b>Count:</b> 496270<br><b>Threshold:</b> 1<hr/>
+<h3>Signal assignment statement on line 131:</h3><code>131:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">oUnaryZeros&nbsp;&lt;=&nbsp;vUnaryZeros;</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Signal assignment statement on line 132:</h3><code>132:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">oSuffixLen&nbsp;&nbsp;&lt;=&nbsp;vSuffixLen;</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1<hr/>
+<h3>Signal assignment statement on line 133:</h3><code>133:&nbsp;&nbsp;&nbsp;&nbsp;<code class="cbg">oSuffixVal&nbsp;&nbsp;&lt;=&nbsp;vSuffixVal;</code>&nbsp;</code><br><b>Count:</b> 2273005<br><b>Threshold:</b> 1  </div>
+  </section>
+
+</div>
+<div id="Branch" class="tabcontent" style="width:76%;margin-left:var(--margin-left); margin-right:auto; margin-top:-2px; border: 2px solid black;">
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ffcccc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Uncovered branches:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#d6eaf8;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Excluded branches:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ccffcc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Covered branches:</h2>
+  <div style="padding:0px 10px;">
+<h3>"if" / "when" / "else" condition on line 82:</h3><code>82:&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(<code class="cbg">iRiMode&nbsp;=&nbsp;'1'</code>)&nbsp;then&nbsp;</code><br><table class="cbt"><tr><th></th><th>Evaluated to</th><th>Count</th><th>Threshold</th></tr><tr><td><b>Bin</b></td><td>True</td><td>428079</td><td>1</td></tr></table><hr/>
+<h3>"if" / "when" / "else" condition on line 82:</h3><code>82:&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(<code class="cbg">iRiMode&nbsp;=&nbsp;'1'</code>)&nbsp;then&nbsp;</code><br><table class="cbt"><tr><th></th><th>Evaluated to</th><th>Count</th><th>Threshold</th></tr><tr><td><b>Bin</b></td><td>False</td><td>78559</td><td>1</td></tr></table><hr/>
+<h3>"if" / "when" / "else" condition on line 111:</h3><code>111:&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(<code class="cbg">not&nbsp;vIsEscape</code>)&nbsp;then&nbsp;</code><br><table class="cbt"><tr><th></th><th>Evaluated to</th><th>Count</th><th>Threshold</th></tr><tr><td><b>Bin</b></td><td>True</td><td>1776735</td><td>1</td></tr></table><hr/>
+<h3>"if" / "when" / "else" condition on line 111:</h3><code>111:&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(<code class="cbg">not&nbsp;vIsEscape</code>)&nbsp;then&nbsp;</code><br><table class="cbt"><tr><th></th><th>Evaluated to</th><th>Count</th><th>Threshold</th></tr><tr><td><b>Bin</b></td><td>False</td><td>78003</td><td>1</td></tr></table>  </div>
+  </section>
+
+</div>
+<div id="Toggle" class="tabcontent" style="width:76%;margin-left:var(--margin-left); margin-right:auto; margin-top:-2px; border: 2px solid black;">
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ffcccc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Uncovered toggles:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#d6eaf8;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Excluded toggles:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ccffcc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Covered toggles:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+</div>
+<div id="Expression" class="tabcontent" style="width:76%;margin-left:var(--margin-left); margin-right:auto; margin-top:-2px; border: 2px solid black;">
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ffcccc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Uncovered expressions:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#d6eaf8;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Excluded expressions:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ccffcc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Covered expressions:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+</div>
+<div id="FSM_state" class="tabcontent" style="width:76%;margin-left:var(--margin-left); margin-right:auto; margin-top:-2px; border: 2px solid black;">
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ffcccc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Uncovered FSM states:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#d6eaf8;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Excluded FSM states:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ccffcc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Covered FSM states:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+</div>
+<div id="Functional" class="tabcontent" style="width:76%;margin-left:var(--margin-left); margin-right:auto; margin-top:-2px; border: 2px solid black;">
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ffcccc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Uncovered functional coverage:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#d6eaf8;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Excluded functional coverage:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+  <section style="padding-left:10px; padding-top: 10px; padding-bottom: 10px; padding-right:10px;background-color:#ccffcc;">
+ <h2 style="margin-top: 0px; margin-bottom: 0px">Covered functional coverage:</h2>
+  <div style="padding:0px 10px;">
+  </div>
+  </section>
+
+</div>
+<script>
+   function selectCoverage(evt, coverageType) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+         tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+         tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(coverageType).style.display = "block";
+      evt.currentTarget.className += " active";
+   }
+   function GetExclude(excludeCmd) {
+      navigator.clipboard.writeText(excludeCmd);
+   }
+   function getCellValue (tr, n) {
+      let v = tr.getElementsByTagName("TD")[n];
+      v = parseInt(v.innerHTML.split("%")[0]);
+      if (isNaN(v)) {
+         v = -1;
+      }
+      return v;
+   }
+   function sortTable(n, tableId) {
+     const table = document.getElementById(tableId);
+     const rows = Array.from(table.querySelectorAll('tr:nth-child(n+2)'));
+     rows.sort((a, b) => {
+       const left = getCellValue(this.ascending ? a : b, n);
+       const right = getCellValue(this.ascending ? b : a, n);
+       if (!isNaN(left) && !isNaN(right)) {
+         return left - right;
+       } else {
+         return left.localeCompare(right);
+       }
+     });
+     rows.forEach(tr => table.appendChild(tr));
+     this.ascending = !this.ascending;
+   }
+   document.getElementById("defaultOpen").click();
+</script>
+<footer>   <p> NVC version: 1.23.0 </p>
+   <p> Generated on: Fri Oct 16 22:32:19 2026
+ </p>
+</footer>
+</body>
+</html>

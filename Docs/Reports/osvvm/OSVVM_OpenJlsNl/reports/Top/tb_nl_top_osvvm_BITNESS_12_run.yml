@@ -1,0 +1,25 @@
+Version: "0.1"
+TestCaseName: "tb_nl_top_osvvm"
+TestCaseFile:  "../../../Top/tb_nl_top_osvvm.vhd"
+TestSuiteName: "Top"
+BuildName: "OSVVM_OpenJlsNl"
+Generics:
+  BITNESS: "12"
+ReportsTestSuiteDirectory:  "reports/Top"
+RequirementsYamlFile:  "reports/Top/tb_nl_top_osvvm_BITNESS_12_req.yml"
+AlertYamlFile:  "reports/Top/tb_nl_top_osvvm_BITNESS_12_alerts.yml"
+CovYamlFile:  "reports/Top/tb_nl_top_osvvm_BITNESS_12_cov.yml"
+ScoreboardDict:
+  slv: "reports/Top/tb_nl_top_osvvm_BITNESS_12_sb_slv.yml"
+TranscriptFiles: ""
+TestCaseFileName: "tb_nl_top_osvvm_BITNESS_12"
+GenericNames: "_BITNESS_12"
+OsvvmSettingsInfo:
+  ReportsSubdirectory:  "reports"
+  SimulationLogFile: "logs/OSVVM_OpenJlsNl.log"
+  SimulationHtmlLogFile: "logs/OSVVM_OpenJlsNl_log.html"
+  RequirementsSubdirectory: ""
+  CoverageSubdirectory:    "CodeCoverage/OSVVM_OpenJlsNl_code_cov.html"
+  Report2CssFiles:
+    - "reports/CssOsvvmStyle.css"
+  Report2PngFile:  "reports/OsvvmLogo.png"

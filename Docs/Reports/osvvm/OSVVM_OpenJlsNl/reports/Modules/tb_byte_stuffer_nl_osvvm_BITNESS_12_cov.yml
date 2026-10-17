@@ -1,0 +1,568 @@
+Version: "0.1"
+Coverage: 100.00
+Settings: 
+  WritePassFail: 0
+Models: 
+  - Name: "reset phase"
+    TestCases: 
+      - "tb_byte_stuffer_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1144280738, 1485537386]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 12
+      TotalCovGoal: 12
+    BinInfo: 
+      Dimensions: 1
+      FieldNames: 
+        - "Bin1"
+      NumBins: 4
+    Bins: 
+      - Name: "reset while idle"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+        Count: 6
+        AtLeast: 3
+        PercentCov: 200.0000
+      - Name: "reset mid-image"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+        Count: 6
+        AtLeast: 3
+        PercentCov: 200.0000
+      - Name: "reset awaiting oFlushDone"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+        Count: 4
+        AtLeast: 3
+        PercentCov: 133.3333
+      - Name: "reset with FIFO backed up (almostFull)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+        Count: 8
+        AtLeast: 3
+        PercentCov: 266.6667
+
+  - Name: "lane x emitBytes"
+    TestCases: 
+      - "tb_byte_stuffer_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [2122506579, 1647990037]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 20
+      TotalCovGoal: 20
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "lane"
+        - "emitBytes"
+      NumBins: 20
+    Bins: 
+      - Name: "lane=0 / emitted bytes=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 0, Max: 0}
+        Count: 17
+        AtLeast: 1
+        PercentCov: 1700.0000
+      - Name: "lane=0 / emitted bytes=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 1}
+        Count: 217
+        AtLeast: 1
+        PercentCov: 21700.0000
+      - Name: "lane=0 / emitted bytes=2"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 2, Max: 2}
+        Count: 721
+        AtLeast: 1
+        PercentCov: 72100.0000
+      - Name: "lane=0 / emitted bytes=3"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 3, Max: 3}
+        Count: 96
+        AtLeast: 1
+        PercentCov: 9600.0000
+      - Name: "lane=0 / emitted bytes=4"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 4, Max: 4}
+        Count: 816
+        AtLeast: 1
+        PercentCov: 81600.0000
+      - Name: "lane=1 / emitted bytes=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 0, Max: 0}
+        Count: 17
+        AtLeast: 1
+        PercentCov: 1700.0000
+      - Name: "lane=1 / emitted bytes=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 218
+        AtLeast: 1
+        PercentCov: 21800.0000
+      - Name: "lane=1 / emitted bytes=2"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 2, Max: 2}
+        Count: 756
+        AtLeast: 1
+        PercentCov: 75600.0000
+      - Name: "lane=1 / emitted bytes=3"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 3, Max: 3}
+        Count: 119
+        AtLeast: 1
+        PercentCov: 11900.0000
+      - Name: "lane=1 / emitted bytes=4"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 4, Max: 4}
+        Count: 879
+        AtLeast: 1
+        PercentCov: 87900.0000
+      - Name: "lane=2 / emitted bytes=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 18
+        AtLeast: 1
+        PercentCov: 1800.0000
+      - Name: "lane=2 / emitted bytes=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 1}
+        Count: 226
+        AtLeast: 1
+        PercentCov: 22600.0000
+      - Name: "lane=2 / emitted bytes=2"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 2, Max: 2}
+        Count: 668
+        AtLeast: 1
+        PercentCov: 66800.0000
+      - Name: "lane=2 / emitted bytes=3"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 3, Max: 3}
+        Count: 98
+        AtLeast: 1
+        PercentCov: 9800.0000
+      - Name: "lane=2 / emitted bytes=4"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 4, Max: 4}
+        Count: 768
+        AtLeast: 1
+        PercentCov: 76800.0000
+      - Name: "lane=3 / emitted bytes=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 0, Max: 0}
+        Count: 19
+        AtLeast: 1
+        PercentCov: 1900.0000
+      - Name: "lane=3 / emitted bytes=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 1}
+        Count: 213
+        AtLeast: 1
+        PercentCov: 21300.0000
+      - Name: "lane=3 / emitted bytes=2"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 2, Max: 2}
+        Count: 745
+        AtLeast: 1
+        PercentCov: 74500.0000
+      - Name: "lane=3 / emitted bytes=3"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 3, Max: 3}
+        Count: 101
+        AtLeast: 1
+        PercentCov: 10100.0000
+      - Name: "lane=3 / emitted bytes=4"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 4, Max: 4}
+        Count: 851
+        AtLeast: 1
+        PercentCov: 85100.0000
+
+  - Name: "lane x flushType"
+    TestCases: 
+      - "tb_byte_stuffer_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [155212492, 117030829]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 12
+      TotalCovGoal: 12
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "lane"
+        - "flushType"
+      NumBins: 12
+    Bins: 
+      - Name: "lane=0 / byte aligned"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 1}
+        Count: 18
+        AtLeast: 1
+        PercentCov: 1800.0000
+      - Name: "lane=0 / padded residue"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 2, Max: 2}
+        Count: 154
+        AtLeast: 1
+        PercentCov: 15400.0000
+      - Name: "lane=0 / dangling FF"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 3, Max: 3}
+        Count: 7
+        AtLeast: 1
+        PercentCov: 700.0000
+      - Name: "lane=1 / byte aligned"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 17
+        AtLeast: 1
+        PercentCov: 1700.0000
+      - Name: "lane=1 / padded residue"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 2, Max: 2}
+        Count: 156
+        AtLeast: 1
+        PercentCov: 15600.0000
+      - Name: "lane=1 / dangling FF"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 3, Max: 3}
+        Count: 5
+        AtLeast: 1
+        PercentCov: 500.0000
+      - Name: "lane=2 / byte aligned"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 1}
+        Count: 18
+        AtLeast: 1
+        PercentCov: 1800.0000
+      - Name: "lane=2 / padded residue"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 2, Max: 2}
+        Count: 155
+        AtLeast: 1
+        PercentCov: 15500.0000
+      - Name: "lane=2 / dangling FF"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 3, Max: 3}
+        Count: 5
+        AtLeast: 1
+        PercentCov: 500.0000
+      - Name: "lane=3 / byte aligned"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 1}
+        Count: 19
+        AtLeast: 1
+        PercentCov: 1900.0000
+      - Name: "lane=3 / padded residue"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 2, Max: 2}
+        Count: 155
+        AtLeast: 1
+        PercentCov: 15500.0000
+      - Name: "lane=3 / dangling FF"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 3, Max: 3}
+        Count: 5
+        AtLeast: 1
+        PercentCov: 500.0000
+
+  - Name: "lane x data x almostFull"
+    TestCases: 
+      - "tb_byte_stuffer_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [492053561, 1869209024]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 8
+      TotalCovGoal: 8
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "lane"
+        - "almostFull"
+      NumBins: 8
+    Bins: 
+      - Name: "lane=0 / data beat / almostFull=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 0, Max: 0}
+        Count: 1774
+        AtLeast: 1
+        PercentCov: 177400.0000
+      - Name: "lane=0 / data beat / almostFull=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 1}
+        Count: 76
+        AtLeast: 1
+        PercentCov: 7600.0000
+      - Name: "lane=1 / data beat / almostFull=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 0, Max: 0}
+        Count: 1912
+        AtLeast: 1
+        PercentCov: 191200.0000
+      - Name: "lane=1 / data beat / almostFull=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 60
+        AtLeast: 1
+        PercentCov: 6000.0000
+      - Name: "lane=2 / data beat / almostFull=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 1723
+        AtLeast: 1
+        PercentCov: 172300.0000
+      - Name: "lane=2 / data beat / almostFull=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 1}
+        Count: 37
+        AtLeast: 1
+        PercentCov: 3700.0000
+      - Name: "lane=3 / data beat / almostFull=0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 0, Max: 0}
+        Count: 1827
+        AtLeast: 1
+        PercentCov: 182700.0000
+      - Name: "lane=3 / data beat / almostFull=1"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 1}
+        Count: 83
+        AtLeast: 1
+        PercentCov: 8300.0000
+
+  - Name: "lane x stuffEvent"
+    TestCases: 
+      - "tb_byte_stuffer_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1256593996, 59676991]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 12
+      TotalCovGoal: 12
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "lane"
+        - "stuffEvent"
+      NumBins: 12
+    Bins: 
+      - Name: "lane=0 / noStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 0, Max: 0}
+        Count: 4616
+        AtLeast: 1
+        PercentCov: 461600.0000
+      - Name: "lane=0 / firstStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 1}
+        Count: 132
+        AtLeast: 1
+        PercentCov: 13200.0000
+      - Name: "lane=0 / runStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 2, Max: 2}
+        Count: 985
+        AtLeast: 1
+        PercentCov: 98500.0000
+      - Name: "lane=1 / noStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 0, Max: 0}
+        Count: 4931
+        AtLeast: 1
+        PercentCov: 493100.0000
+      - Name: "lane=1 / firstStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 132
+        AtLeast: 1
+        PercentCov: 13200.0000
+      - Name: "lane=1 / runStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 2, Max: 2}
+        Count: 1099
+        AtLeast: 1
+        PercentCov: 109900.0000
+      - Name: "lane=2 / noStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 4372
+        AtLeast: 1
+        PercentCov: 437200.0000
+      - Name: "lane=2 / firstStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 1}
+        Count: 130
+        AtLeast: 1
+        PercentCov: 13000.0000
+      - Name: "lane=2 / runStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 2, Max: 2}
+        Count: 956
+        AtLeast: 1
+        PercentCov: 95600.0000
+      - Name: "lane=3 / noStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 0, Max: 0}
+        Count: 4832
+        AtLeast: 1
+        PercentCov: 483200.0000
+      - Name: "lane=3 / firstStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 1}
+        Count: 128
+        AtLeast: 1
+        PercentCov: 12800.0000
+      - Name: "lane=3 / runStuff"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 2, Max: 2}
+        Count: 1001
+        AtLeast: 1
+        PercentCov: 100100.0000
+

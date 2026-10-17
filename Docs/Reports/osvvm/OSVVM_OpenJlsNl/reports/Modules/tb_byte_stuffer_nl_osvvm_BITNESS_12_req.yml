@@ -1,0 +1,10 @@
+- Requirement: "NL.LaneStuff"
+  TestCases: 
+  - TestName: "tb_byte_stuffer_nl_osvvm"
+    Status: PASSED
+    Results: {Goal: 1136, Passed: 1416, Errors: 0, Checked: 1416, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+- Requirement: "NL.Reset"
+  TestCases: 
+  - TestName: "tb_byte_stuffer_nl_osvvm"
+    Status: PASSED
+    Results: {Goal: 48, Passed: 48, Errors: 0, Checked: 48, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}

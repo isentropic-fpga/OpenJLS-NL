@@ -4,3 +4,4 @@
 </picture>
 
 JPEG-LS near-lossless &amp; lossless encoder for FPGA. 
+[![verification](https://img.shields.io/badge/verification-report-0969da)](https://isentropic-fpga.github.io/OpenJLS-NL/)

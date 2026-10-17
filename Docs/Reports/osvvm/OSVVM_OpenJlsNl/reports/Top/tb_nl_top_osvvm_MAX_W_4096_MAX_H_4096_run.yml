@@ -1,0 +1,26 @@
+Version: "0.1"
+TestCaseName: "tb_nl_top_osvvm"
+TestCaseFile:  "../../../Top/tb_nl_top_osvvm.vhd"
+TestSuiteName: "Top"
+BuildName: "OSVVM_OpenJlsNl"
+Generics:
+  MAX_W: "4096"
+  MAX_H: "4096"
+ReportsTestSuiteDirectory:  "reports/Top"
+RequirementsYamlFile:  "reports/Top/tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096_req.yml"
+AlertYamlFile:  "reports/Top/tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096_alerts.yml"
+CovYamlFile:  "reports/Top/tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096_cov.yml"
+ScoreboardDict:
+  slv: "reports/Top/tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096_sb_slv.yml"
+TranscriptFiles: ""
+TestCaseFileName: "tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096"
+GenericNames: "_MAX_W_4096_MAX_H_4096"
+OsvvmSettingsInfo:
+  ReportsSubdirectory:  "reports"
+  SimulationLogFile: "logs/OSVVM_OpenJlsNl.log"
+  SimulationHtmlLogFile: "logs/OSVVM_OpenJlsNl_log.html"
+  RequirementsSubdirectory: ""
+  CoverageSubdirectory:    "CodeCoverage/OSVVM_OpenJlsNl_code_cov.html"
+  Report2CssFiles:
+    - "reports/CssOsvvmStyle.css"
+  Report2PngFile:  "reports/OsvvmLogo.png"
