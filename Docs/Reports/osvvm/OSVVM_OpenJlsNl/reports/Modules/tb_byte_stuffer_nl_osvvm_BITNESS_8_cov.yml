@@ -3,7 +3,7 @@ Coverage: 100.00
 Settings: 
   WritePassFail: 0
 Models: 
-  - Name: "reset phase"
+  - Name: "G5.States resetPhase"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -11,7 +11,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1144280738, 1485537386]
+      Seeds: [1133384431, 2139824688]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -54,7 +54,7 @@ Models:
         AtLeast: 3
         PercentCov: 233.3333
 
-  - Name: "lane x emitBytes"
+  - Name: "G4.Stream lane x emitBytes"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -62,7 +62,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [2122506579, 1647990037]
+      Seeds: [2106938900, 1599039192]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -238,7 +238,7 @@ Models:
         AtLeast: 1
         PercentCov: 73200.0000
 
-  - Name: "lane x flushType"
+  - Name: "G4.Stream lane x flushType"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -246,7 +246,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [155212492, 117030829]
+      Seeds: [927616167, 1350315477]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -358,7 +358,7 @@ Models:
         AtLeast: 1
         PercentCov: 400.0000
 
-  - Name: "lane x data x almostFull"
+  - Name: "G4.Stream lane x data x almostFull"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -366,7 +366,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [492053561, 1869209024]
+      Seeds: [1650467666, 2003243105]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -446,7 +446,7 @@ Models:
         AtLeast: 1
         PercentCov: 1000.0000
 
-  - Name: "lane x stuffEvent"
+  - Name: "G4.Branch lane x stuffEvent"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -454,7 +454,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1256593996, 59676991]
+      Seeds: [1154535448, 1681923099]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0

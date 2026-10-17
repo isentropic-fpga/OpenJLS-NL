@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites 
    name="OSVVM_OpenJlsNl"
-   timestamp="2026-10-16T22:30:01-03:00"
-   time="136.639"
+   timestamp="2026-10-17T14:19:19-03:00"
+   time="128.208"
    tests="64"
    failures="0"
    errors="0"
@@ -15,7 +15,7 @@
 </properties> 
 <testsuite 
    name="Loop"
-   time="45.145"
+   time="45.673"
    tests="36"
    failures="0"
    errors="0"
@@ -25,7 +25,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_0_STRIPES_1"
    classname="Loop"
    assertions="570966"
-   time="2.183"
+   time="2.232"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -37,7 +37,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_0_STRIPES_4"
    classname="Loop"
    assertions="467589"
-   time="0.915"
+   time="0.951"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -49,7 +49,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_1_STRIPES_1"
    classname="Loop"
    assertions="431874"
-   time="1.890"
+   time="1.916"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -61,7 +61,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_1_STRIPES_4"
    classname="Loop"
    assertions="444850"
-   time="0.961"
+   time="0.989"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -73,7 +73,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_1"
    classname="Loop"
    assertions="322689"
-   time="1.760"
+   time="1.499"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -85,7 +85,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_3_STRIPES_4"
    classname="Loop"
    assertions="440053"
-   time="0.988"
+   time="1.099"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -97,7 +97,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_7_STRIPES_1"
    classname="Loop"
    assertions="112663"
-   time="0.672"
+   time="0.692"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -109,7 +109,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_7_STRIPES_4"
    classname="Loop"
    assertions="928422"
-   time="1.851"
+   time="1.896"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -121,7 +121,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_31_STRIPES_1"
    classname="Loop"
    assertions="209076"
-   time="1.163"
+   time="1.149"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -133,7 +133,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_31_STRIPES_4"
    classname="Loop"
    assertions="1193164"
-   time="2.450"
+   time="2.480"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -145,7 +145,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_127_STRIPES_1"
    classname="Loop"
    assertions="95749"
-   time="0.626"
+   time="0.625"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -157,7 +157,7 @@
    name="tb_nl_loop_osvvm_BITNESS_8_NEAR_127_STRIPES_4"
    classname="Loop"
    assertions="252390"
-   time="0.860"
+   time="0.858"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -169,7 +169,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_0_STRIPES_1"
    classname="Loop"
    assertions="405171"
-   time="1.672"
+   time="1.682"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -181,7 +181,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_0_STRIPES_4"
    classname="Loop"
    assertions="464634"
-   time="0.949"
+   time="0.981"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -193,7 +193,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_1_STRIPES_1"
    classname="Loop"
    assertions="186275"
-   time="0.956"
+   time="0.962"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -205,7 +205,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_1_STRIPES_4"
    classname="Loop"
    assertions="429273"
-   time="0.964"
+   time="0.977"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -217,7 +217,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_3_STRIPES_1"
    classname="Loop"
    assertions="165819"
-   time="0.906"
+   time="0.928"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -229,7 +229,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_3_STRIPES_4"
    classname="Loop"
    assertions="428109"
-   time="0.964"
+   time="0.983"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -241,7 +241,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_7_STRIPES_1"
    classname="Loop"
    assertions="643021"
-   time="2.880"
+   time="2.900"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -253,7 +253,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_7_STRIPES_4"
    classname="Loop"
    assertions="456673"
-   time="1.044"
+   time="1.086"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -265,7 +265,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_31_STRIPES_1"
    classname="Loop"
    assertions="234299"
-   time="1.224"
+   time="1.258"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -277,7 +277,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_31_STRIPES_4"
    classname="Loop"
    assertions="420699"
-   time="0.970"
+   time="1.074"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -289,7 +289,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_255_STRIPES_1"
    classname="Loop"
    assertions="443981"
-   time="2.219"
+   time="2.190"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -301,7 +301,7 @@
    name="tb_nl_loop_osvvm_BITNESS_12_NEAR_255_STRIPES_4"
    classname="Loop"
    assertions="390154"
-   time="1.023"
+   time="0.987"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -313,7 +313,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_0_STRIPES_1"
    classname="Loop"
    assertions="271943"
-   time="1.230"
+   time="1.262"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -325,7 +325,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_0_STRIPES_4"
    classname="Loop"
    assertions="468127"
-   time="0.976"
+   time="1.009"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -337,7 +337,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_1_STRIPES_1"
    classname="Loop"
    assertions="160939"
-   time="0.866"
+   time="0.869"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -349,7 +349,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_1_STRIPES_4"
    classname="Loop"
    assertions="427575"
-   time="0.988"
+   time="1.025"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -361,7 +361,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_3_STRIPES_1"
    classname="Loop"
    assertions="185626"
-   time="1.001"
+   time="1.010"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -373,7 +373,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_3_STRIPES_4"
    classname="Loop"
    assertions="421602"
-   time="0.992"
+   time="1.012"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -385,7 +385,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_7_STRIPES_1"
    classname="Loop"
    assertions="104965"
-   time="0.712"
+   time="0.685"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -397,7 +397,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_7_STRIPES_4"
    classname="Loop"
    assertions="417668"
-   time="1.000"
+   time="1.008"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -409,7 +409,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_31_STRIPES_1"
    classname="Loop"
    assertions="252071"
-   time="1.335"
+   time="1.365"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -421,7 +421,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_31_STRIPES_4"
    classname="Loop"
    assertions="413495"
-   time="0.991"
+   time="1.005"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -433,7 +433,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_255_STRIPES_1"
    classname="Loop"
    assertions="123235"
-   time="0.751"
+   time="0.792"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -445,7 +445,7 @@
    name="tb_nl_loop_osvvm_BITNESS_16_NEAR_255_STRIPES_4"
    classname="Loop"
    assertions="403886"
-   time="0.991"
+   time="1.003"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -456,7 +456,7 @@
 </testsuite>
 <testsuite 
    name="Modules"
-   time="25.158"
+   time="25.825"
    tests="22"
    failures="0"
    errors="0"
@@ -466,7 +466,7 @@
    name="tb_a11_1_nl_osvvm_BITNESS_8"
    classname="Modules"
    assertions="121894"
-   time="0.204"
+   time="0.208"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -476,7 +476,7 @@
    name="tb_a15_a16_nl_osvvm_BITNESS_8"
    classname="Modules"
    assertions="53646"
-   time="0.619"
+   time="0.639"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -486,7 +486,7 @@
    name="tb_nl_config_osvvm_BITNESS_8"
    classname="Modules"
    assertions="3597"
-   time="0.093"
+   time="0.099"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -496,7 +496,7 @@
    name="tb_byte_stuffer_nl_osvvm_BITNESS_8"
    classname="Modules"
    assertions="15001"
-   time="0.436"
+   time="0.438"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -516,7 +516,7 @@
    name="tb_nl_frontend_osvvm_BITNESS_8"
    classname="Modules"
    assertions="2757893"
-   time="2.343"
+   time="2.368"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -526,7 +526,7 @@
    name="tb_nl_backend_osvvm_BITNESS_8"
    classname="Modules"
    assertions="1370029"
-   time="4.149"
+   time="4.381"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -546,7 +546,7 @@
    name="tb_a15_a16_nl_osvvm_BITNESS_12"
    classname="Modules"
    assertions="53646"
-   time="0.614"
+   time="0.631"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -556,7 +556,7 @@
    name="tb_nl_config_osvvm_BITNESS_12"
    classname="Modules"
    assertions="3597"
-   time="0.092"
+   time="0.093"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -566,7 +566,7 @@
    name="tb_byte_stuffer_nl_osvvm_BITNESS_12"
    classname="Modules"
    assertions="22629"
-   time="0.571"
+   time="0.556"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -576,7 +576,7 @@
    name="tb_nl_framer_osvvm_BITNESS_12"
    classname="Modules"
    assertions="26767"
-   time="0.157"
+   time="0.163"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -586,7 +586,7 @@
    name="tb_nl_frontend_osvvm_BITNESS_12"
    classname="Modules"
    assertions="2433012"
-   time="2.184"
+   time="2.183"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -596,7 +596,7 @@
    name="tb_nl_backend_osvvm_BITNESS_12"
    classname="Modules"
    assertions="1402580"
-   time="4.241"
+   time="4.543"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -606,7 +606,7 @@
    name="tb_a11_1_nl_osvvm_BITNESS_16"
    classname="Modules"
    assertions="193075"
-   time="0.266"
+   time="0.277"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -616,7 +616,7 @@
    name="tb_a15_a16_nl_osvvm_BITNESS_16"
    classname="Modules"
    assertions="53646"
-   time="0.609"
+   time="0.665"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -626,7 +626,7 @@
    name="tb_nl_config_osvvm_BITNESS_16"
    classname="Modules"
    assertions="3597"
-   time="0.094"
+   time="0.093"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -636,7 +636,7 @@
    name="tb_byte_stuffer_nl_osvvm_BITNESS_16"
    classname="Modules"
    assertions="30431"
-   time="0.603"
+   time="0.610"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -646,7 +646,7 @@
    name="tb_nl_framer_osvvm_BITNESS_16"
    classname="Modules"
    assertions="26767"
-   time="0.152"
+   time="0.162"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -656,7 +656,7 @@
    name="tb_nl_frontend_osvvm_BITNESS_16"
    classname="Modules"
    assertions="3013053"
-   time="2.579"
+   time="2.700"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -666,7 +666,7 @@
    name="tb_nl_backend_osvvm_BITNESS_16"
    classname="Modules"
    assertions="1117411"
-   time="4.082"
+   time="3.929"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -676,7 +676,7 @@
    name="tb_nl_framer_osvvm_BITNESS_12_OUT_WIDTH_200"
    classname="Modules"
    assertions="28918"
-   time="0.161"
+   time="0.170"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -686,7 +686,7 @@
 </testsuite>
 <testsuite 
    name="Top"
-   time="64.706"
+   time="55.357"
    tests="6"
    failures="0"
    errors="0"
@@ -696,7 +696,7 @@
    name="tb_nl_top_osvvm_BITNESS_8"
    classname="Top"
    assertions="129061"
-   time="8.224"
+   time="8.540"
 >
 <properties> 
   <property name="generic" value="BITNESS=8" /> 
@@ -706,7 +706,7 @@
    name="tb_nl_top_osvvm_BITNESS_12"
    classname="Top"
    assertions="141255"
-   time="8.812"
+   time="7.801"
 >
 <properties> 
   <property name="generic" value="BITNESS=12" /> 
@@ -716,7 +716,7 @@
    name="tb_nl_top_osvvm_BITNESS_16"
    classname="Top"
    assertions="208732"
-   time="10.861"
+   time="9.924"
 >
 <properties> 
   <property name="generic" value="BITNESS=16" /> 
@@ -726,7 +726,7 @@
    name="tb_nl_top_osvvm_OUT_WIDTH_48"
    classname="Top"
    assertions="186885"
-   time="11.360"
+   time="10.500"
 >
 <properties> 
   <property name="generic" value="OUT_WIDTH=48" /> 
@@ -736,7 +736,7 @@
    name="tb_nl_top_osvvm_OUT_WIDTH_1024"
    classname="Top"
    assertions="157511"
-   time="14.989"
+   time="10.589"
 >
 <properties> 
   <property name="generic" value="OUT_WIDTH=1024" /> 
@@ -746,7 +746,7 @@
    name="tb_nl_top_osvvm_MAX_W_4096_MAX_H_4096"
    classname="Top"
    assertions="141255"
-   time="10.257"
+   time="7.826"
 >
 <properties> 
   <property name="generic" value="MAX_W=4096" /> 

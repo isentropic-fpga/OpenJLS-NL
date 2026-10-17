@@ -3,7 +3,7 @@ Coverage: 100.00
 Settings: 
   WritePassFail: 0
 Models: 
-  - Name: "reset phase"
+  - Name: "G5.States resetPhase"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -11,7 +11,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1144280738, 1485537386]
+      Seeds: [1133384431, 2139824688]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -61,7 +61,7 @@ Models:
         AtLeast: 3
         PercentCov: 133.3333
 
-  - Name: "header field ranges"
+  - Name: "G2.MinMax field x value"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -69,7 +69,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [2016826385, 231098339]
+      Seeds: [2008890919, 191903161]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -133,7 +133,7 @@ Models:
         AtLeast: 1
         PercentCov: 6700.0000
 
-  - Name: "lane x beat"
+  - Name: "G4.Stream lane x beat"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -141,7 +141,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1774301168, 2003170231]
+      Seeds: [1396774789, 1127188569]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -221,7 +221,7 @@ Models:
         AtLeast: 1
         PercentCov: 50300.0000
 
-  - Name: "lane x chained"
+  - Name: "G4.Stream lane x chained"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -229,7 +229,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1328942195, 336502143]
+      Seeds: [537160394, 1785522674]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -309,7 +309,7 @@ Models:
         AtLeast: 1
         PercentCov: 1600.0000
 
-  - Name: "lane backpressure hold"
+  - Name: "G4.Stream lane backpressure hold"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -317,7 +317,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1065416532, 1157217621]
+      Seeds: [726640049, 398235676]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0

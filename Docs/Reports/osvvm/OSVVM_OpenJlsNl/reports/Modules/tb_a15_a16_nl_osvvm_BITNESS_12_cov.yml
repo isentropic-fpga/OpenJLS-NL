@@ -3,7 +3,7 @@ Coverage: 100.00
 Settings: 
   WritePassFail: 0
 Models: 
-  - Name: "lane x terminal"
+  - Name: "G4.Run lane x terminal"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -11,7 +11,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1070534974, 226388392]
+      Seeds: [168430502, 220585467]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -91,7 +91,7 @@ Models:
         AtLeast: 1
         PercentCov: 24000.0000
 
-  - Name: "lane x immediateBreak"
+  - Name: "G4.Run lane x immediateBreak"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -99,7 +99,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1774062170, 1501782490]
+      Seeds: [1875667854, 858504593]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -179,7 +179,7 @@ Models:
         AtLeast: 1
         PercentCov: 2700.0000
 
-  - Name: "lane x eoiReset"
+  - Name: "G4.Stream lane x eoiReset"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -187,7 +187,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [114483262, 598715556]
+      Seeds: [1086643679, 1085135052]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -267,7 +267,7 @@ Models:
         AtLeast: 1
         PercentCov: 4800.0000
 
-  - Name: "RUNindex clamp"
+  - Name: "G2.Clamp RUNindex"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -275,7 +275,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1736427111, 653713392]
+      Seeds: [1577220497, 584246357]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -304,7 +304,7 @@ Models:
         AtLeast: 1
         PercentCov: 700.0000
 
-  - Name: "startIdx"
+  - Name: "G4.Run startIdx"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -312,7 +312,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [749092804, 1353837188]
+      Seeds: [1997612348, 52275474]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0

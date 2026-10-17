@@ -12,31 +12,31 @@ Children:
     Status: PASSED
     Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
     Children: 
-      - Name: "Q1 x Q2"
+      - Name: "G4.Coding Q1 x Q2"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []
-      - Name: "Q3 from the bounds"
+      - Name: "G4.Coding Q3 from the bounds"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []
-      - Name: "lane x stripe edge"
+      - Name: "G4.Edge lane x stripe edge"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []
-      - Name: "candidate x write age"
+      - Name: "G4.Stream candidate x write age"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []
-      - Name: "loop exit kind"
+      - Name: "G4.Stream loop exit kind"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []
-      - Name: "reset phase"
+      - Name: "G5.States resetPhase"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []
-      - Name: "value ranges"
+      - Name: "G2.MinMax node"
         Status: PASSED
         Results: {TotalErrors: 0, AlertCount: {Failure: 0, Error: 0, Warning: 0}, PassedCount: 0, AffirmCount: 0, RequirementsPassed: 0, RequirementsGoal: 0, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
         Children: []

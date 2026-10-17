@@ -3,7 +3,7 @@ Coverage: 100.00
 Settings: 
   WritePassFail: 0
 Models: 
-  - Name: "Reset phase"
+  - Name: "G5.States resetPhase"
     TestCases: 
       - "tb_nl_config_osvvm"
     Coverage: 100.00
@@ -11,7 +11,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1144280738, 1484235242]
+      Seeds: [1133384431, 2139824688]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -54,7 +54,7 @@ Models:
         AtLeast: 1
         PercentCov: 100.0000
 
-  - Name: "Ranges (G2/G3)"
+  - Name: "G2.MinMax node"
     TestCases: 
       - "tb_nl_config_osvvm"
     Coverage: 100.00
@@ -62,7 +62,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [154699623, 974475436]
+      Seeds: [577387036, 1535670230]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -105,7 +105,7 @@ Models:
         AtLeast: 1
         PercentCov: 4400.0000
 
-  - Name: "NEAR"
+  - Name: "G4.Config NEAR"
     TestCases: 
       - "tb_nl_config_osvvm"
     Coverage: 100.00
@@ -113,7 +113,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1207074421, 907618086]
+      Seeds: [1738604214, 722335605]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -149,7 +149,7 @@ Models:
         AtLeast: 1
         PercentCov: 14900.0000
 
-  - Name: "NEAR clamp"
+  - Name: "G1.Nl NEAR clamp"
     TestCases: 
       - "tb_nl_config_osvvm"
     Coverage: 100.00
@@ -157,7 +157,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1091541169, 1258041792]
+      Seeds: [1418764966, 656889001]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -186,7 +186,7 @@ Models:
         AtLeast: 1
         PercentCov: 14700.0000
 
-  - Name: "qbpp"
+  - Name: "G4.Config qbpp"
     TestCases: 
       - "tb_nl_config_osvvm"
     Coverage: 100.00
@@ -194,7 +194,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1207074421, 1804023927]
+      Seeds: [1868673381, 1433968685]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
