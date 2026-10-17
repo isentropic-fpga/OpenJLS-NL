@@ -80,6 +80,7 @@ foreach f {A11_1_nl_golomb_encoder A15_A16_nl_encode_run nl_pkg nl_loop nl_confi
            nl_frontend nl_backend byte_stuffer_nl nl_framer nl_top} {
   analyze ../../Sources/$f.vhd
 }
+analyze Top/tb_nl_top_golden_pkg.vhd
 
 # Near-lossless loop (Ra -> Rx recurrence + context forwarding). Default
 # generics are 12-bit, NEAR 3, one stripe; the sweep covers both pixel-width
@@ -109,3 +110,15 @@ foreach bitness {8 12 16} {
 }
 # OUT_WIDTH 200: 25-byte beats, the header ends on a full beat (nl_top allows 48..1024).
 Test Modules/tb_nl_framer_osvvm.vhd [generic BITNESS 12] [generic OUT_WIDTH 200]
+
+# nl_top stress (4 streams vs CharLS per stripe, backpressure, stall
+# propagation, reset per phase). Defaults: MAX_W 64 / MAX_H 64 = the largest
+# golden image, so W and H reach their max; then OUT_WIDTH at both ends and
+# nl_top's default 4096 x 4096 limits.
+TestSuite Top
+foreach bitness {8 12 16} {
+  Test Top/tb_nl_top_osvvm.vhd [generic BITNESS $bitness]
+}
+Test Top/tb_nl_top_osvvm.vhd [generic OUT_WIDTH 48]
+Test Top/tb_nl_top_osvvm.vhd [generic OUT_WIDTH 1024]
+Test Top/tb_nl_top_osvvm.vhd [generic MAX_W 4096] [generic MAX_H 4096]

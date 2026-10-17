@@ -226,8 +226,10 @@ begin
     port map (
       iClk        => iClk,
       iRst        => iRst,
-      iWidth      => sWidth,
-      iHeight     => sHeight,
+      -- Ports, not sWidth / sHeight: the front end samples them in reset itself, so a
+      -- one-cycle reset takes the new size (sWidth would still hold the old one).
+      iWidth      => unsigned(iImageWidth),
+      iHeight     => unsigned(iImageHeight),
       iCfgDone    => sCfgDone,
       iNear       => sNear,
       iT1         => sT1,

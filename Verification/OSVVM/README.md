@@ -10,17 +10,18 @@ here.
 
 | Path | Contents |
 |---|---|
-| `OpenJlsNl.pro` | Build script: libraries, RTL, the `Loop` and `Modules` suites |
+| `OpenJlsNl.pro` | Build script: libraries, RTL, the `Loop`, `Modules` and `Top` suites |
 | `build_reports.sh` | Runs the .pro under NVC and writes the OSVVM HTML reports |
 | `build_run.sh` | Full regression with NVC statement+branch coverage of `Sources/` |
 | `Modules/` | One OSVVM TB per NL block |
+| `Top/` | `nl_top` stress TB, its CharLS golden package and `gen_golden.py` |
 | `NVC_CodeCoverage/` | Coverage databases and HTML (generated) |
 | `OSVVM_OpenJlsNl/` | OSVVM logs and reports (generated) |
 
 ## Running
 
 ```sh
-./build_run.sh                  # 58 tests, reports + code coverage
+./build_run.sh                  # 64 tests, reports + code coverage
 NL_ONLY=nl_framer ./build_reports.sh   # only TBs whose path matches
 ```
 
@@ -37,6 +38,11 @@ here).
 - **Modules**: every other TB × BITNESS {8, 12, 16}, plus one `nl_framer`
   variant at OUT_WIDTH 200. That variant uses 25-byte beats, so the header
   ends exactly on a full beat.
+- **Top**: `tb_nl_top_osvvm` × BITNESS {8, 12, 16}, plus OUT_WIDTH 48,
+  OUT_WIDTH 1024 and MAX_W / MAX_H 4096 at 12 bits. Six images per bitness
+  (structured, smooth, NEAR 3 / NMAX, one row, 64x64 noise) are compared
+  byte-exact per lane against CharLS. `Top/tb_nl_top_golden_pkg.vhd` is
+  generated: rerun `Top/gen_golden.py` after changing the image set.
 
 ## Requirements registry and owners
 
@@ -100,6 +106,12 @@ variant. `M` = `MODE_AT * STRIPES` and `F` = `FWD_AT * STRIPES` in
 | `NL.WordTags` | One tagged word per coded token, in order | `tb_nl_backend` | | 1000 |
 | `NL.LaneStuff` | Per-lane FF stuffing and flush on the shared ring | `tb_byte_stuffer_nl` | | 2·4·(N+1) |
 | `NL.LaneFrame` | Per-lane header (with NEAR), payload, FF D9, oLast | `tb_nl_framer` | | 2·4·N |
+| `NL.StripeGolden` | Each lane stream equals CharLS on that stripe, byte-exact | `tb_nl_top` | Golden suite | 4·(36 + N_RST) |
+| `NL.BackToBack` | Images back to back without reset, each one framed | `tb_nl_top` | | 20 |
+| `NL.AxisOut` | oKeep contiguous from the MSB, oLast per image, beat held while iReady is low | `tb_nl_top` | | 1000 |
+| `NL.StallPropagation` | A held lane drops oReady (skid FIFO almost full); nothing lost | `tb_nl_top` | | 5 |
+| `NL.NoStall` | Without backpressure oReady drops only in the config divider, the clear sweep and the row-0 wait (D3) | `tb_nl_top` | | 7 |
+| `NL.ConfigInReset` | NEAR, W, H sampled in reset, also on a 1-cycle reset (D23) | `tb_nl_top` | | 24 |
 | `NL.Reset` | Reset in every phase clears outputs; the next session is scored | every stateful TB | | per TB |
 
 ### Reused blocks (verified upstream, OpenJLS suite)
@@ -122,18 +134,26 @@ check covers.
 
 ## Code coverage (G6)
 
-`build_run.sh` reports 100 % statement coverage (995/995) and 100 % branch
-coverage on every NL source that a module TB instantiates. Justified gaps:
+`build_run.sh` reports 100 % statement coverage (1024/1024) on every NL
+source, and 100 % branch coverage except one line in `byte_stuffer_nl` (79/80).
+The script prints statements only; branches are in the HTML report.
+Justified gaps:
+
+- **`byte_stuffer_nl` line 485, `sFifoFull = '0'` false**: the burst FIFO
+  never fills. AlmFull leaves a 5-entry cushion for the ~4-cycle stall
+  latency, but a lane writes only on its own slot (1 in 4 cycles), so at most
+  about one word lands after AlmFull. `tb_byte_stuffer_nl` at 1 % iReady duty
+  and `tb_nl_top` under backpressure do not reach it. The assert above the
+  branch checks that nothing is pending whenever the FIFO is full.
 
 - **`nl_framer` `get_header_byte` `when others`**: unreachable, because every
   caller passes an index below `HEADER_LEN`. It is excluded with
   `-- coverage off/on`.
 - **`nl_framer` exact-end header beat**: reachable only when `BYTES_OUT`
   divides 25. The OUT_WIDTH 200 variant covers it.
-- **`nl_top`, `nl_pkg`**: no module TB instantiates them yet. Step 4
-  (`tb_nl_top` stress TB with backpressure) will cover them, including the
-  `nl_top` AXIS hold PSL. The golden suite exercises them today, but without
-  backpressure.
+- **`nl_pkg`**: types and constants only, nothing to instrument.
+- **`nl_top`** is covered by `tb_nl_top` (42/42 statements, 26/26 branches).
+  That TB also runs the `nl_top` AXIS hold and reset PSL under backpressure.
 
 ## Contracts the TBs rely on
 

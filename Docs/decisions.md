@@ -146,6 +146,14 @@ picked. **Picked** marks the choice; everything here is open for review.
   run-segment token), aligned with the registered k / MErrval. A
   combinational valid glitched in delta time and fired the k assert.
 
+## D23. Front end samples the size ports in reset (OSVVM finding)
+- nl_frontend latches width / height while iRst = 1. nl_top fed it the
+  registered sWidth / sHeight, which lag the ports by one cycle, so a
+  one-cycle reset kept the previous image's size.
+- nl_top now drives the front end from iImageWidth / iImageHeight directly.
+  The framer still uses the registered copies (it reads them after reset).
+- Found by tb_nl_top (1-cycle reset with a new config, G5).
+
 ## Status (nl_top, xczu7eg-1, OOC, Vivado 2025.2)
 | BITNESS | est. fmax | LUT | FF | BRAM | DSP |
 |---|---|---|---|---|---|

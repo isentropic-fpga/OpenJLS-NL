@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+# Copyright (C) 2026 Vitor Mendes Camilo
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# This file is part of OpenJLS. Available under GPLv3 or a
+# commercial license. See LICENSE and README for details.
+#
+"""Generate tb_nl_top_golden_pkg.vhd for tb_nl_top_osvvm.
+
+Seeded synthetic images per BITNESS {8, 12, 16}, each encoded per stripe
+(4 vertical stripes) by CharLS through Verification/ref/nl_charls.cpp. The
+package holds the pixels and the expected per-lane .jls bytes, so the TB runs
+without CharLS. Rerun after changing the image set:
+
+    OJ_FULL=~/Repos/OpenJLS ./gen_golden.py
+"""
+import os
+import random
+import subprocess
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, "../../.."))
+OJ_FULL = os.environ.get("OJ_FULL", os.path.expanduser("~/Repos/OpenJLS"))
+CHARLS = os.path.join(OJ_FULL, "ThirdParty/charls")
+OUT = os.path.join(HERE, "tb_nl_top_golden_pkg.vhd")
+
+# Kinds (the TB's case table carries the kind).
+K_STRUCT, K_SMOOTH, K_LINE, K_NOISE = range(4)
+
+
+def structured(bits, w, h, rng):
+    """Per stripe: flat (run to EOL), gradient, 0/MAXVAL edges, noise.
+    Row 0 is flat across the whole width (a run ending on every lane's EOL)."""
+    mx = (1 << bits) - 1
+    ws = w // 4
+    img = []
+    for y in range(h):
+        row = []
+        for x in range(w):
+            lane, c = divmod(x, ws)
+            if y == 0:
+                v = mx // 3
+            elif lane == 0:
+                v = mx // 2 if c < ws - 2 or y % 2 else mx // 2 + 5  # runs, some interrupted
+            elif lane == 1:
+                v = min(mx, (c * mx) // ws + y * (mx // 16))
+            elif lane == 2:
+                v = mx if ((c // 2) + y) % 2 else 0
+            else:
+                v = rng.randint(0, mx)
+            row.append(v)
+        img.append(row)
+    return img
+
+
+def smooth(bits, w, h, rng):
+    """Slow ramps with small noise: mostly regular mode, few escapes."""
+    mx = (1 << bits) - 1
+    img = []
+    base = rng.randint(0, mx)
+    for y in range(h):
+        img.append([max(0, min(mx, base + 3 * x - 2 * y + rng.randint(-4, 4))) for x in range(w)])
+    return img
+
+
+def noise(bits, w, h, rng):
+    mx = (1 << bits) - 1
+    return [[rng.randint(0, mx) for _ in range(w)] for _ in range(h)]
+
+
+def cases_for(bits):
+    nmax = min(255, ((1 << bits) - 1) // 2)
+    # (kind, w, h, near, seed). The struct/smooth pair shares dims and NEAR 0,
+    # so the TB can chain them back to back without a reset.
+    return [
+        (K_STRUCT, 32, 6, 0, 1),
+        (K_SMOOTH, 32, 6, 0, 2),
+        (K_STRUCT, 32, 6, 3, 1),
+        (K_SMOOTH, 32, 6, nmax, 2),
+        (K_LINE, 32, 1, 1, 3),
+        (K_NOISE, 64, 64, 0, 4),
+    ]
+
+
+def build_ref(tmp):
+    exe = os.path.join(tmp, "nl_charls")
+    subprocess.run(["g++", "-std=c++17", "-O2", "-DCHARLS_STATIC", "-I" + os.path.join(CHARLS, "include"),
+                    os.path.join(ROOT, "Verification/ref/nl_charls.cpp"),
+                    os.path.join(CHARLS, "build/libcharls.a"), "-o", exe], check=True)
+    return exe
+
+
+def encode(exe, tmp, bits, img, near):
+    h, w = len(img), len(img[0])
+    mx = (1 << bits) - 1
+    pgm = os.path.join(tmp, "in.pgm")
+    with open(pgm, "wb") as f:
+        f.write(b"P5\n%d %d\n%d\n" % (w, h, mx))
+        for row in img:
+            for v in row:
+                f.write(bytes([v >> 8, v & 0xFF]) if mx > 255 else bytes([v]))
+    subprocess.run([exe, pgm, str(near), "4", os.path.join(tmp, "ref")], check=True)
+    lanes = []
+    for s in range(4):
+        with open(os.path.join(tmp, "ref%d.jls" % s), "rb") as f:
+            lanes.append(list(f.read()))
+    return lanes
+
+
+def vhdl_ints(vals, per_line=24):
+    lines = []
+    for i in range(0, len(vals), per_line):
+        lines.append("    " + ", ".join(str(v) for v in vals[i:i + per_line]))
+    return ",\n".join(lines)
+
+
+def main():
+    rows, pix, byt = [], [], []
+    with tempfile.TemporaryDirectory() as tmp:
+        exe = build_ref(tmp)
+        for bits in (8, 12, 16):
+            for kind, w, h, near, seed in cases_for(bits):
+                rng = random.Random(seed * 100 + bits)
+                img = {K_STRUCT: structured, K_SMOOTH: smooth, K_LINE: noise, K_NOISE: noise}[kind](bits, w, h, rng)
+                lanes = encode(exe, tmp, bits, img, near)
+                off, ln = [], []
+                for lb in lanes:
+                    off.append(len(byt))
+                    ln.append(len(lb))
+                    byt.extend(lb)
+                rows.append((bits, kind, w, h, near, len(pix), off, ln))
+                pix.extend(v for row in img for v in row)
+
+    with open(OUT, "w") as f:
+        f.write("""-- Copyright (C) 2026 Vitor Mendes Camilo
+-- SPDX-License-Identifier: GPL-3.0-only
+--
+-- This file is part of OpenJLS. Available under GPLv3 or a
+-- commercial license. See LICENSE and README for details.
+--
+
+-- GENERATED by gen_golden.py: do not edit. Pixels and per-lane CharLS
+-- (nl_charls, 4 stripes) bytes for tb_nl_top_osvvm.
+
+package tb_nl_top_golden_pkg is
+
+  constant K_STRUCT : natural := 0;
+  constant K_SMOOTH : natural := 1;
+  constant K_LINE   : natural := 2;
+  constant K_NOISE  : natural := 3;
+
+  type t_case is record
+    bits     : natural;
+    kind     : natural;
+    w        : natural;
+    h        : natural;
+    near     : natural;
+    pix_off  : natural;                                              -- into PIX, raster order
+    lane_off : integer_vector(0 to 3);                               -- into BYTES
+    lane_len : integer_vector(0 to 3);
+  end record t_case;
+
+  type t_case_array is array (natural range <>) of t_case;
+
+""")
+        f.write("  constant CASES : t_case_array(0 to %d) := (\n" % (len(rows) - 1))
+        f.write(",\n".join("    (%d, %d, %d, %d, %d, %d, (%s), (%s))" % (
+            b, k, w, h, n, po, ", ".join(map(str, o)), ", ".join(map(str, l)))
+            for b, k, w, h, n, po, o, l in rows))
+        f.write("\n  );\n\n")
+        f.write("  constant PIX : integer_vector(0 to %d) := (\n%s\n  );\n\n" % (len(pix) - 1, vhdl_ints(pix, 16)))
+        f.write("  constant BYTES : integer_vector(0 to %d) := (\n%s\n  );\n\n" % (len(byt) - 1, vhdl_ints(byt)))
+        f.write("end package tb_nl_top_golden_pkg;\n")
+    print("wrote %s: %d cases, %d pixels, %d bytes" % (OUT, len(rows), len(pix), len(byt)))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
