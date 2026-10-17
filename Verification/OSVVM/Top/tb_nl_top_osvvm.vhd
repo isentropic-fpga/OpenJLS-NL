@@ -68,7 +68,9 @@ entity tb_nl_top_osvvm is
     OUT_WIDTH : natural := 64;
     -- Defaults equal the largest golden image (64 x 64), so W and H reach max.
     MAX_W     : natural := 64;
-    MAX_H     : natural := 64
+    MAX_H     : natural := 64;
+    -- Bind to the funcsim netlist of PostSynth/build_run_osvvm.sh (no generics).
+    POST_SYNTH : boolean := false
   );
 end entity tb_nl_top_osvvm;
 
@@ -129,34 +131,105 @@ begin
 
   clk <= not clk after CLK_PERIOD / 2;
 
-  dut : entity work.nl_top
-    generic map (
-      BITNESS          => BITNESS,
-      MAX_IMAGE_WIDTH  => MAX_W,
-      MAX_IMAGE_HEIGHT => MAX_H,
-      OUT_WIDTH        => OUT_WIDTH
-    )
-    port map (
-      iClk         => clk,
-      iRst         => rst,
-      iNear        => iNear,
-      iImageWidth  => iImageWidth,
-      iImageHeight => iImageHeight,
-      iValid       => iValid,
-      iPixel       => iPixel,
-      oReady       => oReady,
-      oData        => oData,
-      oValid       => oValid,
-      oKeep        => oKeep,
-      oLast        => oLast,
-      iReady       => iReady
-    );
+  -- Components, not entity instantiation: the netlist nl_top has no generics,
+  -- and only the elaborated branch is bound.
+  g_dut : if POST_SYNTH generate
+
+    component nl_top is
+      port (
+        iClk         : in  std_logic;
+        iRst         : in  std_logic;
+        iNear        : in  std_logic_vector(7 downto 0);
+        iImageWidth  : in  std_logic_vector(15 downto 0);
+        iImageHeight : in  std_logic_vector(15 downto 0);
+        iValid       : in  std_logic;
+        iPixel       : in  std_logic_vector(BITNESS - 1 downto 0);
+        oReady       : out std_logic;
+        oData        : out std_logic_vector(LANES * OUT_WIDTH - 1 downto 0);
+        oValid       : out std_logic_vector(LANES - 1 downto 0);
+        oKeep        : out std_logic_vector(LANES * NB - 1 downto 0);
+        oLast        : out std_logic_vector(LANES - 1 downto 0);
+        iReady       : in  std_logic_vector(LANES - 1 downto 0)
+      );
+    end component nl_top;
+
+  begin
+
+    dut : component nl_top
+      port map (
+        iClk         => clk,
+        iRst         => rst,
+        iNear        => iNear,
+        iImageWidth  => iImageWidth,
+        iImageHeight => iImageHeight,
+        iValid       => iValid,
+        iPixel       => iPixel,
+        oReady       => oReady,
+        oData        => oData,
+        oValid       => oValid,
+        oKeep        => oKeep,
+        oLast        => oLast,
+        iReady       => iReady
+      );
+
+  else generate
+
+    component nl_top is
+      generic (
+        BITNESS          : natural;
+        MAX_IMAGE_WIDTH  : natural;
+        MAX_IMAGE_HEIGHT : natural;
+        OUT_WIDTH        : natural
+      );
+      port (
+        iClk         : in  std_logic;
+        iRst         : in  std_logic;
+        iNear        : in  std_logic_vector(7 downto 0);
+        iImageWidth  : in  std_logic_vector(15 downto 0);
+        iImageHeight : in  std_logic_vector(15 downto 0);
+        iValid       : in  std_logic;
+        iPixel       : in  std_logic_vector(BITNESS - 1 downto 0);
+        oReady       : out std_logic;
+        oData        : out std_logic_vector(LANES * OUT_WIDTH - 1 downto 0);
+        oValid       : out std_logic_vector(LANES - 1 downto 0);
+        oKeep        : out std_logic_vector(LANES * NB - 1 downto 0);
+        oLast        : out std_logic_vector(LANES - 1 downto 0);
+        iReady       : in  std_logic_vector(LANES - 1 downto 0)
+      );
+    end component nl_top;
+
+  begin
+
+    dut : component nl_top
+      generic map (
+        BITNESS          => BITNESS,
+        MAX_IMAGE_WIDTH  => MAX_W,
+        MAX_IMAGE_HEIGHT => MAX_H,
+        OUT_WIDTH        => OUT_WIDTH
+      )
+      port map (
+        iClk         => clk,
+        iRst         => rst,
+        iNear        => iNear,
+        iImageWidth  => iImageWidth,
+        iImageHeight => iImageHeight,
+        iValid       => iValid,
+        iPixel       => iPixel,
+        oReady       => oReady,
+        oData        => oData,
+        oValid       => oValid,
+        oKeep        => oKeep,
+        oLast        => oLast,
+        iReady       => iReady
+      );
+
+  end generate g_dut;
 
   stim : process is
 
     -- Phase probes (G5): config divider done, context clear sweep.
-    alias sCfgDone is << signal .tb_nl_top_osvvm.dut.sCfgDone : std_logic >>;
-    alias sClr is << signal .tb_nl_top_osvvm.dut.sClr : std_logic >>;
+    alias sCfgDone is << signal .tb_nl_top_osvvm.g_dut.dut.sCfgDone : std_logic >>;
+    alias sClr is << signal .tb_nl_top_osvvm.g_dut.dut.sClr : std_logic >>;
 
     type t_int is array (0 to LANES - 1) of integer;
     type t_bool is array (0 to LANES - 1) of boolean;

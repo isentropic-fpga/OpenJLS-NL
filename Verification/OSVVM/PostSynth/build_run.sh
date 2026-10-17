@@ -24,7 +24,6 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/../../.." && pwd)"
 GOLD="$HERE/../Golden"
 OJ_FULL="${OJ_FULL:-$HOME/Repos/OpenJLS}"
 CHARLS="$OJ_FULL/ThirdParty/charls"
@@ -50,35 +49,8 @@ RUND="$OUT/runs"
 LOGD="$OUT/logs"
 mkdir -p "$SYN" "$CROP" "$REFD" "$RUND" "$LOGD"
 
-# 1. Netlists, rebuilt when the RTL hash changes.
-OLO="$ROOT/OpenJLS/ThirdParty/open-logic/src/base/vhdl"
-OJ="$ROOT/OpenJLS/Sources"
-SRC="$ROOT/Sources"
-RTL_FILES=(
-  "$OLO"/olo_base_pkg_{array,math,string,logic,attribute}.vhd
-  "$OLO/olo_base_ram_sdp.vhd" "$OLO/olo_base_fifo_sync.vhd"
-  "$OJ/openjls_pkg.vhd" "$OJ/A11_2_bit_packer.vhd"
-  "$OJ"/{A10_compute_k,A11_error_mapping,A12_variables_update}.vhd
-  "$OJ"/{A20_compute_temp,A21_compute_map,A22_errval_mapping,A23_run_interruption_update}.vhd
-  "$SRC"/{A11_1_nl_golomb_encoder,A15_A16_nl_encode_run}.vhd
-  "$SRC"/{nl_pkg,nl_loop,nl_config,nl_frontend,nl_backend,byte_stuffer_nl,nl_framer,nl_top}.vhd
-)
-RTL_HASH="$(cat "${RTL_FILES[@]}" "$HERE/synth_funcsim.tcl" | sha256sum | cut -c1-12)"
-if [ "${1:-}" = --synth ] || [ "$(cat "$SYN/rtl.hash" 2>/dev/null)" != "$RTL_HASH" ]; then
-  rm -f "$SYN/rtl.hash"
-  ( cd "$SYN" && vivado -mode batch -nojournal -log synth.log -source "$HERE/synth_funcsim.tcl" \
-      -tclargs "$BITS" "$MAX_W" "$MAX_H" "$OUT_WIDTH" > /dev/null )
-  echo "$RTL_HASH" > "$SYN/rtl.hash"
-fi
-for b in $BITS; do
-  [ -f "$SYN/nl_top_${b}bit_funcsim.vhd" ] || { echo "netlist missing: $b bit" >&2; exit 1; }
-done
-echo "Netlists: BITNESS $BITS, ${MAX_W}x${MAX_H}, OUT_WIDTH $OUT_WIDTH (RTL $RTL_HASH)"
-
-if ! compgen -G "$HOME/.nvc/lib/unisim*" > /dev/null; then
-  : "${XILINX_VIVADO:?set XILINX_VIVADO for the one-time nvc --install vivado}"
-  ( cd /tmp && nvc --install vivado )
-fi
+# 1. Netlists (synth.sh: rebuilt when the RTL hash changes).
+BITS="$BITS" "$HERE/synth.sh" "$@"
 
 # 2. Reference encoder, gated on the official T16E0 / T16E3.
 g++ -std=c++17 -O2 -DCHARLS_STATIC -I"$CHARLS/include" "$GOLD/ref/nl_charls.cpp" \
@@ -209,5 +181,5 @@ pass=$(grep -c $'\tPASS$' "$RES" || true); fail=$((NJ - pass))
   echo "DATE=\"$(date -Iseconds)\""
 } > "$OUT/report_status.env"
 
-echo "Post-synth golden: PASS=$pass FAIL=$fail of $NJ (RTL $RTL_HASH), table $RES"
+echo "Post-synth golden: PASS=$pass FAIL=$fail of $NJ (RTL $(cat "$SYN/rtl.hash")), table $RES"
 [ "$fail" -eq 0 ] && [ "$rc" -eq 0 ] || { grep -v $'\tPASS$' "$RES" | tail -n +2 | head -20; exit 1; }

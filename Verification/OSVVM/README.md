@@ -16,7 +16,7 @@ here.
 | `Modules/` | One OSVVM TB per NL block |
 | `Top/` | `nl_top` stress TB, its CharLS golden package and `gen_golden.py` |
 | `Golden/` | CharLS golden suite on the image corpus (`build_run.sh`, `ref/nl_charls.cpp`) |
-| `PostSynth/` | Gate-level smoke test of the synthesized netlist (`build_run.sh`) |
+| `PostSynth/` | Gate-level runs on the synthesized netlist: golden smoke test (`build_run.sh`), nl_top stress TB (`build_run_osvvm.sh`) |
 | `publish_reports.sh` | Assembles all suite results into `Docs/Reports/` |
 | `NVC_CodeCoverage/` | Coverage databases and HTML (generated) |
 | `OSVVM_OpenJlsNl/` | OSVVM logs and reports (generated) |
@@ -72,6 +72,14 @@ must match CharLS per stripe, byte-exact.
 - The netlist is rebuilt only when the RTL hash changes (`--synth` forces).
 - Images run in 16 shards, each capped at 1.5 GB.
 - **Status**: 57/57 PASS, ~3 min.
+
+`PostSynth/build_run_osvvm.sh` runs the nl_top stress TB
+(`Top/tb_nl_top_osvvm.vhd`, `POST_SYNTH=true`) on the same 8-bit netlist. The
+netlist is analyzed as `work.nl_top` and the TB's generic-free component binds
+to it. `sClr` carries `keep` in `nl_top.vhd` so the TB's phase probe survives
+synthesis. Needs the OSVVM library from `build_reports.sh`.
+
+- **Status**: PASS, 129,061 affirmations, 7/7 requirements, ~3.5 min of simulation.
 
 ## Reports
 

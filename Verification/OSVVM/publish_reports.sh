@@ -18,6 +18,7 @@
 #   ./build_run.sh                         # OSVVM regression + coverage
 #   ( cd Golden    && ./build_run.sh )     # RTL golden vs CharLS
 #   ( cd PostSynth && ./build_run.sh )     # gate-level golden (needs Vivado)
+#   ( cd PostSynth && ./build_run_osvvm.sh )  # gate-level nl_top stress TB
 #   ./publish_reports.sh                   # -> Docs/Reports/
 #
 # Usage:  ./publish_reports.sh
@@ -34,6 +35,8 @@ GOLDEN_ENV="$HERE/Golden/Output/report_status.env"
 GOLDEN_TSV="$HERE/Golden/Output/golden_results.tsv"
 PS_ENV="$HERE/PostSynth/Output/report_status.env"
 PS_TSV="$HERE/PostSynth/Output/ps_results.tsv"
+PS_OSVVM_ENV="$HERE/PostSynth/Output/report_status_osvvm.env"
+PS_OSVVM_LOG="$HERE/PostSynth/Output/postsynth_osvvm.log"
 
 rm -rf "$DEST"
 mkdir -p "$DEST/assets"
@@ -185,14 +188,40 @@ HDR
   echo "$sub/index.html"
 }
 
+# render_log_page <log> <dest-subdir> <title> -> echoes the relative link. For
+# a suite with no table or OSVVM HTML (post-synth OSVVM is one plain NVC run),
+# the captured console log is the report, HTML-escaped into a <pre>.
+render_log_page() {
+  local log="$1" sub="$2" title="$3"
+  [ -f "$log" ] || { echo ""; return; }
+  mkdir -p "$DEST/$sub"
+  {
+    page_head "$title" "../"
+    cat <<HDR
+<a class="back" href="../index.html">&larr; All reports</a>
+<div class="hero" style="margin-top:14px;"><h1 class="text">$title</h1></div>
+<pre class="log">
+HDR
+    sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$log"
+    echo "</pre>"
+    page_foot "../"
+  } > "$DEST/$sub/index.html"
+  echo "$sub/index.html"
+}
+
 golden_link=""
 [ -f "$GOLDEN_ENV" ] && golden_link="$(render_tsv_page "$GOLDEN_TSV" golden "Golden suite — processed images")"
+ps_osvvm_link=""
+[ -f "$PS_OSVVM_ENV" ] && ps_osvvm_link="$(render_log_page "$PS_OSVVM_LOG" post-synth-osvvm "Post-synth OSVVM — simulation log")"
 ps_link=""
 [ -f "$PS_ENV" ] && ps_link="$(render_tsv_page "$PS_TSV" post-synth "Post-synth golden — processed images")"
 
 env_row "$GOLDEN_ENV" "Golden suite" \
   "RTL encode of the OpenJLS corpus and the NL corpus (images up to 0.5&nbsp;MP, depths 8&ndash;16, NEAR sweep), each of the 4 stripes compared byte-for-byte with CharLS." \
   "$golden_link"
+env_row "$PS_OSVVM_ENV" "Post-synth OSVVM" \
+  "The nl_top stress test (backpressure, stalls, back to back, reset rounds) re-run on the synthesized gate-level netlist (BITNESS 8, 4096x4096, OUT_WIDTH 64)." \
+  "$ps_osvvm_link"
 env_row "$PS_ENV" "Post-synth golden" \
   "Smoke test: 8-bit images up to 0.01&nbsp;MP encoded on the synthesized gate-level netlist (BITNESS 8, 4096x4096, OUT_WIDTH 64) and compared per stripe with CharLS; the cap keeps gate-level simulation time bounded." \
   "$ps_link"

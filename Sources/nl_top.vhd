@@ -97,7 +97,12 @@ architecture rtl of nl_top is
   -- Front end -> loop
   signal sClr       : std_logic;
   signal sClrAddr   : unsigned(8 downto 0);
-  signal fValid     : std_logic;
+
+  -- Kept by name in the netlist: the post-synth OSVVM TB probes it.
+  attribute keep : string;
+  attribute keep of sClr : signal is "true";
+
+  signal fValid   : std_logic;
   signal fFirstPix  : std_logic;
   signal fFirstCol  : std_logic;
   signal fEol       : std_logic;
