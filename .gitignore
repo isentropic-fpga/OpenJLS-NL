@@ -1,5 +1,5 @@
 build/
-Verification/Golden model/Output/
+Verification/OSVVM/Golden/Output/
 .Xil/
 clockInfo.txt
 cong/

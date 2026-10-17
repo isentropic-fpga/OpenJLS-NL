@@ -8,7 +8,7 @@
 """Generate tb_nl_top_golden_pkg.vhd for tb_nl_top_osvvm.
 
 Seeded synthetic images per BITNESS {8, 12, 16}, each encoded per stripe
-(4 vertical stripes) by CharLS through Verification/ref/nl_charls.cpp. The
+(4 vertical stripes) by CharLS through Verification/OSVVM/Golden/ref/nl_charls.cpp. The
 package holds the pixels and the expected per-lane .jls bytes, so the TB runs
 without CharLS. Rerun after changing the image set:
 
@@ -87,7 +87,7 @@ def cases_for(bits):
 def build_ref(tmp):
     exe = os.path.join(tmp, "nl_charls")
     subprocess.run(["g++", "-std=c++17", "-O2", "-DCHARLS_STATIC", "-I" + os.path.join(CHARLS, "include"),
-                    os.path.join(ROOT, "Verification/ref/nl_charls.cpp"),
+                    os.path.join(ROOT, "Verification/OSVVM/Golden/ref/nl_charls.cpp"),
                     os.path.join(CHARLS, "build/libcharls.a"), "-o", exe], check=True)
     return exe
 

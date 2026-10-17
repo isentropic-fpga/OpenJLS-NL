@@ -15,6 +15,7 @@ here.
 | `build_run.sh` | Full regression with NVC statement+branch coverage of `Sources/` |
 | `Modules/` | One OSVVM TB per NL block |
 | `Top/` | `nl_top` stress TB, its CharLS golden package and `gen_golden.py` |
+| `Golden/` | CharLS golden suite on the image corpus (`build_run.sh`, `ref/nl_charls.cpp`) |
 | `NVC_CodeCoverage/` | Coverage databases and HTML (generated) |
 | `OSVVM_OpenJlsNl/` | OSVVM logs and reports (generated) |
 
@@ -28,8 +29,35 @@ NL_ONLY=nl_framer ./build_reports.sh   # only TBs whose path matches
 The filtered run reports `BuildError` because the skipped tests count as
 missing. Each test's own `DONE PASSED` line is the result to read.
 
-The CharLS golden suite lives in `Verification/Golden model` (step 5 moves it
-here).
+## Golden suite
+
+`Golden/build_run.sh` checks nl_top against CharLS byte-exact, per lane, on
+real and synthetic images. Each image is cropped to W % 4 = 0, split into 4
+stripes, and encoded per stripe by `ref/nl_charls.cpp` at the same NEAR.
+
+```sh
+cd Golden && ./build_run.sh             # incremental, 20 threads
+RERUN=1 BATCH=nl ./build_run.sh         # force one batch
+```
+
+- **Gate**: CharLS must first reproduce T16E0.JLS and T16E3.JLS byte-exact.
+- **Batches**: `wide` runs every OpenJLS corpus image ≤ `MAX_MP` (0.5) at
+  NEAR 3 and 7. `sweep` runs `sweep_images.txt` at NEAR 0..16. `nl` runs the
+  corpus from `gen_nl_images.py`:
+  - stripe-seam textures, noise and 0/MAXVAL edges at every BITNESS 8..16,
+    up to NEAR = NMAX;
+  - W = 32 (minimal stripe), W = 36 (odd stripe), one-row, 32 x 8192 and
+    65532 x 4 images (max lane line, RUNindex 30).
+- **Incremental**: a job (image, NEAR) that passed against the same RTL hash
+  is skipped. The hash covers the NL and reused OpenJLS sources, the TB and
+  `nl_charls.cpp`. A job also re-runs when its PGM is newer than the table.
+- **Output**: `Output/golden_results.tsv` has one row per job (Image, Dims,
+  Bits, NEAR, matched/total bytes, Result, Run date, RTL hash). New rows
+  replace old ones; images that no longer exist drop out.
+  `Output/report_status.env` summarizes the table for a report page.
+- **Status**: 10919/10919 jobs PASS, 250 images skipped (over the cap or
+  W < 32). The full run takes ~1.5 h; an incremental run only re-runs what
+  changed.
 
 ## Suites
 

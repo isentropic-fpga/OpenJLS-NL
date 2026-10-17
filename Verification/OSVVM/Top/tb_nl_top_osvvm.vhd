@@ -9,7 +9,7 @@
 -- OSVVM testbench: nl_top (4 vertical stripes, 4 output streams).
 --
 -- Port of OpenJLS tb_openjls_top_osvvm to the 4-lane core. The golden suite
--- (Verification/Golden model) owns payload correctness on real images; here
+-- (Verification/OSVVM/Golden) owns payload correctness on real images; here
 -- the payload oracle is small seeded images encoded per stripe by CharLS
 -- (tb_nl_top_golden_pkg, from gen_golden.py), and the TB proves the 4 streams
 -- stay byte-exact under stress:

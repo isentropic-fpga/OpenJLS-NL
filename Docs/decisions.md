@@ -100,8 +100,8 @@ picked. **Picked** marks the choice; everything here is open for review.
   SOF/SOS as in T.87; default thresholds, so no LSE marker (matches CharLS).
 
 ## D17. Reference
-- Verification/ref/nl_charls.cpp: CharLS per stripe at the same NEAR. Gated
-  on T16E3.JLS byte-exact. nl_top output is compared byte-exact per lane.
+- Verification/OSVVM/Golden/ref/nl_charls.cpp: CharLS per stripe at the
+  same NEAR. Gated on T16E0.JLS and T16E3.JLS byte-exact. nl_top output is compared byte-exact per lane.
 
 ## D18. Back end reuses OpenJLS blocks
 - A10, A11, A12, A15/A16, A20-A23 and A11_2 are used unchanged. NEAR-only
@@ -111,8 +111,10 @@ picked. **Picked** marks the choice; everything here is open for review.
 - A23 is combinational, and the A RAM word settles deltas after r(2). Its inputs
   are built in one process (one delta), and RItype is dropped when A = Errval = 0.
   That is a sim-only guard: real RItype=1 tokens have Errval /= 0.
-- Golden suite (Verification/Golden model): all images <= 0.5 MP at NEAR 3, 7,
-  plus a small set at NEAR 0..16, byte-exact vs CharLS per stripe: 524/524.
+- Golden suite (Verification/OSVVM/Golden): all corpus images <= 0.5 MP at
+  NEAR 3, 7, a sweep set at NEAR 0..16 and the NL corpus (stripe seams,
+  BITNESS 8..16, W 32 / 36 / 65532), byte-exact vs CharLS per stripe:
+  10919/10919 jobs.
 
 ## D19. One byte stuffer and framer for all 4 lanes
 - The 4 lanes take turns on one byte stuffer and one framer (lane = slot
