@@ -19,31 +19,13 @@
 -- Every lane also checks oKeep (contiguous from the MSB, >= 1 byte), oLast on FF D9 and the AXIS
 -- hold.
 --
--- Requirements:
---   NL.StripeGolden      every lane byte-exact against CharLS per stripe
---   NL.BackToBack        images back to back without reset
---   NL.AxisOut           AXIS keep / last / hold per lane
---   NL.StallPropagation  output hold reaches oReady, nothing lost
---   NL.NoStall           clean runs never drop oReady
---   NL.ConfigInReset     NEAR / W / H sampled in reset
---   NL.Reset             reset in any phase, recovery image scored
---
 -- Guidelines:
---   G1.Req      N/A: T.87 payload is owned by the module TBs and the golden suite
---   G1.Golden   CharLS (nl_charls.cpp) per stripe, generated offline from the same pixels
---   G1.Nl       see Requirements
---   G2.Range    nl_top.vhd range comments, asserts and PSL
---   G2.MinMax   G2.MinMax config ranges (W 32 / MAX_W, H 1 / MAX_H, NEAR 0 / min(255, MAXVAL/2))
 --   G2.Clamp    N/A: no accumulator at this level
 --   G2.Checked  N/A: bytes are scoreboarded against CharLS, X / U never matches
 --   G3.Stim     N/A: no arithmetic in the TB beyond byte counts
---   G4.Config   G2.MinMax config ranges, G4.Config config across reset
+--   G4.Config   W, H, NEAR min/max in G2.MinMax config ranges
 --   G4.Lane     G4.Stream lane backpressure hold; every image scored on all 4 lanes
---   G4.Stream   G4.Stream image kind x stress mode, G4.Stream back to back,
---               G4.Stream stall propagation, G4.Stream lane backpressure hold
 --   G4 other    N/A: owned by the module TBs
---   G5          G5.States resetPhase; aborted output discarded, recovery image scored
---   G6.Code     reviewed in the suite report
 
 library ieee;
   use ieee.std_logic_1164.all;

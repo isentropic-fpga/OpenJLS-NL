@@ -11,24 +11,12 @@
 -- Every qbpp of a legal NEAR is swept over both modes, every RUNindex, every k, the escape threshold
 -- +-1 and the MErrval extremes, then random.
 --
--- Requirements:
---   T87.A11.1   regular LG(k, LIMIT), per qbpp
---   T87.A22.1   RI LG(k, glimit), per qbpp
---
 -- Guidelines:
---   G1.Req      T87.A11.1, T87.A22.1
---   G1.Property A.5.3 / A.22.1 text in integers (no C code for LG)
---   G2.Range    A11_1_nl_golomb_encoder.vhd range comments and asserts
---   G2.MinMax   G2.MinMax node
 --   G2.Clamp    N/A: combinational, no accumulator
---   G2.Checked  checked_* on all outputs
---   G3.Stim     G2.MinMax node (MErrval MSB set); no signed nodes
---   G4.Coding   G4.Coding k, G4.Coding qbpp x riMode x escape
---   G4.Run      G4.Run RUNindex
---   G4.Config   G4.Coding qbpp x riMode x escape (NEAR 0 / max); BITNESS by the suite generics
+--   G3.Stim     G2.MinMax node (MErrval MSB set)
+--   G4.Config   G4.Coding qbpp x riMode x escape (NEAR 0 / max)
 --   G4 other    N/A: combinational, single datapath
 --   G5          N/A: combinational
---   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;

@@ -11,43 +11,15 @@
 -- slots between pixels). The random loop runs CYCLES slots, then until all coverage closes (cap
 -- 20 x CYCLES). A.4.1 / A.4.2 arrive precomputed in iCand* (tb_nl_frontend_osvvm).
 --
--- Requirements:
---   T87.A2 / T87.A3  oMode (NEAR > 0 / NEAR = 0)
---   T87.A4           oCtx
---   T87.A5           oPx
---   T87.A6           oPx
---   T87.A7           oErrval
---   T87.A8           oRx (NEAR > 0)
---   T87.A8.1         oRx (NEAR = 0), regular and RI
---   T87.A9           oErrval
---   T87.A12          oNq oBpre oNpre oNRes
---   T87.A13          oCq oBq
---   T87.A14          oRx
---   T87.A17          oRiType
---   T87.A18          oPx
---   T87.A19          oErrval oRx
---   NL.CtxForward    all of the above
---
 -- Guidelines:
---   G1.Req      T87.A2-A19 above
---   G1.Golden   per-stripe transcription above
---   G1.Nl       NL.CtxForward
---   G2.Range    nl_loop.vhd range comments and asserts
---   G2.MinMax   G2.MinMax node
---   G2.Clamp    G2.MinMax node (C, B, N = RESET), G2.Clamp mode x reconstruction
---   G2.Checked  checked_integer / checked_bit on every compared output
+--   G2.Clamp    G2.MinMax node (C, B, N = RESET)
 --   G3.Stim     G2.MinMax node (most negative Errval), 0 / MAXVAL pixels
---   G4.Edge     G4.Edge stripe events; first line, last column, 1-line, Ws = 8 N/A: Rb, Rc, Rd
---               come in (tb_nl_frontend_osvvm)
+--   G4.Edge     first line, last column, 1-line, Ws = 8 N/A: Rb, Rc, Rd come in
+--               (tb_nl_frontend_osvvm)
 --   G4.Run      G4.Edge stripe events, G4.Lane lane x mode; RUNindex N/A: tb_a15_a16_nl_osvvm
 --   G4.Coding   G2.MinMax node (N = RESET, C ends); k, escape, A.11 N/A: tb_nl_backend_osvvm
---   G4.Branch   G4.Branch mode x errval sign, G4.Branch mode x modulo wrap
---   G4.Config   NEAR swept by the generics; NEAR change N/A: no NEAR-dependent state
---               (tb_nl_config_osvvm, tb_nl_top_osvvm)
---   G4.Lane     G4.Lane lane x mode, G4.Stream lane x forward x gap
---   G4.Stream   G4.Stream lane x forward x gap, G4.Edge stripe events
+--   G4.Config   NEAR change N/A: no NEAR-dependent state (tb_nl_config_osvvm, tb_nl_top_osvvm)
 --   G5          N/A: no reset; lane state restarts on iFirstPix (G4.Edge stripe events)
---   G6.Code     reviewed in the suite report
 
 library ieee;
   use ieee.std_logic_1164.all;

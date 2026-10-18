@@ -12,37 +12,12 @@
 -- candidates. Exits with no slot at E are junk and must be dropped. The model keeps the Rx lines and
 -- the per-lane context store fed by those exits and checks every slot at L.
 --
--- Requirements:
---   NL.LaneIssue      column j of lanes 0..3 on 4 consecutive cycles, raster order per stripe
---   NL.Neighbours     Rb, Rc, Rd from the Rx lines with the T.87 edge rules
---   T87.A4            Q1, Q2 (decoded from candidate 4) and Q3 through the bounds
---   T87.A4.1          SIGN of the 9 candidates
---   T87.A4.2          one-to-one vector -> context map
---   NL.CtxNumbering   ctx = 9*(9*Q1 + Q2) + Q3 + 4 after the flip (D5)
---   NL.Q3Bounds       -4 + #{k : Ra < bound(k)} = A.4(Rc - Ra)
---   NL.CtxStore       candidate C, B, N = latest regular exit of that lane and context
---   NL.ClearSweep     512-cycle oClr sweep before each image
---   NL.ExitTags       oEx* tags at E, oExValid only for slots issued since reset
---   NL.Reset          reset in any phase, next session scored
---
 -- Guidelines:
---   G1.Req      T87.A4, T87.A4.1, T87.A4.2
---   G1.Golden   quantA4 is A.4 line by line on the TB's own NEAR / T
---   G1.Property T87.A4.1 sign merge, T87.A4.2 one-to-one map
---   G1.Nl       the NL.* IDs above
---   G2.Range    nl_frontend.vhd range comments and asserts
---   G2.MinMax   G2.MinMax node
 --   G2.Clamp    N/A: no accumulator (C, B, N pass through from the loop)
---   G2.Checked  checked_integer / checked_bit on every compared output
 --   G3.Stim     G2.MinMax node (D1, D2 at -MAXVAL, B at 1-RESET), G4.Coding Q1 x Q2 at -4
---   G4.Edge     G4.Edge lane x stripe edge
---   G4.Coding   G4.Coding Q1 x Q2, G4.Coding Q3 from the bounds
 --   G4.Config   G2.MinMax node (Ws, H, NEAR, thresholds)
 --   G4.Lane     G4.Edge lane x stripe edge
---   G4.Stream   G4.Stream candidate x write age, G4.Stream loop exit kind
 --   G4 other    N/A: Run / Branch belong to tb_nl_loop_osvvm and tb_a15_a16_nl_osvvm
---   G5          G5.States resetPhase, then a scored session; junk exits after reset discarded
---   G6.Code     reviewed in the suite report
 
 library ieee;
   use ieee.std_logic_1164.all;

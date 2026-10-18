@@ -9,28 +9,12 @@
 -- A.2.1 and C.2.4.1.1 are outside Docs/Requirements.md (per-sample procedure only) but are T.87
 -- text, so they get T87 IDs.
 --
--- Requirements:
---   T87.A2.1       RANGE, qbpp, A init
---   T87.C2.4.1.1   default T1 / T2 / T3
---   NL.NearClamp   NEAR above min(255, MAXVAL/2) clamped
---   NL.Config      RECIP, RANGE*(2*NEAR+1), oDone timing, outputs hold
---   NL.Reset       oDone low in reset, reset in every phase, recovery
---
 -- Guidelines:
---   G1.Req      T87.A2.1, T87.C2.4.1.1
---   G1.Property A.2.1 / C.2.4.1.1 text in integers (no C code in T.87)
---   G1.Nl       NL.NearClamp, NL.Config, NL.Reset
---   G2.Range    nl_config.vhd range comments and asserts
---   G2.MinMax   every NEAR code: G4.Config NEAR, G4.Config qbpp, G2.MinMax node (T1 / T3 CLAMP)
---   G2.Clamp    NL.NearClamp (in range / clamped); no accumulator
---   G2.Checked  checked_* on all outputs
---   G3.Stim     G2.MinMax node (NEAR code MSB set); no signed nodes
---   G4.Config   G4.Config NEAR, G4.Config qbpp; NEAR change: every run_near re-resets with a new
---               NEAR; BITNESS 8 / 12 / 16 by the suite generics
+--   G2.Clamp    N/A: no accumulator
+--   G3.Stim     G2.MinMax node (NEAR code MSB set)
+--   G4.Config   NEAR change: every run_near re-resets with a new NEAR
 --   G4 other    N/A: per-image constants only
---   G5          G5.States resetPhase; only oDone is reset, data is valid with oDone; next NEAR
---               replayed against golden
---   G6.Code     fully covered
+--   G5          only oDone is reset; data is qualified by oDone
 
 library ieee;
   use ieee.std_logic_1164.all;

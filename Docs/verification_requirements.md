@@ -1,7 +1,7 @@
 # Verification requirements
 
 Requirement registry and traceability for the OSVVM suite in [`Verification/OSVVM`](../Verification/OSVVM).
-Rules G1-G6 are defined in [`verification_guidelines.md`](verification_guidelines.md); per-rule detail (coverage IDs, N/A reasons) is in each TB's `Guidelines:` header.
+Rules G1-G6 are defined in [`verification_guidelines.md`](verification_guidelines.md); coverage IDs carry the rule tag, and N/A reasons and other exceptions are in each TB's `Guidelines:` header.
 Base: the OpenJLS matrix ([`OpenJLS/Docs/verification_requirements.md`](../OpenJLS/Docs/verification_requirements.md)), extended with the near-lossless paths and the NL lane/stripe behaviour.
 
 ## ID families

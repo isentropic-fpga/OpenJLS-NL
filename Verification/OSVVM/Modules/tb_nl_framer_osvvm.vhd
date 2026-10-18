@@ -12,25 +12,12 @@
 -- turn. Images: a minimal back-to-back pair (FF D9 only), random images, some chained before the
 -- previous oLast, then N_RST reset rounds with a scored recovery image per lane.
 --
--- Requirements:
---   NL.LaneFrame   per-lane T.87 C.2.2 / C.2.3 header with NEAR, payload, FF D9, oLast
---   NL.Reset       reset in any phase, next image per lane matches
---
 -- Guidelines:
---   G1.Req      N/A: no per-sample T.87 clause (framing is NL.LaneFrame)
---   G1.Golden   header from T.87 C.2.2 / C.2.3 field by field, not the RTL ROM
---   G1.Nl       NL.LaneFrame, NL.Reset
---   G2.Range    nl_framer.vhd range comments and asserts
---   G2.MinMax   G2.MinMax field x value
 --   G2.Clamp    N/A: no accumulator
---   G2.Checked  checked_* on byte counts, bytes scoreboarded
---   G3.Stim     G2.MinMax field x value (NEAR = 255); no signed nodes
---   G4.Stream   G4.Stream lane x beat, lane x chained, lane backpressure hold
+--   G3.Stim     G2.MinMax field x value (NEAR = 255)
 --   G4.Lane     every G4 bin crossed with the lane
 --   G4.Config   G2.MinMax field x value
 --   G4 other    N/A: no Edge / Run / Coding / Branch logic
---   G5          G5.States resetPhase; aborted output discarded, recovery image scored
---   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;

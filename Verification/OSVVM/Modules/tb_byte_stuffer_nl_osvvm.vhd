@@ -12,25 +12,13 @@
 -- nl_top; iStall pulses and per-lane iReady bursts are random. Each lane plays the OpenJLS directed
 -- corners, then random images, then N_RST reset rounds with a scored recovery image per lane.
 --
--- Requirements:
---   NL.LaneStuff   per-lane T.87 FF stuffing and flush
---   NL.Reset       reset in any phase, next image per lane matches
---
 -- Guidelines:
---   G1.Req      N/A: no T.87 clause (stuffing is NL.LaneStuff)
---   G1.Golden   bit-level T.87 stuffing rule, not the RTL layouts
---   G1.Nl       NL.LaneStuff, NL.Reset
---   G2.Range    byte_stuffer_nl.vhd range comments and asserts
 --   G2.MinMax   N/A: no arithmetic node (emitBytes 0..4 in G4.Stream lane x emitBytes)
 --   G2.Clamp    N/A: no accumulator
---   G2.Checked  checked_integer on oValidBytes, bytes scoreboarded
 --   G3.Stim     N/A: random payload, FF runs in G4.Branch lane x stuffEvent
---   G4.Branch   G4.Branch lane x stuffEvent
---   G4.Stream   G4.Stream lane x emitBytes, lane x flushType, lane x data x almostFull
 --   G4.Lane     every G4 bin crossed with the lane
 --   G4.Config   N/A: IN_WIDTH / OUT_WIDTH fixed by nl_top
 --   G4 other    N/A: no Edge / Run / Coding logic
---   G5          G5.States resetPhase; aborted output discarded, recovery image scored
 --   G6.Code     covered except the stage 1 "FIFO full" assert, unreachable behind AlmFull
 
 library ieee;

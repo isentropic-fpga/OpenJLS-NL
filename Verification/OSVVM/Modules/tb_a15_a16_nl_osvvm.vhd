@@ -12,27 +12,13 @@
 -- state leaking between lanes shows up as a wrong bitstream. Lane 0 plays the OpenJLS directed
 -- script (climb to 31, boundary at 31, break from 31); the others are random.
 --
--- Requirements:
---   T87.A15          A.15 '1' bits
---   T87.A16          terminal: EOL '1', or '0' + J[RUNindex] bits; RI fields
---   NL.RunLaneState  per-lane state ports, idle / reset slots hold state
---
 -- Guidelines:
---   G1.Req      T87.A15, T87.A16
---   G1.Golden   A.15 / A.16 C code as a bit-string reference (gen_expected)
---   G1.Nl       NL.RunLaneState
---   G2.Range    A15_A16_nl_encode_run.vhd range comments and asserts
 --   G2.MinMax   G4.Run startIdx (RUNindex 0..30), G2.Clamp RUNindex (31); RUNcnt up to 40000
---   G2.Clamp    G2.Clamp RUNindex
---   G2.Checked  checked_* on all outputs
 --   G3.Stim     N/A: run events, no signed node
---   G4.Run      G4.Run lane x terminal, lane x immediateBreak, startIdx; RItype is A.17 (nl_loop)
+--   G4.Run      RItype N/A: A.17, in tb_nl_loop_osvvm
 --   G4.Lane     every G4.Run bin crossed with the lane, G4.Stream lane x eoiReset
---   G4.Stream   G4.Stream lane x eoiReset
---   G4.Config   BITNESS 8 / 12 / 16 by the suite generics
 --   G4 other    N/A: no Edge / Coding / Branch logic
 --   G5          N/A: combinational, the state lives in nl_backend; reset slots hold state
---   G6.Code     fully covered
 
 library ieee;
   use ieee.std_logic_1164.all;
