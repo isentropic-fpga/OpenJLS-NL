@@ -6,8 +6,10 @@
 --
 -- nl_frontend: raster input to 4 vertical stripes (lanes), everything in front of nl_loop
 --
--- Rows go through a double-buffered row RAM and are issued as column groups: column j of lanes
--- 0..3 in 4 consecutive slots, so the lane of a slot is cycle mod 4. Stages, n cycles after issue:
+-- Pixels land in a one-row RAM at their raster column. Lane k owns the slots with cycle mod 4 = k
+-- and issues a pixel once it is written, so the lanes run skewed by up to 3/4 row. A pixel is
+-- only overwritten after its lane has read it. Lanes wait for each other at the image end, since
+-- the context clear is shared. Stages, n cycles after issue:
 --   I2 Rb, Rc, Rd   I3 D1, D2, Q3 bounds   I4 Q1, Q2   I5 sign merge, context RAM read
 --   I8 = L loop input   I15 = E loop exit, Rx and context write back
 -- Context RAM: one bank per Q3 candidate at lane*64 + row, ctx = 9*row + bank. The write of the
@@ -49,6 +51,7 @@ entity nl_frontend is
     oClrAddr  : out   unsigned(8 downto 0);
     -- Loop inputs (L)
     oValid    : out   std_logic;
+    oLane     : out   unsigned(1 downto 0);                               -- cycle mod 4, for checks
     oFirstPix : out   std_logic;
     oFirstCol : out   std_logic;
     oEol      : out   std_logic;
@@ -86,6 +89,7 @@ architecture behavioral of nl_frontend is
   constant WORD_W  : natural := CO_C_WIDTH + 7 + 7;
   constant L       : natural := 8;
   constant E       : natural := L + 7;
+  constant IW      : natural := AW + 3;                               -- raster index mod 2**IW
 
   type t_state is (S_CFG, S_DRAIN, S_CLEAR, S_RUN);
 
@@ -136,6 +140,8 @@ architecture behavioral of nl_frontend is
 
   type t_ring_array is array (0 to 3) of t_ring;
   type t_base_array is array (0 to 3) of unsigned(AW - 1 downto 0);
+  type t_idx_array is array (0 to 3) of unsigned(IW - 1 downto 0);
+  type t_cnt_array is array (0 to 3) of unsigned(15 downto 0);
   type t_word_array is array (0 to 8) of std_logic_vector(WORD_W - 1 downto 0);
 
   -- Control
@@ -146,14 +152,20 @@ architecture behavioral of nl_frontend is
   signal sWsM1     : unsigned(15 downto 0);                            -- W/4-1: [7, MAX_IMAGE_WIDTH/4-1]
   signal sHm1      : unsigned(15 downto 0);                            -- H-1: [0, 65534]
   signal sBase     : t_base_array;                                     -- lane*W/4: [0, 3*W/4]
-  signal sFull     : std_logic_vector(0 to 1) := "00";
-  signal sWrBuf    : std_logic;
+  signal sWidth    : unsigned(IW - 1 downto 0);                        -- W
+  signal sEolStep  : unsigned(IW - 1 downto 0);                        -- W - W/4 + 1
+  signal sWrIdx    : unsigned(IW - 1 downto 0);                        -- next raster index to write
   signal sWrCol    : unsigned(AW - 1 downto 0);                        -- [0, W-1]
-  signal sRdBuf    : std_logic;
-  signal sJ        : unsigned(15 downto 0);                            -- stripe column: [0, W/4-1]
-  signal sJp1      : unsigned(15 downto 0);                            -- [1, W/4]
-  signal sRow      : unsigned(15 downto 0);                            -- [0, H-1]
-  signal sGo       : std_logic;
+  signal sWrLane   : unsigned(1 downto 0);                             -- full type
+  signal sWrJ      : unsigned(15 downto 0);                            -- [0, W/4-1]
+  -- Per lane
+  signal sIdx      : t_idx_array;                                      -- next raster index to issue
+  signal sLim      : t_idx_array;                                      -- sIdx + W, one cycle late
+  signal sAvail    : std_logic_vector(0 to 3);                         -- pixel sIdx written
+  signal sDone     : std_logic_vector(0 to 3);                         -- last pixel issued
+  signal sJ        : t_cnt_array;                                      -- stripe column: [0, W/4-1]
+  signal sJp1      : t_cnt_array;                                      -- [1, W/4]
+  signal sRow      : t_cnt_array;                                      -- [0, H-1]
   signal sReady    : std_logic;
   signal sAccept   : std_logic;
 
@@ -170,8 +182,7 @@ architecture behavioral of nl_frontend is
   signal sRing     : t_ring_array;
 
   -- RAMs
-  signal sRowWrAddr : std_logic_vector(AW downto 0);
-  signal sRowRdAddr : std_logic_vector(AW downto 0);
+  signal sRowRdAddr : std_logic_vector(AW - 1 downto 0);
   signal sRowRd     : std_logic_vector(BITNESS - 1 downto 0);
   signal sLbRdAddr  : unsigned(AW - 1 downto 0);
   signal sLbRd      : std_logic_vector(BITNESS - 1 downto 0);
@@ -229,24 +240,24 @@ architecture behavioral of nl_frontend is
 
 begin
 
-  sReady <= not iRst and not sFull(0) when sWrBuf = '0' else
-            not iRst and not sFull(1);
+  -- sLim lags sIdx by a cycle, so a slot is rewritten only after its RAM read
+  sReady  <= not iRst and bool2sl(signed(sLim(to_integer(sWrLane)) - sWrIdx) > 0);
   oReady  <= sReady;
   sAccept <= iValid and sReady;
 
   ctrl_proc : process (iClk) is
 
-    variable vFull : std_logic_vector(0 to 1);
     variable vGo   : std_logic;
+    variable vK    : integer range 0 to 3;
     variable v     : t_slot;
     variable vX    : unsigned(AW - 1 downto 0);                        -- [0, W-1]
     variable vN    : signed(SW - 1 downto 0);                          -- [0, NMAX]
+    variable vWs   : unsigned(15 downto 0);
 
   begin
 
     if rising_edge(iClk) then
       sCyc <= sCyc + 1;
-      vFull := sFull;
 
       -- Per image constants
       vN       := signed(resize(iNear, SW));
@@ -264,23 +275,31 @@ begin
 
       -- Raster write side
       if (sAccept = '1') then
+        sWrIdx <= sWrIdx + 1;
         if (sWrCol = sWm1) then
           sWrCol <= (others => '0');
-          if (sWrBuf = '0') then
-            vFull(0) := '1';
-          else
-            vFull(1) := '1';
-          end if;
-          sWrBuf <= not sWrBuf;
         else
           sWrCol <= sWrCol + 1;
         end if;
+        if (sWrJ = sWsM1) then
+          sWrJ    <= (others => '0');
+          sWrLane <= sWrLane + 1;
+        else
+          sWrJ <= sWrJ + 1;
+        end if;
       end if;
+
+      -- A lane is not issued again for 4 cycles, so the late sAvail is current by then
+      for k in 0 to 3 loop
+        sLim(k)   <= sIdx(k) + sWidth;
+        sAvail(k) <= bool2sl(signed(sWrIdx - sIdx(k)) > 0);
+      end loop;
 
       -- Issue
       v       := sIss;
       v.valid := '0';
       vGo     := '0';
+      vK      := to_integer(sCyc);
       case sState is
 
         when S_CFG =>
@@ -303,76 +322,74 @@ begin
           end if;
 
         when S_RUN =>
-          if (sCyc = 0) then
-            vGo := bool2sl(iHold = '0' and ((sRdBuf = '0' and sFull(0) = '1') or (sRdBuf = '1' and sFull(1) = '1')));
-            sGo <= vGo;
+          if (sDone = "1111") then
+            sDone  <= "0000";
+            sState <= S_DRAIN;
+            sCnt   <= (others => '0');
           else
-            vGo := sGo;
+            vGo := not iHold and not sDone(vK) and sAvail(vK);
           end if;
 
       end case;
 
       if (vGo = '1') then
-        vX         := sBase(to_integer(sCyc)) + sJ(AW - 1 downto 0);
+        vX         := sBase(vK) + sJ(vK)(AW - 1 downto 0);
         v.valid    := '1';
         v.lane     := sCyc;
         v.x        := vX;
-        v.firstCol := bool2sl(sJ = 0);
-        v.eol      := bool2sl(sJ = sWsM1);
-        v.row0     := bool2sl(sRow = 0);
+        v.firstCol := bool2sl(sJ(vK) = 0);
+        v.eol      := bool2sl(sJ(vK) = sWsM1);
+        v.row0     := bool2sl(sRow(vK) = 0);
         v.firstPix := v.firstCol and v.row0;
-        v.lastPix  := v.eol and bool2sl(sRow = sHm1);
-        sRowRdAddr <= sRdBuf & std_logic_vector(vX);
+        v.lastPix  := v.eol and bool2sl(sRow(vK) = sHm1);
+        sRowRdAddr <= std_logic_vector(vX);
         if (v.eol = '1') then
-          sLbRdAddr <= sBase(to_integer(sCyc));
+          sLbRdAddr <= sBase(vK);
         else
-          sLbRdAddr <= sBase(to_integer(sCyc)) + sJp1(AW - 1 downto 0);
+          sLbRdAddr <= sBase(vK) + sJp1(vK)(AW - 1 downto 0);
         end if;
 
-        if (sCyc = 3) then
-          if (v.eol = '1') then
-            sJ   <= (others => '0');
-            sJp1 <= to_unsigned(1, 16);
-            if (sRdBuf = '0') then
-              vFull(0) := '0';
-            else
-              vFull(1) := '0';
-            end if;
-            sRdBuf <= not sRdBuf;
-            if (v.lastPix = '1') then
-              sRow   <= (others => '0');
-              sState <= S_DRAIN;
-              sCnt   <= (others => '0');
-            else
-              sRow <= sRow + 1;
-            end if;
+        if (v.eol = '1') then
+          sJ(vK)   <= (others => '0');
+          sJp1(vK) <= to_unsigned(1, 16);
+          sIdx(vK) <= sIdx(vK) + sEolStep;
+          if (v.lastPix = '1') then
+            sRow(vK)  <= (others => '0');
+            sDone(vK) <= '1';
           else
-            sJ   <= sJp1;
-            sJp1 <= sJp1 + 1;
+            sRow(vK) <= sRow(vK) + 1;
           end if;
+        else
+          sJ(vK)   <= sJp1(vK);
+          sJp1(vK) <= sJp1(vK) + 1;
+          sIdx(vK) <= sIdx(vK) + 1;
         end if;
       end if;
-      sIss  <= v;
-      sFull <= vFull;
+      sIss <= v;
 
       if (iRst = '1') then
-        sState   <= S_CFG;
-        sFull    <= "00";
-        sWrBuf   <= '0';
-        sWrCol   <= (others => '0');
-        sRdBuf   <= '0';
-        sJ       <= (others => '0');
-        sJp1     <= to_unsigned(1, 16);
-        sRow     <= (others => '0');
-        sGo      <= '0';
+        vWs        := shift_right(iWidth, 2);
+        sState     <= S_CFG;
+        sWrIdx     <= (others => '0');
+        sWrCol     <= (others => '0');
+        sWrLane    <= (others => '0');
+        sWrJ       <= (others => '0');
         sIss.valid <= '0';
-        sWm1     <= resize(iWidth - 1, AW);
-        sWsM1    <= shift_right(iWidth, 2) - 1;
-        sHm1     <= iHeight - 1;
-        sBase(0) <= (others => '0');
-        sBase(1) <= resize(shift_right(iWidth, 2), AW);
-        sBase(2) <= resize(shift_right(iWidth, 1), AW);
-        sBase(3) <= resize(iWidth - shift_right(iWidth, 2), AW);
+        sWm1       <= resize(iWidth - 1, AW);
+        sWsM1      <= vWs - 1;
+        sHm1       <= iHeight - 1;
+        sWidth     <= resize(iWidth, IW);
+        sEolStep   <= resize(iWidth - vWs + 1, IW);
+        for k in 0 to 3 loop
+          sBase(k)  <= resize(to_unsigned(k, 2) * vWs, AW);
+          sIdx(k)   <= resize(to_unsigned(k, 2) * vWs, IW);
+          sLim(k)   <= resize(to_unsigned(k, 2) * vWs, IW) + resize(iWidth, IW);
+          sAvail(k) <= '0';
+          sDone(k)  <= '0';
+          sJ(k)     <= (others => '0');
+          sJp1(k)   <= to_unsigned(1, 16);
+          sRow(k)   <= (others => '0');
+        end loop;
       end if;
     end if;
 
@@ -513,6 +530,7 @@ begin
 
   -- L: loop inputs
   oValid    <= p(L).valid;
+  oLane     <= p(L).lane;
   oFirstPix <= p(L).firstPix;
   oFirstCol <= p(L).firstCol;
   oEol      <= p(L).eol;
@@ -546,17 +564,15 @@ begin
   oExEol      <= p(E).eol;
 
   -- RAMs
-  sRowWrAddr <= sWrBuf & std_logic_vector(sWrCol);
-
   u_row_ram : entity work.olo_base_ram_sdp
     generic map (
-      Depth_g     => 2 ** (AW + 1),
+      Depth_g     => 2 ** AW,
       Width_g     => BITNESS,
       RdLatency_g => 2
     )
     port map (
       Clk     => iClk,
-      Wr_Addr => sRowWrAddr,
+      Wr_Addr => std_logic_vector(sWrCol),
       Wr_Ena  => sAccept,
       Wr_Data => iPixel,
       Rd_Addr => sRowRdAddr,
@@ -621,9 +637,15 @@ begin
       if (sState = S_DRAIN) then
         assert sCnt <= 31 report "nl_frontend: drain counter overrun" severity failure;
       end if;
-      if (sState = S_RUN and sGo = '1') then
-        assert sJ <= sWsM1 and sRow <= sHm1
-          report "nl_frontend: issue column / row outside the image" severity failure;
+      if (iRst = '0') then
+        for k in 0 to 3 loop
+          assert sJ(k) <= sWsM1 and sRow(k) <= sHm1
+            report "nl_frontend: lane column / row outside the image" severity failure;
+          assert abs(signed(sWrIdx - sIdx(k))) < 2 * signed(resize(sWidth, IW + 1))
+            report "nl_frontend: writer and lane more than 2 rows apart" severity failure;
+        end loop;
+        assert signed(sLim(to_integer(sWrLane)) - sWrIdx) >= 0
+          report "nl_frontend: write past an unread pixel" severity failure;
       end if;
       if (p(4).valid = '1') then
         assert abs(p(4).d1) <= MAXVAL and abs(p(4).d2) <= MAXVAL

@@ -7,7 +7,8 @@
 -- tb_nl_frontend_osvvm: nl_frontend, raster in, 4 stripe lanes out to the loop
 --
 -- Each session resets with a random config (W = 4*Ws, H, NEAR, T1..T3) and runs 1..3 images with
--- random gaps, iHold bursts and row-buffer backpressure. The TB plays nl_loop at the exit: each slot
+-- random gaps, iHold bursts and row-buffer backpressure. Lanes issue independently (skewed) and meet
+-- at image ends; a lane keeps its slot phase (cycle mod 4). The TB plays nl_loop at the exit: each slot
 -- leaves E - L = 7 cycles after L with a random mode, Rx and, if regular, new (C, B, N) for one of its
 -- candidates. Exits with no slot at E are junk and must be dropped. The model keeps the Rx lines and
 -- the per-lane context store fed by those exits and checks every slot at L.
@@ -78,6 +79,7 @@ architecture sim of tb_nl_frontend_osvvm is
   constant R_NMIN     : integer := 18;
   constant R_NMAX     : integer := 19;
   constant R_IMGS     : integer := 20;
+  constant R_SKEW     : integer := 21;
 
   signal clk       : std_logic := '0';
   signal rst       : std_logic := '1';
@@ -95,6 +97,7 @@ architecture sim of tb_nl_frontend_osvvm is
   signal oClr      : std_logic;
   signal oClrAddr  : unsigned(8 downto 0);
   signal oValid    : std_logic;
+  signal oLane     : unsigned(1 downto 0);
   signal oFirstPix : std_logic;
   signal oFirstCol : std_logic;
   signal oEol      : std_logic;
@@ -158,6 +161,7 @@ begin
       oClr        => oClr,
       oClrAddr    => oClrAddr,
       oValid      => oValid,
+      oLane       => oLane,
       oFirstPix   => oFirstPix,
       oFirstCol   => oFirstCol,
       oEol        => oEol,
@@ -207,6 +211,8 @@ begin
     end record t_slot;
 
     type t_hist is array (0 to 7) of t_slot;
+    type t_lane_nat is array (0 to 3) of natural;
+    type t_lane_bool is array (0 to 3) of boolean;
 
     variable rv       : RandomPType;
     variable reqIssue : AlertLogIDType;
@@ -253,18 +259,18 @@ begin
     variable postRst  : boolean := false;
     variable cfgLeft  : natural := 0;
     variable staleLeft : natural := 0;
-    variable issImg   : natural := 0;
-    variable issRow   : natural := 0;
-    variable issCol   : natural := 0;
-    variable issLane  : natural := 0;
-    variable lastL    : integer := 0;
+    variable issImg   : t_lane_nat := (others => 0);
+    variable issRow   : t_lane_nat := (others => 0);
+    variable issCol   : t_lane_nat := (others => 0);
+    variable clrDone  : t_lane_bool := (others => false);
+    variable lanePh   : integer := -1;                                   -- (cycle - lane) mod 4
+    variable skewed   : boolean;
     variable rasImg   : natural := 0;
     variable rasRow   : natural := 0;
     variable rasCol   : natural := 0;
     variable gapLeft  : natural := 0;
     variable holdLeft : natural := 0;
     variable clrCnt   : natural := 0;
-    variable clrDone  : boolean := false;
     variable inRun    : boolean := false;
     variable draining : boolean := false;
     variable imgsDone : natural := 0;
@@ -362,15 +368,14 @@ begin
       for k in 0 to 7 loop
         hist(k).valid := false;
       end loop;
-      issImg   := 0;
-      issRow   := 0;
-      issCol   := 0;
-      issLane  := 0;
+      issImg   := (others => 0);
+      issRow   := (others => 0);
+      issCol   := (others => 0);
+      clrDone  := (others => false);
       rasImg   := 0;
       rasRow   := 0;
       rasCol   := 0;
       clrCnt   := 0;
-      clrDone  := false;
       inRun    := false;
       draining := false;
       gapLeft  := 0;
@@ -390,9 +395,19 @@ begin
       return false;
     end function in_flight;
 
+    impure function lanes_done return boolean is
+    begin
+      for l in 0 to 3 loop
+        if (issImg(l) < nImg) then
+          return false;
+        end if;
+      end loop;
+      return true;
+    end function lanes_done;
+
     impure function session_done return boolean is
     begin
-      return issImg >= nImg and not in_flight;
+      return lanes_done and not in_flight;
     end function session_done;
 
     -- Slot at L: everything the loop is given, against the model.
@@ -409,33 +424,37 @@ begin
       variable slot           : t_slot;
       variable vC, vB, vN     : integer;
     begin
-      AffirmIf(reqIssue, issImg < nImg, "slot beyond the session's images");
-      if (issImg >= nImg) then
+      lane := checked_integer(oLane);
+      if (lanePh < 0) then
+        lanePh := (cycles - lane) mod 4;
+      end if;
+      AffirmIfEqual(reqIssue, (cycles - lane) mod 4, lanePh, "lane " & to_string(lane) & " off its slot phase");
+      AffirmIf(reqIssue, issImg(lane) < nImg, "slot beyond the session's images");
+      if (issImg(lane) >= nImg) then
         return;
       end if;
-      lane := issLane;
-      row  := issRow;
-      col  := issCol;
-      if (lane > 0) then
-        AffirmIfEqual(reqIssue, cycles, lastL + 1, "column group lanes on consecutive cycles");
-      end if;
-      lastL := cycles;
+      row := issRow(lane);
+      col := issCol(lane);
+      skewed := false;
+      for l in 0 to 3 loop
+        skewed := skewed or (issImg(l) = issImg(lane) and issRow(l) /= row);
+      end loop;
+      if (skewed) then ICover(covRange, R_SKEW); end if;
 
-      -- First slot of an image: sweep done, store at its reset value.
-      if (row = 0 and col = 0 and lane = 0) then
-        AffirmIf(reqClr, clrDone, "image " & to_string(issImg) & " issued after the clear sweep");
-        clrDone := false;
-        for l in 0 to 3 loop
-          for x in 0 to 511 loop
-            stC(l, x)    := 0;
-            stB(l, x)    := 0;
-            stN(l, x)    := 1;
-            lastWr(l, x) := -100;
-          end loop;
+      -- First slot of a lane image: sweep done, store at its reset value.
+      if (row = 0 and col = 0) then
+        AffirmIf(reqClr, clrDone(lane), "lane " & to_string(lane) & " image " & to_string(issImg(lane)) &
+                 " issued after the clear sweep");
+        clrDone(lane) := false;
+        for x in 0 to 511 loop
+          stC(lane, x)    := 0;
+          stB(lane, x)    := 0;
+          stN(lane, x)    := 1;
+          lastWr(lane, x) := -100;
         end loop;
       end if;
 
-      AffirmIfEqual(reqIssue, checked_integer(oIx), img(issImg, row, lane * cfgWs + col),
+      AffirmIfEqual(reqIssue, checked_integer(oIx), img(issImg(lane), row, lane * cfgWs + col),
                     "Ix lane " & to_string(lane) & " row " & to_string(row) & " col " & to_string(col));
       AffirmIfEqual(reqIssue, oFirstPix, sl(row = 0 and col = 0), "first pixel flag");
       AffirmIfEqual(reqIssue, oFirstCol, sl(col = 0), "first column flag");
@@ -574,23 +593,20 @@ begin
       slot.firstPix := row = 0 and col = 0;
       slot.lastPix  := row = cfgH - 1 and col = cfgWs - 1;
       slot.eol      := col = cfgWs - 1;
-      slot.ix       := img(issImg, row, lane * cfgWs + col);
+      slot.ix       := img(issImg(lane), row, lane * cfgWs + col);
       hist(cycles mod 8) := slot;
 
-      -- Next expected slot.
-      if (issLane < 3) then
-        issLane := issLane + 1;
+      -- Next expected slot of this lane.
+      if (col < cfgWs - 1) then
+        issCol(lane) := col + 1;
       else
-        issLane := 0;
-        if (issCol < cfgWs - 1) then
-          issCol := issCol + 1;
+        issCol(lane) := 0;
+        if (row < cfgH - 1) then
+          issRow(lane) := row + 1;
         else
-          issCol := 0;
-          if (issRow < cfgH - 1) then
-            issRow := issRow + 1;
-          else
-            issRow   := 0;
-            issImg   := issImg + 1;
+          issRow(lane) := 0;
+          issImg(lane) := issImg(lane) + 1;
+          if (issImg = (0 to 3 => issImg(lane))) then
             imgsDone := imgsDone + 1;
             inRun    := false;
             draining := true;
@@ -617,8 +633,8 @@ begin
       elsif (clrCnt > 0) then
         AffirmIfEqual(reqClr, clrCnt, 512, "clear sweep length");
         clrCnt  := 0;
-        clrDone := true;
-        inRun   := issImg < nImg;
+        clrDone := (others => true);
+        inRun   := not lanes_done;
       end if;
 
       if (oValid = '1') then
@@ -907,6 +923,7 @@ begin
     AddBins(covRange, "N = 1", GenBin(R_NMIN));
     AddBins(covRange, "N = RESET", GenBin(R_NMAX));
     AddBins(covRange, "3 images in a session", GenBin(R_IMGS));
+    AddBins(covRange, "lanes on different rows", GenBin(R_SKEW));
 
     for s in 0 to N_SESS - 1 loop
       begin_session(rv.RandInt(1, 6));

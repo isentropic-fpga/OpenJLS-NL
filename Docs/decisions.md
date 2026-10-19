@@ -16,11 +16,15 @@ picked. **Picked** marks the choice; everything here is open for review.
 - B: uneven stripes (last stripe takes the remainder). Later if needed.
 
 ## D3. Input reorder (raster -> lane interleave)
-- A: double-buffered row RAM (2 x MAX_W). Row r+1 is written while row r is
-  read as (col j, lane 0..3). **Picked**: deterministic, 1 px/cycle, 1 row latency.
+- A: double-buffered row RAM (2 x MAX_W), lanes in lockstep one column group
+  (4 slots) at a time. 1 px/cycle, 1 row latency. Replaced by C.
 - B: per-lane FIFOs. Same storage, more control.
-- Lanes advance in lockstep, one column group (4 slots) at a time, starting
-  on slot phase 0, so lane = slot mod 4 always holds.
+- C: one-row RAM (MAX_W) at the raster column, lanes skewed. Lane k issues on
+  slot phase k as soon as its pixel is written; the writer only overwrites a
+  pixel its lane has read. A lane reads at 1/4 px/cycle, so by the end of its
+  stripe it trails the writer by ~3*Ws < W pixels and the writer never waits.
+  Lanes wait for each other at the image end (shared clear sweep).
+  **Picked**: half the input RAM, 1 px/cycle, lane k starts k*Ws cycles in.
 
 ## D4. MAXVAL and thresholds
 - A: MAXVAL = 2^BITNESS-1 and default T1..T3 (computed from runtime NEAR).
@@ -53,7 +57,7 @@ picked. **Picked** marks the choice; everything here is open for review.
 ## D9. Backpressure
 - A: global clock enable on the whole pipeline, loop included (OpenJLS style).
   Touches the loop's timing (big CE fanout).
-- B: stop issuing new column groups when any lane is near full; in-flight
+- B: stop issuing new slots when any lane is near full; in-flight
   pixels drain into a per-lane skid FIFO between bit packer and byte stuffer.
   **Picked**: loop stays CE-free. Costs 4 small FIFOs.
 

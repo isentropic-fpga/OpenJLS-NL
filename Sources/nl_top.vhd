@@ -226,6 +226,7 @@ begin
       oClr        => sClr,
       oClrAddr    => sClrAddr,
       oValid      => fValid,
+      oLane       => open,
       oFirstPix   => fFirstPix,
       oFirstCol   => fFirstCol,
       oEol        => fEol,

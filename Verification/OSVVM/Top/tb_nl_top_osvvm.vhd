@@ -414,7 +414,9 @@ begin
 
     -- One clock: drive just after an edge, check at the next.
     procedure step is
-      variable rdy : std_logic_vector(LANES - 1 downto 0);
+      variable rdy     : std_logic_vector(LANES - 1 downto 0);
+      variable w       : natural;
+      variable expWait : boolean;
     begin
       if (not vld and fedImg < nFq) then
         if (gapLeft > 0) then
@@ -435,10 +437,20 @@ begin
       wait until rising_edge(clk);
       cycles := cycles + 1;
 
-      -- Not a stall: the wait at pixel 2*W. Both row buffers filled during the
-      -- clear sweep, and the first one frees once row 0 is issued (D3).
-      if (vld and oReady = '0' and sCfgDone = '1' and sClr = '0' and
-          pixIdx /= 2 * CASES(fq(fedImg)).w) then
+      -- Not a stall: overwriting lane 0's stripe of the first row after a clear
+      -- sweep. That row was buffered during the sweep, so lane 0 frees it at
+      -- 1/4 px per clock (D3).
+      expWait := false;
+      if (vld) then
+        w := CASES(fq(fedImg)).w;
+        if (pixIdx >= w) then
+          expWait := pixIdx < 2 * w;
+        else
+          expWait := fedImg > 0 and CASES(fq(fedImg - 1)).h = 1;
+        end if;
+        expWait := expWait and pixIdx mod w < w / 4;
+      end if;
+      if (vld and oReady = '0' and sCfgDone = '1' and sClr = '0' and not expWait) then
         stallCyc := stallCyc + 1;
       end if;
       if (vld and oReady = '1') then
