@@ -9,11 +9,15 @@
 -- Each session resets with a random NEAR and runs 1..3 images: a clear sweep, then legal per-lane
 -- token sequences interleaved at random, same-lane tokens >= 4 cycles apart. The TB plays the loop
 -- (N, B of regular contexts). RI uses RUNindex before the decrement (CharLS order). A long-run
--- session (three 16383-pixel lines of hits) takes RUNindex to its reachable max, 30. Each word is
--- one token: length, lane, last flag and bits are checked in order.
+-- session (six 16383-pixel lines of hits) takes RUNindex to its reachable max, 30, then plans the
+-- lines that start there for the A.15 bound and raw-suffix maxima. Each word is one token: length,
+-- lane, last flag and bits are checked in order. Steered sessions take A, Nn and EMErrval to their
+-- extremes: quiet (minimal errors, A halves to 0, then random errors), loud (Errval = eLo at
+-- NEAR 0: A to Ainit + (RESET-1)*2^(BITNESS-1), Nn to RESET-1) and spike (quiet, with eLo on RI
+-- tokens at k = 0: EMErrval = 2^BITNESS).
 --
 -- Guidelines:
---   G2.Clamp    G2.MinMax node (N, B, RUNindex 30), G4.Coding corners (halving). RUNindex 31
+--   G2.Clamp    G2.MinMax node (N, B, A, Nn, RUNindex 30), G4.Coding corners (halving). RUNindex 31
 --               unreachable: its J = 14 segment needs 16384 pixels, a lane line is <= 16383
 --   G3.Stim     G2.MinMax node (Errval at -2^(BITNESS-1), B at 1-N), G4.Coding corners (map)
 --   G4.Run      G4.Coding corners, G2.MinMax node (RUNindex max)
@@ -51,7 +55,17 @@ architecture sim of tb_nl_backend_osvvm is
   constant N_SESS     : natural := 10;
   constant N_RST      : natural := 20;
   constant LONG_WS    : natural := 16383;                                -- max lane line (65532 / 4)
-  constant LONG_H     : natural := 3;                                    -- lines to reach RUNindex 30
+  constant LONG_H     : natural := 6;                                    -- RUNindex 30, then planned lines
+  constant AINIT_MAX  : natural := maximum(2, (MAXVAL + 1 + 32) / 64);
+  constant A_MAX      : natural := AINIT_MAX + (RESET_N - 1) * 2 ** (BITNESS - 1);
+  constant STEER_WS   : natural := 64;
+  constant STEER_H    : natural := 64;
+
+  -- steered sessions
+  constant S_NONE     : natural := 0;
+  constant S_QUIET    : natural := 1;                                    -- minimal errors: A falls to 0
+  constant S_LOUD     : natural := 2;                                    -- Errval = eLo: A and Nn to max
+  constant S_SPIKE    : natural := 3;                                    -- S_QUIET with eLo at k = 0: EMErrval 2^B
 
   -- requirement mask bits of a token
   constant M_A10      : natural := 1;
@@ -114,6 +128,35 @@ architecture sim of tb_nl_backend_osvvm is
   constant R_LIMIT    : integer := 16;
   constant R_RIDX31   : integer := 17;
   constant R_RCMAX    : integer := 18;
+  constant R_AREG0    : integer := 19;
+  constant R_AREGMAX  : integer := 20;
+  constant R_ARI0_T0  : integer := 21;
+  constant R_ARI0_T1  : integer := 22;
+  constant R_ARIMAX   : integer := 23;
+  constant R_NN0      : integer := 24;
+  constant R_NNMAX    : integer := 25;
+  constant R_CNTMAX   : integer := 26;
+  constant R_RIIDX0   : integer := 27;
+  constant R_RIIDX30  : integer := 28;
+  constant R_BND1     : integer := 29;
+  constant R_BNDMAX   : integer := 30;
+  constant R_RAWMAX   : integer := 31;
+  constant R_NREG2    : integer := 32;
+  constant R_NREGMAX  : integer := 33;
+  constant R_NRI2     : integer := 34;
+  constant R_NRIMAX   : integer := 35;
+  constant R_MREG0    : integer := 36;
+  constant R_MREGMAX  : integer := 37;
+  constant R_MRI0     : integer := 38;
+  constant R_MRIMAX   : integer := 39;
+  constant R_UN0      : integer := 40;
+  constant R_UNMAX    : integer := 41;
+  constant R_SL0      : integer := 42;
+  constant R_SLMAX    : integer := 43;
+  constant R_SV0      : integer := 44;
+  constant R_SVMAX    : integer := 45;
+  constant R_NRI1     : integer := 46;
+  constant R_NRIRESET : integer := 47;
 
   type t_int32 is array (0 to 31) of natural;
 
@@ -239,6 +282,7 @@ begin
     variable nHot     : natural := 1;
     variable hot      : t_hot;
     variable riLvl    : natural := 0;
+    variable steer    : natural := S_NONE;
 
     -- Golden state per lane
     variable stA      : t_actx;
@@ -249,7 +293,10 @@ begin
     variable riNn     : t_ri;
     variable runIdx   : t_lane_nat;
     variable runCnt   : t_lane_nat;
-    variable rcTarget : t_lane_int;
+    variable runLen   : t_lane_nat;                                      -- A.14 RUNcnt
+    variable rcTarget : t_lane_int;                                      -- long run: RI at this RUNcnt at 30
+    variable lnS30    : t_lane_nat;                                      -- long run: lines started at RUNindex 30
+    variable lnDesc   : t_lane_bool;                                     -- long run: RIs down to RUNindex 23
     variable lnInRun  : t_lane_bool;                                     -- run open (A.14 RUNcnt > 0)
 
     -- Expected stream per lane
@@ -332,11 +379,18 @@ begin
         put(1, 1);
         put(merr mod 2 ** k, k);
         escape := false;
+        if (merr / 2 ** k = 0) then ICover(covRange, R_UN0); end if;
+        if (k = 0) then ICover(covRange, R_SL0); end if;
+        if (merr mod 2 ** k = 0) then ICover(covRange, R_SV0); end if;
+        if (merr mod 2 ** k = 2 ** BITNESS - 1) then ICover(covRange, R_SVMAX); end if;
       else
         put(0, thr);
         put(1, 1);
         put(merr - 1, cfgQbpp);
         escape := true;
+        if (thr = LIMIT - cfgQbpp - 1) then ICover(covRange, R_UNMAX); end if;
+        if (cfgQbpp = BITNESS) then ICover(covRange, R_SLMAX); end if;
+        if (merr - 1 = 2 ** BITNESS - 1) then ICover(covRange, R_SVMAX); end if;
       end if;
     end procedure lg;
 
@@ -378,9 +432,9 @@ begin
         lnDone(l)    := false;
         lnLastOut(l) := false;
         lnLastAt(l)  := -100;
-        if (longRun) then
-          rcTarget(l) := rv.DistValInt(((2 ** 14 - 1, 1), (-1, 1), (rv.RandInt(1, 2 ** 14 - 2), 2)));
-        end if;
+        lnS30(l)     := 0;
+        lnDesc(l)    := false;
+        rcTarget(l)  := -1;
       end loop;
       nHot := rv.RandInt(1, 12);
       for i in 0 to nHot - 1 loop
@@ -423,6 +477,26 @@ begin
       return maximum(eLo, minimum(eHi, e));
     end function gen_err;
 
+    -- Steered Errval for a regular (rt 0) or RI token. Quiet images turn to small random errors in
+    -- their second half, so tokens follow A = 0 with real errors.
+    impure function steer_err (l, rt : natural) return integer is
+      variable e : integer;
+    begin
+      if (steer = S_LOUD) then
+        return eLo;
+      elsif (steer = S_QUIET and 2 * lnRow(l) >= cfgH) then
+        e := maximum(eLo, minimum(eHi, rv.RandInt(-4, 4)));              -- small A: an off-by-one flips k
+        if (rt = 1 and e = 0) then
+          e := 1;
+        end if;
+        return e;
+      elsif (rt = 0) then
+        return 0;
+      else
+        return 2 * rv.RandInt(0, 1) - 1;
+      end if;
+    end function steer_err;
+
     -- One token of lane l: pick a legal kind, drive it, append its code.
     procedure issue (l : natural) is
       variable kind  : integer;
@@ -440,17 +514,39 @@ begin
       variable mp    : natural;
       variable esc   : boolean;
       variable dist  : integer;
+      variable bnd   : natural;
     begin
       eol  := lnCol(l) = cfgWs - 1;
       last := eol and lnRow(l) = cfgH - 1;
+      -- Lines started at RUNindex 30: 1st descends to 23 (A.15 bound max), 2nd ends in an RI after
+      -- 2^14-2 hits (raw max), later ones RI at a random RUNcnt.
+      if (longRun and lnCol(l) = 0) then
+        rcTarget(l) := -1;
+        if (runIdx(l) = 30) then
+          lnS30(l) := lnS30(l) + 1;
+          lnDesc(l) := lnS30(l) = 1;
+          if (lnS30(l) = 2) then
+            rcTarget(l) := 2 ** 14 - 2;
+          elsif (lnS30(l) > 2) then
+            rcTarget(l) := rv.RandInt(1, 2 ** 14 - 3);
+          end if;
+        end if;
+      end if;
       if (longRun) then
-        if (runIdx(l) = 30 and rcTarget(l) >= 0 and runCnt(l) = rcTarget(l)) then
+        if (lnDesc(l) and runIdx(l) = 23) then
+          lnDesc(l) := false;
+        end if;
+        if (lnDesc(l) or (runIdx(l) = 30 and runCnt(l) = rcTarget(l))) then
           kind := K_RI0 + rv.RandInt(0, 1);
         else
           kind := K_HIT;
         end if;
+      elsif (lnInRun(l) and steer /= S_NONE) then
+        kind := rv.DistValInt(((K_HIT, 2), (K_RI0, 1), (K_RI1, 1)));
       elsif (lnInRun(l)) then
         kind := rv.DistValInt(((K_HIT, 6), (K_RI0, 1), (K_RI1, 1)));
+      elsif (steer /= S_NONE) then
+        kind := rv.DistValInt(((K_REG, 2), (K_HIT, 2), (K_RI0, 1), (K_RI1, 1)));
       else
         kind := rv.DistValInt(((K_REG, 6), (K_HIT, 2), (K_RI0, 1), (K_RI1, 1)));
       end if;
@@ -486,6 +582,10 @@ begin
             when others => ctx := rv.RandInt(4, 368);
           end case;
           e := gen_err(stLvl(l, ctx));
+          if (steer /= S_NONE) then
+            ctx := hot(0);
+            e   := steer_err(l, 0);
+          end if;
           n    := stN(l, ctx);
           npre := n;
           b    := rv.DistValInt(((1 - n, 1), (0, 1), (rv.RandInt(1 - n, 0), 2)));
@@ -495,6 +595,8 @@ begin
           if (b = 1 - n) then ICover(covRange, R_BMIN); end if;
           if (b = 0) then ICover(covRange, R_B0); end if;
           a := stA(l, ctx);
+          if (a = 0) then ICover(covRange, R_AREG0); end if;
+          if (a = A_MAX) then ICover(covRange, R_AREGMAX); end if;
           -- A.10
           k := 0;
           while n * 2 ** k < a loop
@@ -513,6 +615,8 @@ begin
           else
             merr := -2 * e - 1;
           end if;
+          if (merr = 0) then ICover(covRange, R_MREG0); end if;
+          if (merr = 2 ** BITNESS - 1) then ICover(covRange, R_MREGMAX); end if;
           lg(k, merr, LIMIT, esc);
           -- A.12 (A only; B, N are the loop's)
           a := a + abs(e);
@@ -523,6 +627,8 @@ begin
           end if;
           stA(l, ctx) := a;
           stN(l, ctx) := n + 1;
+          if (n + 1 = 2) then ICover(covRange, R_NREG2); end if;
+          if (n + 1 = RESET_N) then ICover(covRange, R_NREGMAX); end if;
           ICover(covK, (k, 0));
           if (esc) then ICover(covCode, C_ESC_REG); end if;
           if (e = eLo) then ICover(covRange, R_EMIN); end if;
@@ -537,6 +643,8 @@ begin
           tokMask := M_A15 + M_A16;
           lnInRun(l) := kind = K_HIT;
           -- A.15, one hit at a time: a completed segment gives '1'.
+          runLen(l) := runLen(l) + 1;
+          if (runLen(l) = 16383) then ICover(covRange, R_CNTMAX); end if;
           runCnt(l) := runCnt(l) + 1;
           if (runCnt(l) = 2 ** J(runIdx(l))) then
             put(1, 1);
@@ -555,8 +663,12 @@ begin
               ICover(covCode, C_EOL0);
             end if;
             runCnt(l) := 0;
+            runLen(l) := 0;
           end if;
           if (runIdx(l) = 30) then ICover(covRange, R_RIDX31); end if;
+          bnd := runLen(l) - runCnt(l) + 2 ** J(runIdx(l));                -- run count of the next '1'
+          if (bnd = 1) then ICover(covRange, R_BND1); end if;
+          if (bnd = 32640) then ICover(covRange, R_BNDMAX); end if;
 
         when others =>
           -- A.16 interruption: '0' + J[RUNindex] bits of RUNcnt.
@@ -571,6 +683,9 @@ begin
           if (J(runIdx(l)) >= 2 and runCnt(l) = 2 ** J(runIdx(l)) - 1) then
             ICover(covRange, R_RCMAX);
           end if;
+          if (runIdx(l) = 0) then ICover(covRange, R_RIIDX0); end if;
+          if (runIdx(l) = 30) then ICover(covRange, R_RIIDX30); end if;
+          if (runIdx(l) = 30 and runCnt(l) = 2 ** 14 - 2) then ICover(covRange, R_RAWMAX); end if;
           put(0, 1);
           put(runCnt(l), J(runIdx(l)));
           -- Errval: RItype 1 never 0.
@@ -581,8 +696,21 @@ begin
               e := eLo;
             end if;
           end if;
+          if (steer /= S_NONE) then
+            e := steer_err(l, rt);
+          end if;
+          if (steer = S_SPIKE and rt = 0 and riA(l, 0) <= riN(l, 0) and 2 * riNn(l, 0) < riN(l, 0) and
+              rv.RandInt(0, 7) = 0) then
+            e := eLo;                                                    -- k = 0, map 0: EMErrval = 2^BITNESS
+          end if;
           a  := riA(l, rt);
           n  := riN(l, rt);
+          if (a = 0) then ICover(covRange, R_ARI0_T0 + rt); end if;
+          if (a = A_MAX) then ICover(covRange, R_ARIMAX); end if;
+          if (n = 1) then ICover(covRange, R_NRI1); end if;
+          if (n = RESET_N) then ICover(covRange, R_NRIRESET); end if;
+          if (riNn(l, rt) = 0) then ICover(covRange, R_NN0); end if;
+          if (riNn(l, rt) = RESET_N - 1) then ICover(covRange, R_NNMAX); end if;
           -- A.20
           if (rt = 0) then
             temp := a;
@@ -603,6 +731,8 @@ begin
           ICover(covCode, C_MAP0_T0 + 2 * rt + mp);
           -- A.22
           merr := 2 * abs(e) - rt - mp;
+          if (merr = 0) then ICover(covRange, R_MRI0); end if;
+          if (merr = 2 ** BITNESS) then ICover(covRange, R_MRIMAX); end if;
           lg(k, merr, LIMIT - J(runIdx(l)) - 1, esc);
           if (esc) then ICover(covCode, C_ESC_RI); end if;
           if (tokLen = LIMIT) then ICover(covRange, R_LIMIT); end if;
@@ -622,10 +752,14 @@ begin
           end if;
           riA(l, rt) := a;
           riN(l, rt) := n + 1;
+          if (n + 1 = 2) then ICover(covRange, R_NRI2); end if;
+          if (n + 1 = RESET_N) then ICover(covRange, R_NRIMAX); end if;
           if (runIdx(l) > 0) then
             runIdx(l) := runIdx(l) - 1;
           end if;
           runCnt(l) := 0;
+          runLen(l) := 0;
+          if (2 ** J(runIdx(l)) = 1) then ICover(covRange, R_BND1); end if;
       end case;
 
       end_token(last);
@@ -633,6 +767,7 @@ begin
       -- Run state clears after the lane's last pixel.
       if (last) then
         runCnt(l)  := 0;
+        runLen(l)  := 0;
         runIdx(l)  := 0;
         lnInRun(l) := false;
         lnDone(l)  := true;
@@ -792,11 +927,19 @@ begin
       return imgLeft = 0 and st = 0 and not pending;
     end function session_done;
 
-    procedure begin_session (n : positive; long : boolean) is
+    procedure begin_session (n : positive; long : boolean; mode : natural := S_NONE) is
     begin
       longRun := long;
+      steer   := mode;
       cfgNear := rv.DistValInt(((0, 3), (NEAR_MAX, 1), (rv.RandInt(1, 7), 1), (rv.RandInt(0, NEAR_MAX), 1)));
-      if (long) then
+      if (mode = S_LOUD or mode = S_SPIKE) then
+        cfgNear := 0;                                                    -- widest Errval, Ainit max
+      end if;
+      if (mode /= S_NONE) then
+        cfgWs := STEER_WS;
+        cfgH  := STEER_H;
+        nImg  := 3;
+      elsif (long) then
         cfgWs := LONG_WS;
         cfgH  := LONG_H;
         nImg  := 1;
@@ -817,7 +960,7 @@ begin
       if (cfgNear = 0) then ICover(covRange, R_NEAR0); end if;
       if (cfgNear = NEAR_MAX) then ICover(covRange, R_NEARMAX); end if;
       if (cfgAinit = 2) then ICover(covRange, R_AINIT2); end if;
-      if (cfgAinit = maximum(2, (MAXVAL + 1 + 32) / 64)) then ICover(covRange, R_AINITMAX); end if;
+      if (cfgAinit = AINIT_MAX) then ICover(covRange, R_AINITMAX); end if;
 
       inRst  := true;
       rst    <= '1';
@@ -834,6 +977,7 @@ begin
       for l in 0 to 3 loop
         runCnt(l)   := 0;
         runIdx(l)   := 0;
+        runLen(l)   := 0;
         lnInRun(l)  := false;
         lnLastAt(l) := -100;
       end loop;
@@ -953,6 +1097,35 @@ begin
     AddBins(covRange, "word = LIMIT bits", GenBin(R_LIMIT));
     AddBins(covRange, "RUNindex = 30 (max on a 16383-pixel line)", GenBin(R_RIDX31));
     AddBins(covRange, "RUNcnt = 2^J - 1 at RI (J >= 2)", GenBin(R_RCMAX));
+    AddBins(covRange, "regular A = 0", GenBin(R_AREG0));
+    AddBins(covRange, "regular A = Ainit + (RESET-1)*2^(BITNESS-1)", GenBin(R_AREGMAX));
+    AddBins(covRange, "RI A = 0, RItype 0", GenBin(R_ARI0_T0));
+    AddBins(covRange, "RI A = 0, RItype 1", GenBin(R_ARI0_T1));
+    AddBins(covRange, "RI A = Ainit + (RESET-1)*2^(BITNESS-1)", GenBin(R_ARIMAX));
+    AddBins(covRange, "Nn = 0", GenBin(R_NN0));
+    AddBins(covRange, "Nn = RESET-1", GenBin(R_NNMAX));
+    AddBins(covRange, "A.14 RUNcnt = 16383", GenBin(R_CNTMAX));
+    AddBins(covRange, "RI at RUNindex = 0", GenBin(R_RIIDX0));
+    AddBins(covRange, "RI at RUNindex = 30", GenBin(R_RIIDX30));
+    AddBins(covRange, "A.15 bound = 1", GenBin(R_BND1));
+    AddBins(covRange, "A.15 bound = 32640 (16256 hits from RUNindex 23)", GenBin(R_BNDMAX));
+    AddBins(covRange, "RI RUNcnt = 2^14-2 at RUNindex 30", GenBin(R_RAWMAX));
+    AddBins(covRange, "regular updated N = 2", GenBin(R_NREG2));
+    AddBins(covRange, "regular updated N = RESET", GenBin(R_NREGMAX));
+    AddBins(covRange, "RI updated N = 2", GenBin(R_NRI2));
+    AddBins(covRange, "RI updated N = RESET", GenBin(R_NRIMAX));
+    AddBins(covRange, "regular MErrval = 0", GenBin(R_MREG0));
+    AddBins(covRange, "regular MErrval = 2^BITNESS-1", GenBin(R_MREGMAX));
+    AddBins(covRange, "RI EMErrval = 0", GenBin(R_MRI0));
+    AddBins(covRange, "RI EMErrval = 2^BITNESS", GenBin(R_MRIMAX));
+    AddBins(covRange, "unary = 0", GenBin(R_UN0));
+    AddBins(covRange, "unary = LIMIT-QBPP-1", GenBin(R_UNMAX));
+    AddBins(covRange, "suffix length = 0", GenBin(R_SL0));
+    AddBins(covRange, "suffix length = BITNESS", GenBin(R_SLMAX));
+    AddBins(covRange, "suffix value = 0", GenBin(R_SV0));
+    AddBins(covRange, "suffix value = 2^BITNESS-1", GenBin(R_SVMAX));
+    AddBins(covRange, "RI N = 1", GenBin(R_NRI1));
+    AddBins(covRange, "RI N = RESET", GenBin(R_NRIRESET));
 
     begin_session(rv.RandInt(1, 6), true);
     run_session;
@@ -960,6 +1133,12 @@ begin
       begin_session(rv.RandInt(1, 6), false);
       run_session;
     end loop;
+    begin_session(rv.RandInt(1, 6), false, S_QUIET);
+    run_session;
+    begin_session(rv.RandInt(1, 6), false, S_LOUD);
+    run_session;
+    begin_session(rv.RandInt(1, 6), false, S_SPIKE);
+    run_session;
 
     for r in 0 to N_RST - 1 loop
       if (r < 5 * 3) then

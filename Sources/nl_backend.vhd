@@ -106,64 +106,63 @@ architecture behavioral of nl_backend is
   signal sEoi       : std_logic;
   signal sRunCnt    : t_cnt_array;                                        -- per lane: A.14 RUNcnt [0, 16383]
   signal sRunIdx    : t_idx_array;                                        --   RUNindex [0, 30] (line <= 16383)
-  signal sBound     : t_bound_array;                                      --   A.15 next boundary
+  signal sBound     : t_bound_array;                                      --   A.15 next boundary [1, 32640]
   signal sCntIn     : unsigned(RUN_CNT - 1 downto 0);                   -- [0, 16383]
   signal sIdxNext   : unsigned(4 downto 0);                             -- [0, 30]
-  signal sBoundNext : unsigned(RUN_CNT downto 0);                       -- A.15 boundary, [1, 2^16]
+  signal sBoundNext : unsigned(RUN_CNT downto 0);                       -- A.15 boundary [1, 32640]: 16256 hits from RUNindex 23, + 2^J[30]
   signal sRawV      : std_logic;
   signal sGolV      : std_logic := '0';                                   -- a11_1 iValid, registered with r(5)
-  signal sRawLen    : unsigned(4 downto 0);                             -- [1, 16]
-  signal sRawVal    : unsigned(RUN_CNT - 1 downto 0);                   -- full type
+  signal sRawLen    : unsigned(4 downto 0);                             -- [1, J[30]+1 = 15]
+  signal sRawVal    : unsigned(RUN_CNT - 1 downto 0);                   -- [0, 2^14-2]: RI ends a line
   signal sRunIdxOut : unsigned(4 downto 0);                             -- [0, 30]
 
   -- X2 context update
   signal sRdAddr   : std_logic_vector(8 downto 0);
   signal sRd       : t_word_array;
   signal sWord     : std_logic_vector(WORD_W - 1 downto 0);
-  signal sAq       : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
-  signal sRiErr    : signed(BITNESS downto 0);                          -- A.23 inputs, one snapshot
+  signal sAq       : unsigned(AWID - 1 downto 0);                       -- [0, Ainit + (RESET-1)*2^(BITNESS-1)]
+  signal sRiErr    : signed(BITNESS downto 0);                          -- [-2^(BITNESS-1), 2^(BITNESS-1)-1]
   signal sRiRt     : std_logic;
-  signal sRiAqIn   : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
+  signal sRiAqIn   : unsigned(AWID - 1 downto 0);                       -- [0, Ainit + (RESET-1)*2^(BITNESS-1)]
   signal sRiNqIn   : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
   signal sRiNnIn   : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
   signal sNq       : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
   signal sNn       : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
   signal sN2       : unsigned(NWID - 1 downto 0);                       -- [1, RESET] on valid tokens
   signal sRiType   : std_logic;                                         -- 0 outside valid RI tokens
-  signal sTemp     : unsigned(AWID - 1 downto 0);                       -- A.12 temp, [0, 2*RESET*2^(BITNESS-1)]
-  signal sRegAq    : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
-  signal sRegNq    : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
-  signal sRegBq    : signed(6 downto 0);                                -- [1-N, 0]
-  signal sRiAq     : unsigned(AWID - 1 downto 0);                       -- [0, RESET*2^(BITNESS-1)]
-  signal sRiNq     : unsigned(NWID - 1 downto 0);                       -- [1, RESET]
+  signal sTemp     : unsigned(AWID - 1 downto 0);                       -- A.20 TEMP, [0, Ainit + (RESET-1)*2^(BITNESS-1)]
+  signal sRegAq    : unsigned(AWID - 1 downto 0);                       -- [0, Ainit + (RESET-1)*2^(BITNESS-1)]
+  signal sRegNq    : unsigned(NWID - 1 downto 0);                       -- [2, RESET]
+  signal sRiAq     : unsigned(AWID - 1 downto 0);                       -- [0, Ainit + (RESET-1)*2^(BITNESS-1)]
+  signal sRiNq     : unsigned(NWID - 1 downto 0);                       -- [2, RESET]
   signal sRiNn     : unsigned(NWID - 1 downto 0);                       -- [0, RESET-1]
   signal sWe       : std_logic_vector(0 to 3);
   signal sWrAddr   : std_logic_vector(8 downto 0);
   signal sWrData   : std_logic_vector(WORD_W - 1 downto 0);
   signal sAWe      : std_logic;
-  signal sAWrAddr  : unsigned(8 downto 0);
+  signal sAWrAddr  : unsigned(8 downto 0);                             -- [0, 368]
   signal sAWrData  : std_logic_vector(WORD_W - 1 downto 0);
-  signal sAWrLane  : unsigned(1 downto 0);
+  signal sAWrLane  : unsigned(1 downto 0);                             -- full type
 
   -- X3 .. X5
-  signal sK        : unsigned(KWID - 1 downto 0);                       -- [0, BITNESS] on valid tokens
+  signal sK        : unsigned(KWID - 1 downto 0);                       -- [0, BITNESS-1] on valid tokens: TEMP <= N*2^(BITNESS-1)
   signal sBqMap    : signed(6 downto 0);                                -- [1-N, 0] (NEAR = 0), else 0
   signal sRegMerr  : unsigned(MW - 1 downto 0);                         -- [0, 2^BITNESS - 1]
   signal sRiMap    : std_logic;
-  signal sRiMerr   : unsigned(MW - 1 downto 0);                         -- [0, 2^BITNESS - 1]
-  signal sUnary    : unsigned(UW - 1 downto 0);                         -- [0, LIMIT-2]
-  signal sSufLen   : unsigned(4 downto 0);                              -- [0, max(k, QBPP)]
-  signal sSufVal   : unsigned(SUFW - 1 downto 0);                       -- full type
+  signal sRiMerr   : unsigned(MW - 1 downto 0);                         -- [0, 2^BITNESS]: Errval -2^(BITNESS-1), map 0
+  signal sUnary    : unsigned(UW - 1 downto 0);                         -- [0, LIMIT-QBPP-1]
+  signal sSufLen   : unsigned(4 downto 0);                              -- [0, BITNESS]
+  signal sSufVal   : unsigned(SUFW - 1 downto 0);                       -- [0, 2^BITNESS - 1]
 
   -- X6 bit packer inputs
   signal sBpRawV   : std_logic;
-  signal sBpRawLen : unsigned(4 downto 0);                              -- [0, 16]
-  signal sBpRawVal : unsigned(SUFW - 1 downto 0);                       -- full type
+  signal sBpRawLen : unsigned(4 downto 0);                              -- [1, 15] when sBpRawV
+  signal sBpRawVal : unsigned(SUFW - 1 downto 0);                       -- [0, 2^14-2]
   signal sBpGolV   : std_logic;
-  signal sBpUnary  : unsigned(UW - 1 downto 0);                         -- [0, LIMIT-2]
-  signal sBpSufLen : unsigned(4 downto 0);                              -- [0, max(k, QBPP)]
-  signal sBpSufVal : unsigned(SUFW - 1 downto 0);                       -- full type
-  signal sTagLane  : unsigned(1 downto 0);
+  signal sBpUnary  : unsigned(UW - 1 downto 0);                         -- [0, LIMIT-QBPP-1]
+  signal sBpSufLen : unsigned(4 downto 0);                              -- [0, BITNESS]
+  signal sBpSufVal : unsigned(SUFW - 1 downto 0);                       -- [0, 2^BITNESS - 1]
+  signal sTagLane  : unsigned(1 downto 0);                              -- full type
   signal sTagLast  : std_logic;
 
   function bool2sl (
@@ -376,7 +375,7 @@ begin
       iBq         => r(2).bpre,
       iNq         => r(2).npre,
       oAq         => sRegAq,
-      oBq         => sRegBq,
+      oBq         => open,
       oNq         => sRegNq
     );
 
@@ -548,10 +547,12 @@ begin
 
   -- Input contract on valid tokens, A RAM ranges on the tokens that use them
   assert_proc : process (iClk) is
-    constant EMAX : integer := 2 ** (BITNESS - 1);
-    variable vA   : integer;
+    constant EMAX  : integer := 2 ** (BITNESS - 1);
+    variable vAMax : integer;                                            -- Ainit [2, 2^(BITNESS-6)] + (RESET-1)*EMAX
+    variable vA    : integer;                                            -- [0, Ainit + (RESET-1)*EMAX]
   begin
     if rising_edge(iClk) then
+      vAMax := to_integer(iAinit) + (RESET - 1) * EMAX;
       if (iRst = '0' and iValid = '1') then
         assert iMode /= "11" report "nl_backend: token mode 11" severity failure;
         assert iClr = '0' report "nl_backend: token during the clear sweep" severity failure;
@@ -577,12 +578,31 @@ begin
       end if;
       if (iRst = '0' and r(2).valid = '1' and r(2).mode /= "01") then
         vA := to_integer(sAq);
-        assert vA <= RESET * EMAX and sNq >= 1 and sNq <= RESET and sNn < RESET
-          report "nl_backend: A RAM word outside A [0, RESET*2^(BITNESS-1)], N [1, RESET], Nn [0, RESET-1]"
+        assert vA <= vAMax and sNq >= 1 and sNq <= RESET and sNn < RESET
+          report "nl_backend: A RAM word outside A [0, Ainit + (RESET-1)*2^(BITNESS-1)], N [1, RESET], " &
+                 "Nn [0, RESET-1]"
           severity failure;
+        assert sTemp <= vAMax report "nl_backend: TEMP above Ainit + (RESET-1)*2^(BITNESS-1)" severity failure;
+        assert sAWrAddr <= 368 report "nl_backend: A RAM address above 368" severity failure;
+        if (r(2).mode = "00") then
+          assert sRegAq <= vAMax and sRegNq >= 2 and sRegNq <= RESET
+            report "nl_backend: A.12 output outside A [0, Ainit + (RESET-1)*2^(BITNESS-1)], N [2, RESET]"
+            severity failure;
+        else
+          assert sRiAq <= vAMax and sRiNq >= 2 and sRiNq <= RESET and sRiNn < RESET
+            report "nl_backend: A.23 output outside A [0, Ainit + (RESET-1)*2^(BITNESS-1)], N [2, RESET], " &
+                   "Nn [0, RESET-1]"
+            severity failure;
+        end if;
       end if;
       if (iRst = '0' and r(3).valid = '1' and r(3).mode /= "01") then
-        assert sK <= BITNESS report "nl_backend: k above BITNESS" severity failure;
+        assert sK <= BITNESS - 1 report "nl_backend: k above BITNESS-1" severity failure;
+      end if;
+      if (iRst = '0' and r(4).valid = '1' and r(4).mode = "00") then
+        assert sRegMerr < 2 ** BITNESS report "nl_backend: MErrval above 2^BITNESS-1" severity failure;
+      end if;
+      if (iRst = '0' and r(4).valid = '1' and r(4).mode = "10") then
+        assert sRiMerr <= 2 ** BITNESS report "nl_backend: EMErrval above 2^BITNESS" severity failure;
       end if;
     end if;
   end process assert_proc;
@@ -591,5 +611,15 @@ begin
     report "nl_backend: X2 N outside [1, RESET]" severity error;
   postponed assert is_x(sCntIn) or sCntIn <= 16383
     report "nl_backend: RUNcnt above 16383" severity error;
+  postponed assert sRun /= '1' or is_x(sIdxNext) or is_x(sBoundNext) or is_x(sRunIdxOut) or
+                   (sIdxNext <= 30 and sRunIdxOut <= 30 and sBoundNext >= 1 and sBoundNext <= 32640)
+    report "nl_backend: A.15 RUNindex outside [0, 30] or boundary outside [1, 32640]" severity error;
+  postponed assert sRun /= '1' or sRawV /= '1' or is_x(sRawLen) or is_x(sRawVal) or
+                   (sRawLen >= 1 and sRawLen <= 15 and sRawVal <= 2 ** 14 - 2)
+    report "nl_backend: A.15/A.16 raw bits outside length [1, 15], value [0, 2^14-2]" severity error;
+  postponed assert sGolV /= '1' or is_x(sUnary) or is_x(sSufLen) or is_x(sSufVal) or
+                   (sUnary <= LIMIT - to_integer(iQbpp) - 1 and sSufLen <= BITNESS and sSufVal < 2 ** BITNESS)
+    report "nl_backend: A.11.1 code outside unary [0, LIMIT-QBPP-1], suffix [0, BITNESS] bits < 2^BITNESS"
+    severity error;
 
 end architecture behavioral;

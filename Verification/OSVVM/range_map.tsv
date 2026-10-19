@@ -1,0 +1,39 @@
+# check_ranges.py map: unit	node	<tb>	<min bin>	<max bin> | N/A <reason> | = <node>
+nl_backend	sL	tb_nl_backend_osvvm	G4.Lane lane x token kind	G4.Lane lane x token kind
+nl_backend	sAWrLane	= sL
+nl_backend	sTagLane	= sL
+nl_backend	sCntIn	tb_nl_backend_osvvm	RI with RUNcnt 0	A.14 RUNcnt = 16383
+nl_backend	sIdxNext	tb_nl_backend_osvvm	RI at RUNindex = 0	RUNindex = 30 (max on a 16383-pixel line)
+nl_backend	sRunIdxOut	tb_nl_backend_osvvm	RI at RUNindex = 0	RI at RUNindex = 30
+nl_backend	sBoundNext	tb_nl_backend_osvvm	A.15 bound = 1	A.15 bound = 32640 (16256 hits from RUNindex 23)
+nl_backend	sRawLen	tb_nl_backend_osvvm	run segment completed	RI at RUNindex = 30
+nl_backend	sRawVal	tb_nl_backend_osvvm	RI with RUNcnt 0	RI RUNcnt = 2^14-2 at RUNindex 30
+nl_backend	sBpRawLen	= sRawLen
+nl_backend	sBpRawVal	= sRawVal
+nl_backend	sRiErr	tb_nl_backend_osvvm	RI Errval min	RI Errval max
+nl_backend	sAq	tb_nl_backend_osvvm	regular A = 0	regular A = Ainit + (RESET-1)*2^(BITNESS-1)
+nl_backend	sTemp	= sAq
+nl_backend	vA	= sAq
+nl_backend	vAMax	tb_nl_backend_osvvm	Ainit = 2	Ainit = max
+nl_backend	sRegAq	= sAq
+nl_backend	sRiAqIn	tb_nl_backend_osvvm	RI A = 0, RItype 0	RI A = Ainit + (RESET-1)*2^(BITNESS-1)
+nl_backend	sRiAq	= sRiAqIn
+nl_backend	sNq	tb_nl_backend_osvvm	RI N = 1	RI N = RESET
+nl_backend	sRiNqIn	= sNq
+nl_backend	sN2	tb_nl_backend_osvvm	N = 1	N = RESET
+nl_backend	sRegNq	tb_nl_backend_osvvm	regular updated N = 2	regular updated N = RESET
+nl_backend	sRiNq	tb_nl_backend_osvvm	RI updated N = 2	RI updated N = RESET
+nl_backend	sNn	tb_nl_backend_osvvm	Nn = 0	Nn = RESET-1
+nl_backend	sRiNnIn	= sNn
+nl_backend	sRiNn	= sNn
+nl_backend	sAWrAddr	tb_nl_backend_osvvm	 / RI, RItype 0	ctx = 368
+nl_backend	sK	tb_nl_backend_osvvm	k = 0	k = BITNESS-1
+nl_backend	sBqMap	tb_nl_backend_osvvm	B = 1-N	B = 0
+nl_backend	sRegMerr	tb_nl_backend_osvvm	regular MErrval = 0	regular MErrval = 2^BITNESS-1
+nl_backend	sRiMerr	tb_nl_backend_osvvm	RI EMErrval = 0	RI EMErrval = 2^BITNESS
+nl_backend	sUnary	tb_nl_backend_osvvm	unary = 0	unary = LIMIT-QBPP-1
+nl_backend	sSufLen	tb_nl_backend_osvvm	suffix length = 0	suffix length = BITNESS
+nl_backend	sSufVal	tb_nl_backend_osvvm	suffix value = 0	suffix value = 2^BITNESS-1
+nl_backend	sBpUnary	= sUnary
+nl_backend	sBpSufLen	= sSufLen
+nl_backend	sBpSufVal	= sSufVal
