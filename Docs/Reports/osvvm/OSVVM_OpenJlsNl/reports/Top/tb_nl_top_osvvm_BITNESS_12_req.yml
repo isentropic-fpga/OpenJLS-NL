@@ -2,7 +2,7 @@
   TestCases: 
   - TestName: "tb_nl_top_osvvm"
     Status: PASSED
-    Results: {Goal: 240, Passed: 256, Errors: 0, Checked: 256, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Results: {Goal: 240, Passed: 257, Errors: 0, Checked: 257, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
 - Requirement: "NL.BackToBack"
   TestCases: 
   - TestName: "tb_nl_top_osvvm"
@@ -12,7 +12,7 @@
   TestCases: 
   - TestName: "tb_nl_top_osvvm"
     Status: PASSED
-    Results: {Goal: 1000, Passed: 29135, Errors: 0, Checked: 29135, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Results: {Goal: 1000, Passed: 27998, Errors: 0, Checked: 27998, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
 - Requirement: "NL.StallPropagation"
   TestCases: 
   - TestName: "tb_nl_top_osvvm"
@@ -27,7 +27,7 @@
   TestCases: 
   - TestName: "tb_nl_top_osvvm"
     Status: PASSED
-    Results: {Goal: 24, Passed: 180, Errors: 0, Checked: 180, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
+    Results: {Goal: 24, Passed: 173, Errors: 0, Checked: 173, AlertCount: {Failure: 0, Error: 0, Warning: 0}, DisabledAlertCount: {Failure: 0, Error: 0, Warning: 0}}
 - Requirement: "NL.Reset"
   TestCases: 
   - TestName: "tb_nl_top_osvvm"

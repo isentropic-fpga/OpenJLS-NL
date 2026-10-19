@@ -61,7 +61,7 @@ Models:
         AtLeast: 3
         PercentCov: 166.6667
 
-  - Name: "G2.MinMax field x value"
+  - Name: "G2.MinMax G3.Stim G4.Config field x value"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -69,7 +69,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [2008890919, 191903161]
+      Seeds: [1555033946, 303566575]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -133,7 +133,7 @@ Models:
         AtLeast: 1
         PercentCov: 6600.0000
 
-  - Name: "G4.Stream lane x beat"
+  - Name: "G4.Stream G4.Lane lane x beat"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -141,7 +141,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1396774789, 1127188569]
+      Seeds: [949481989, 226466398]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -221,7 +221,7 @@ Models:
         AtLeast: 1
         PercentCov: 19600.0000
 
-  - Name: "G4.Stream lane x chained"
+  - Name: "G4.Stream G4.Lane lane x chained"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -229,7 +229,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [537160394, 1785522674]
+      Seeds: [2042725524, 1392464405]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -309,7 +309,7 @@ Models:
         AtLeast: 1
         PercentCov: 1300.0000
 
-  - Name: "G4.Stream lane backpressure hold"
+  - Name: "G4.Stream G4.Lane lane backpressure hold"
     TestCases: 
       - "tb_nl_framer_osvvm"
     Coverage: 100.00
@@ -317,7 +317,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [726640049, 398235676]
+      Seeds: [1418661367, 864201611]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0

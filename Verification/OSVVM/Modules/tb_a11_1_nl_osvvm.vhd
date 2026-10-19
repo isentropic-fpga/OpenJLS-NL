@@ -13,8 +13,6 @@
 --
 -- Guidelines:
 --   G2.Clamp    N/A: combinational, no accumulator
---   G3.Stim     G2.MinMax node (MErrval MSB set)
---   G4.Config   G4.Coding qbpp x riMode x escape (NEAR 0 / max)
 --   G4 other    N/A: combinational, single datapath
 --   G5          N/A: combinational
 
@@ -221,7 +219,7 @@ begin
     for index in 0 to 31 loop
       AddBins(covJ, "RUNindex=" & to_string(index) & " J=" & to_string(TB_J_TABLE(index)), GenBin(index));
     end loop;
-    covRng := NewID("G2.MinMax node");
+    covRng := NewID("G2.MinMax G3.Stim node");
     SetFieldName(covRng, "node");
     AddBins(covRng, "MErrval=0", GenBin(0));
     AddBins(covRng, "MErrval=max", GenBin(1));
@@ -229,7 +227,7 @@ begin
     AddBins(covRng, "qbpp min (NEAR max)", GenBin(3));
     AddBins(covRng, "qbpp max (lossless)", GenBin(4));
     AddBins(covRng, "threshold min (RI, RUNindex 31, qbpp max)", GenBin(5));
-    cov := NewID("G4.Coding qbpp x riMode x escape");
+    cov := NewID("G4.Coding G4.Config qbpp x riMode x escape");
     SetFieldName(cov, "qbpp", "riMode", "escape");
     for qb in QBPP_LO to QBPP_HI loop
       for ri in 0 to 1 loop

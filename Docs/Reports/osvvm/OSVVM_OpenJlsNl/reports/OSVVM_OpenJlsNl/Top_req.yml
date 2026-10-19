@@ -2,62 +2,62 @@
   TestCases:
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 1000, Passed: 40370, Errors: 0, Checked: 40370, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 1000, Passed: 44626, Errors: 0, Checked: 44626, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 1000, Passed: 29135, Errors: 0, Checked: 29135, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 1000, Passed: 27998, Errors: 0, Checked: 27998, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 1000, Passed: 29135, Errors: 0, Checked: 29135, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 1000, Passed: 27998, Errors: 0, Checked: 27998, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 1000, Passed: 41537, Errors: 0, Checked: 41537, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 1000, Passed: 39519, Errors: 0, Checked: 39519, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 1000, Passed: 15547, Errors: 0, Checked: 15547, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 1000, Passed: 15006, Errors: 0, Checked: 15006, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 1000, Passed: 27889, Errors: 0, Checked: 27889, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 1000, Passed: 22853, Errors: 0, Checked: 22853, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
 - Requirement: NL.BackToBack
   TestCases:
   - TestName: tb_nl_top_osvvm
     Status: PASSED
+    Results: { Goal: 20, Passed: 28, Errors: 0, Checked: 28, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+  - TestName: tb_nl_top_osvvm
+    Status: PASSED
     Results: { Goal: 20, Passed: 20, Errors: 0, Checked: 20, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
     Results: { Goal: 20, Passed: 20, Errors: 0, Checked: 20, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+  - TestName: tb_nl_top_osvvm
+    Status: PASSED
+    Results: { Goal: 20, Passed: 28, Errors: 0, Checked: 28, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
     Results: { Goal: 20, Passed: 20, Errors: 0, Checked: 20, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
     Results: { Goal: 20, Passed: 24, Errors: 0, Checked: 24, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
-  - TestName: tb_nl_top_osvvm
-    Status: PASSED
-    Results: { Goal: 20, Passed: 20, Errors: 0, Checked: 20, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
-  - TestName: tb_nl_top_osvvm
-    Status: PASSED
-    Results: { Goal: 20, Passed: 20, Errors: 0, Checked: 20, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
 - Requirement: NL.ConfigInReset
   TestCases:
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 24, Passed: 164, Errors: 0, Checked: 164, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 24, Passed: 189, Errors: 0, Checked: 189, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+  - TestName: tb_nl_top_osvvm
+    Status: PASSED
+    Results: { Goal: 24, Passed: 173, Errors: 0, Checked: 173, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+  - TestName: tb_nl_top_osvvm
+    Status: PASSED
+    Results: { Goal: 24, Passed: 173, Errors: 0, Checked: 173, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
     Results: { Goal: 24, Passed: 180, Errors: 0, Checked: 180, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 24, Passed: 180, Errors: 0, Checked: 180, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 24, Passed: 186, Errors: 0, Checked: 186, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 24, Passed: 164, Errors: 0, Checked: 164, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
-  - TestName: tb_nl_top_osvvm
-    Status: PASSED
-    Results: { Goal: 24, Passed: 176, Errors: 0, Checked: 176, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
-  - TestName: tb_nl_top_osvvm
-    Status: PASSED
-    Results: { Goal: 24, Passed: 176, Errors: 0, Checked: 176, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 24, Passed: 181, Errors: 0, Checked: 181, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
 - Requirement: NL.NoStall
   TestCases:
   - TestName: tb_nl_top_osvvm
@@ -122,19 +122,19 @@
   TestCases:
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 240, Passed: 256, Errors: 0, Checked: 256, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 240, Passed: 279, Errors: 0, Checked: 279, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 240, Passed: 256, Errors: 0, Checked: 256, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 240, Passed: 257, Errors: 0, Checked: 257, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 240, Passed: 256, Errors: 0, Checked: 256, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 240, Passed: 257, Errors: 0, Checked: 257, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 240, Passed: 260, Errors: 0, Checked: 260, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 240, Passed: 270, Errors: 0, Checked: 270, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 240, Passed: 252, Errors: 0, Checked: 252, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 240, Passed: 254, Errors: 0, Checked: 254, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
   - TestName: tb_nl_top_osvvm
     Status: PASSED
-    Results: { Goal: 240, Passed: 256, Errors: 0, Checked: 256, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}
+    Results: { Goal: 240, Passed: 261, Errors: 0, Checked: 261, AlertCount: {Failure: 0,  Error: 0,  Warning: 0}, DisabledAlertCount: {Failure: 0,  Error: 0,  Warning: 0}}

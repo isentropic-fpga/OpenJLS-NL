@@ -17,13 +17,8 @@
 -- tokens at k = 0: EMErrval = 2^BITNESS).
 --
 -- Guidelines:
---   G2.Clamp    G2.MinMax node (N, B, A, Nn, RUNindex 30), G4.Coding corners (halving). RUNindex 31
---               unreachable: its J = 14 segment needs 16384 pixels, a lane line is <= 16383
---   G3.Stim     G2.MinMax node (Errval at -2^(BITNESS-1), B at 1-N), G4.Coding corners (map)
---   G4.Run      G4.Coding corners, G2.MinMax node (RUNindex max)
---   G4.Branch   G4.Coding corners (map bit x RItype)
---   G4.Config   G2.MinMax node (NEAR 0 / max)
---   G4 other    N/A: Edge belongs to tb_nl_frontend_osvvm
+--   G2.Clamp    RUNindex 31 N/A: its J = 14 segment needs 16384 pixels, a lane line is <= 16383
+--   G4.Edge     N/A: owned by tb_nl_frontend_osvvm
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -1046,7 +1041,7 @@ begin
       AddCross(covK, "k=" & to_string(k) & " / RI", GenBin(k), GenBin(1));
     end loop;
 
-    covCode := NewID("G4.Coding corners");
+    covCode := NewID("G4.Coding G2.Clamp G3.Stim G4.Run G4.Branch corners");
     AddBins(covCode, "regular escape", GenBin(C_ESC_REG));
     AddBins(covCode, "RI escape (glimit)", GenBin(C_ESC_RI));
     AddBins(covCode, "A.11 lossless special mapping", GenBin(C_SPECIAL));
@@ -1077,7 +1072,7 @@ begin
     AddBins(covRst, "reset mid-run", 3, GenBin(RP_RUN));
     AddBins(covRst, "reset with words in flight", 3, GenBin(RP_DRAIN));
 
-    covRange := NewID("G2.MinMax node");
+    covRange := NewID("G2.MinMax G2.Clamp G3.Stim G4.Run G4.Config node");
     AddBins(covRange, "NEAR = 0", GenBin(R_NEAR0));
     AddBins(covRange, "NEAR = max", GenBin(R_NEARMAX));
     AddBins(covRange, "Ainit = 2", GenBin(R_AINIT2));

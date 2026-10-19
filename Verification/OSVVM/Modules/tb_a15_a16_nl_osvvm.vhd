@@ -9,14 +9,12 @@
 -- Slot k belongs to lane k mod 4, as in nl_backend. The TB latches each lane's o*Next on its slot
 -- and clears it after the lane's last pixel. Each lane plays its own runs, interleaved slot by slot,
 -- and its bits are compared run by run with an A.15 / A.16 reference using that lane's RUNindex, so
--- state leaking between lanes shows up as a wrong bitstream. Lane 0 plays the OpenJLS directed
--- script (climb to 31, boundary at 31, break from 31); the others are random.
+-- state leaking between lanes shows up as a wrong bitstream. Lane l plays l random runs, then the
+-- OpenJLS directed script (climb to 31, boundary at 31, break from 31), then random runs.
 --
 -- Guidelines:
---   G2.MinMax   G4.Run startIdx (RUNindex 0..30), G2.Clamp RUNindex (31); RUNcnt up to 40000
 --   G3.Stim     N/A: run events, no signed node
---   G4.Run      RItype N/A: A.17, in tb_nl_loop_osvvm
---   G4.Lane     every G4.Run bin crossed with the lane, G4.Stream lane x eoiReset
+--   G4.Run      RItype N/A: A.17, owned by tb_nl_loop_osvvm
 --   G4 other    N/A: no Edge / Coding / Branch logic
 --   G5          N/A: combinational, the state lives in nl_backend; reset slots hold state
 
@@ -42,6 +40,7 @@ architecture sim of tb_a15_a16_nl_osvvm is
   constant CLK_PERIOD : time    := CLK_PERIOD_DEFAULT;
   constant MAXBITS    : natural := 8192;
   constant LANES      : natural := 4;
+  constant N_GOAL     : natural := 400;                             -- runs, one A.15 check each
 
   constant T_BREAK    : integer := 0;
   constant T_EOL      : integer := 1;
@@ -64,8 +63,8 @@ architecture sim of tb_a15_a16_nl_osvvm is
     (800, T_EOL, '0'), (800, T_EOL, '0'), (800, T_EOL, '0'),
     (800, T_EOL, '0'), (800, T_EOL, '0'), (800, T_EOL, '0'),
     -- J[24..31] = 8..15: one run past 2^14 reaches 31, the next proves the
-    -- index holds at 31 on a boundary, then a break leaves 30.
-    (33100, T_EOL, '0'), (40000, T_EOL, '0'), (3, T_BREAK, '1')
+    -- index holds at 31 on a boundary, a full-port run follows, then a break leaves 30.
+    (33100, T_EOL, '0'), (40000, T_EOL, '0'), (2 ** RC_W - 1, T_EOL, '0'), (3, T_BREAK, '1')
   );
 
   signal clk            : std_logic := '0';
@@ -214,6 +213,7 @@ begin
     variable req16   : AlertLogIDType;
     variable reqLane : AlertLogIDType;
     variable covAcc  : CoverageIDType;
+    variable covCnt  : CoverageIDType;
     variable expN15  : t_int;
     variable expSat  : t_bool;
     variable n15     : natural;
@@ -238,7 +238,11 @@ begin
     variable termIdx : t_int;
     variable newIdx  : t_int;
     variable step    : integer := 0;
-    variable runs    : natural := 0;
+    variable runs    : t_int := (others => 0);
+    variable pre     : t_int := (others => 0);
+    variable inScript : t_bool := (others => false);
+    variable scripted : boolean;
+    variable nDone    : natural := 0;
     variable lane    : natural;
     variable len     : natural;
     variable ti, ni  : natural;
@@ -298,15 +302,15 @@ begin
     SetAlertLogName("tb_a15_a16_nl_osvvm");
     SetLogEnable(PASSED, FALSE);
     rv.InitSeed(rv'instance_name);
-    req     := GetReqID("T87.A15", 400);
-    req16   := GetReqID("T87.A16", 400);
-    reqLane := GetReqID("NL.RunLaneState", 400);
+    req     := GetReqID("T87.A15", N_GOAL);
+    req16   := GetReqID("T87.A16", N_GOAL);
+    reqLane := GetReqID("NL.RunLaneState", N_GOAL);
 
-    covTerm := NewID("G4.Run lane x terminal");
+    covTerm := NewID("G4.Run G4.Lane lane x terminal");
     SetFieldName(covTerm, "lane", "terminal");
-    covImm  := NewID("G4.Run lane x immediateBreak");
+    covImm  := NewID("G4.Run G4.Lane lane x immediateBreak");
     SetFieldName(covImm, "lane", "immediateBreak");
-    covEoi  := NewID("G4.Stream lane x eoiReset");
+    covEoi  := NewID("G4.Stream G4.Lane lane x eoiReset");
     SetFieldName(covEoi, "lane", "eoiReset");
     for l in 0 to LANES - 1 loop
       AddCross(covTerm, "lane=" & to_string(l) & " / interruption", GenBin(l), GenBin(T_BREAK));
@@ -316,17 +320,23 @@ begin
       AddCross(covEoi, "lane=" & to_string(l) & " / within image", GenBin(l), GenBin(0));
       AddCross(covEoi, "lane=" & to_string(l) & " / end of image", GenBin(l), GenBin(1));
     end loop;
-    covAcc := NewID("G2.Clamp RUNindex");
-    SetFieldName(covAcc, "clamp");
-    AddBins(covAcc, "A.15 boundary at RUNindex 31 (holds 31)", GenBin(0));
-    AddBins(covAcc, "A.16 break at RUNindex 0 (holds 0)", GenBin(1));
-    covIdx := NewID("G4.Run startIdx");
-    SetFieldName(covIdx, "startIdx");
-    AddBins(covIdx, "startIdx0", GenBin(0, 0));
-    AddBins(covIdx, "startIdxLo", GenBin(1, 3, 1));
-    AddBins(covIdx, "startIdxMid", GenBin(4, 10, 1));
-    AddBins(covIdx, "startIdxHi", GenBin(11, 30, 1));
-    AddBins(covIdx, "startIdx31", GenBin(31, 31));
+    covAcc := NewID("G2.Clamp G2.MinMax G4.Lane lane x RUNindex clamp");
+    SetFieldName(covAcc, "lane", "clamp");
+    covIdx := NewID("G4.Run G2.MinMax G4.Lane lane x startIdx");
+    SetFieldName(covIdx, "lane", "startIdx");
+    for l in 0 to LANES - 1 loop
+      AddCross(covAcc, "lane=" & to_string(l) & " / A.15 boundary at RUNindex 31 (holds 31)", GenBin(l), GenBin(0));
+      AddCross(covAcc, "lane=" & to_string(l) & " / A.16 break at RUNindex 0 (holds 0)", GenBin(l), GenBin(1));
+      AddCross(covIdx, "lane=" & to_string(l) & " / startIdx0", GenBin(l), GenBin(0, 0));
+      AddCross(covIdx, "lane=" & to_string(l) & " / startIdxLo", GenBin(l), GenBin(1, 3, 1));
+      AddCross(covIdx, "lane=" & to_string(l) & " / startIdxMid", GenBin(l), GenBin(4, 10, 1));
+      AddCross(covIdx, "lane=" & to_string(l) & " / startIdxHi", GenBin(l), GenBin(11, 30, 1));
+      AddCross(covIdx, "lane=" & to_string(l) & " / startIdx31", GenBin(l), GenBin(31, 31));
+    end loop;
+    covCnt := NewID("G2.MinMax G3.Stim RUNcnt");
+    SetFieldName(covCnt, "RUNcnt");
+    AddBins(covCnt, "RUNcnt=0", GenBin(0));
+    AddBins(covCnt, "RUNcnt=2^RC_W-1 (MSB set)", GenBin(2 ** RC_W - 1));
 
     for l in 0 to LANES - 1 loop
       clear_lane(l);
@@ -342,10 +352,14 @@ begin
       step := step + 1;
 
       if (not busy(lane)) then
-        if (lane = 0 and runs < SCRIPT'length) then
-          new_run(0, SCRIPT(runs).m, SCRIPT(runs).term, SCRIPT(runs).eoi);
-          runs := runs + 1;
+        if (runs(lane) < SCRIPT'length and pre(lane) >= lane) then
+          new_run(lane, SCRIPT(runs(lane)).m, SCRIPT(runs(lane)).term, SCRIPT(runs(lane)).eoi);
+          runs(lane)     := runs(lane) + 1;
+          inScript(lane) := true;
         else
+          if (runs(lane) = 0) then
+            pre(lane) := pre(lane) + 1;
+          end if;
           random_run(lane);
         end if;
       end if;
@@ -450,13 +464,16 @@ begin
         ICover(covTerm, (lane, runTerm(lane)));
         ICover(covImm, (lane, boolean'pos(runM(lane) = 0)));
         ICover(covEoi, (lane, std_to_int(runEoi(lane))));
-        ICover(covIdx, carried(lane));
+        ICover(covIdx, (lane, carried(lane)));
+        ICover(covCnt, runM(lane));
         if (expSat(lane)) then
-          ICover(covAcc, 0);
+          ICover(covAcc, (lane, 0));
         end if;
         if (runTerm(lane) = T_BREAK and termIdx(lane) = 0) then
-          ICover(covAcc, 1);
+          ICover(covAcc, (lane, 1));
         end if;
+        inScript(lane) := false;
+        nDone          := nDone + 1;
 
         if (runEoi(lane) = '1') then
           clear_lane(lane);
@@ -469,8 +486,12 @@ begin
 
       wait until rising_edge(clk);
 
-      exit when runs = SCRIPT'length and not busy(0) and IsCovered(covTerm) and IsCovered(covImm) and
-                IsCovered(covEoi) and IsCovered(covIdx) and IsCovered(covAcc) and step > 40000;
+      scripted := true;
+      for l in 0 to LANES - 1 loop
+        scripted := scripted and runs(l) = SCRIPT'length and not inScript(l);
+      end loop;
+      exit when scripted and IsCovered(covTerm) and IsCovered(covImm) and IsCovered(covEoi) and
+                IsCovered(covIdx) and IsCovered(covAcc) and IsCovered(covCnt) and nDone >= N_GOAL;
       exit when step > 4_000_000;
 
     end loop;
@@ -485,6 +506,7 @@ begin
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covImm), "lane x immediate-break coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covEoi), "lane x EOI-reset coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covIdx), "start-RUNindex coverage closed");
+    AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covCnt), "RUNcnt range coverage closed");
 
     end_of_test("tb_a15_a16_nl_osvvm");
     wait;

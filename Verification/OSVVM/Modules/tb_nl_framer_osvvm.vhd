@@ -14,9 +14,6 @@
 --
 -- Guidelines:
 --   G2.Clamp    N/A: no accumulator
---   G3.Stim     G2.MinMax field x value (NEAR = 255)
---   G4.Lane     every G4 bin crossed with the lane
---   G4.Config   G2.MinMax field x value
 --   G4 other    N/A: no Edge / Run / Coding / Branch logic
 
 library ieee;
@@ -433,7 +430,7 @@ begin
     AddBins(covRst, "reset with EoI pending", 3, GenBin(RP_EOI));
     AddBins(covRst, "reset with output held", 3, GenBin(RP_HOLD));
 
-    covRange := NewID("G2.MinMax field x value");
+    covRange := NewID("G2.MinMax G3.Stim G4.Config field x value");
     SetFieldName(covRange, "field", "value");
     AddCross(covRange, "X = 1", GenBin(0), GenBin(1));
     AddCross(covRange, "X = max", GenBin(0), GenBin(MAX_W));
@@ -442,11 +439,11 @@ begin
     AddCross(covRange, "NEAR = 0", GenBin(2), GenBin(0));
     AddCross(covRange, "NEAR = 255 (MSB set)", GenBin(2), GenBin(255));
 
-    covBeat := NewID("G4.Stream lane x beat");
+    covBeat := NewID("G4.Stream G4.Lane lane x beat");
     SetFieldName(covBeat, "lane", "fullBeat");
-    covChain := NewID("G4.Stream lane x chained");
+    covChain := NewID("G4.Stream G4.Lane lane x chained");
     SetFieldName(covChain, "lane", "chained");
-    covHold := NewID("G4.Stream lane backpressure hold");
+    covHold := NewID("G4.Stream G4.Lane lane backpressure hold");
     SetFieldName(covHold, "lane");
     for l in 0 to LANES - 1 loop
       AddCross(covBeat, "lane=" & to_string(l) & " / partial beat", GenBin(l), GenBin(0));

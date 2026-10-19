@@ -3,33 +3,33 @@ TestCase: "tb_nl_top_osvvm"
 Scoreboards: 
   - Name:         "lane SB(1)"
     ParentName:   "OSVVM"
-    ItemCount:    40794
+    ItemCount:    40625
     ErrorCount:   0
-    ItemsChecked: 26910
-    ItemsPopped:  40794
+    ItemsChecked: 30449
+    ItemsPopped:  40625
     ItemsDropped: 0
     FifoCount:    0
   - Name:         "lane SB(2)"
     ParentName:   "OSVVM"
-    ItemCount:    42359
+    ItemCount:    41855
     ErrorCount:   0
-    ItemsChecked: 28171
-    ItemsPopped:  42359
+    ItemsChecked: 31326
+    ItemsPopped:  41855
     ItemsDropped: 0
     FifoCount:    0
   - Name:         "lane SB(3)"
     ParentName:   "OSVVM"
-    ItemCount:    41265
+    ItemCount:    40953
     ErrorCount:   0
-    ItemsChecked: 27297
-    ItemsPopped:  41265
+    ItemsChecked: 30642
+    ItemsPopped:  40953
     ItemsDropped: 0
     FifoCount:    0
   - Name:         "lane SB(4)"
     ParentName:   "OSVVM"
-    ItemCount:    43487
+    ItemCount:    42766
     ErrorCount:   0
-    ItemsChecked: 29101
-    ItemsPopped:  43487
+    ItemsChecked: 31984
+    ItemsPopped:  42766
     ItemsDropped: 0
     FifoCount:    0

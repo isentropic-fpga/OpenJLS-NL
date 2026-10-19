@@ -13,13 +13,12 @@
 -- corners, then random images, then N_RST reset rounds with a scored recovery image per lane.
 --
 -- Guidelines:
---   G2.MinMax   N/A: no arithmetic node (emitBytes 0..4 in G4.Stream lane x emitBytes)
+--   G2.MinMax   N/A: no arithmetic node
 --   G2.Clamp    N/A: no accumulator
---   G3.Stim     N/A: random payload, FF runs in G4.Branch lane x stuffEvent
---   G4.Lane     every G4 bin crossed with the lane
+--   G3.Stim     N/A: random payload, no signed source
 --   G4.Config   N/A: IN_WIDTH / OUT_WIDTH fixed by nl_top
 --   G4 other    N/A: no Edge / Run / Coding logic
---   G6.Code     covered except the stage 1 "FIFO full" assert, unreachable behind AlmFull
+--   G6.Code     N/A: stage 1 "FIFO full" assert, unreachable behind AlmFull
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -453,13 +452,13 @@ begin
     AddBins(covRst, "reset awaiting oFlushDone", 3, GenBin(RP_FLUSH));
     AddBins(covRst, "reset with FIFO backed up (almostFull)", 3, GenBin(RP_BACKUP));
 
-    covEmit := NewID("G4.Stream lane x emitBytes");
+    covEmit := NewID("G4.Stream G4.Lane lane x emitBytes");
     SetFieldName(covEmit, "lane", "emitBytes");
-    covFlush := NewID("G4.Stream lane x flushType");
+    covFlush := NewID("G4.Stream G4.Lane lane x flushType");
     SetFieldName(covFlush, "lane", "flushType");
-    covCross := NewID("G4.Stream lane x data x almostFull");
+    covCross := NewID("G4.Stream G4.Lane lane x data x almostFull");
     SetFieldName(covCross, "lane", "almostFull");
-    covStuff := NewID("G4.Branch lane x stuffEvent");
+    covStuff := NewID("G4.Branch G4.Lane lane x stuffEvent");
     SetFieldName(covStuff, "lane", "stuffEvent");
     for l in 0 to LANES - 1 loop
       for c in 0 to OUT_BYTES loop

@@ -11,10 +11,9 @@
 --
 -- Guidelines:
 --   G2.Clamp    N/A: no accumulator
---   G3.Stim     G2.MinMax node (NEAR code MSB set)
---   G4.Config   NEAR change: every run_near re-resets with a new NEAR
+--   G4.Config   W, H N/A: no image size in nl_config
 --   G4 other    N/A: per-image constants only
---   G5          only oDone is reset; data is qualified by oDone
+--   G5.Init     data outputs N/A: not reset, qualified by oDone
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -208,7 +207,7 @@ begin
     AddBins(covRst, "RANGE divide", GenBin(1));
     AddBins(covRst, "POST", GenBin(2));
     AddBins(covRst, "DONE", GenBin(3));
-    covRange := NewID("G2.MinMax node");
+    covRange := NewID("G2.MinMax G3.Stim node");
     SetFieldName(covRange, "node");
     AddBins(covRange, "NEAR code MSB set", GenBin(0));
     -- CLAMP above MAXVAL only exists where some legal NEAR overflows it.
@@ -220,6 +219,7 @@ begin
     end if;
     AddBins(covRange, "T3 no clamp", GenBin(3));
 
+    -- Every run_near re-resets with a new NEAR, so each bin is also a NEAR change.
     covNear := NewID("G4.Config NEAR");
     SetFieldName(covNear, "NEAR");
     AddBins(covNear, "lossless", GenBin(0));

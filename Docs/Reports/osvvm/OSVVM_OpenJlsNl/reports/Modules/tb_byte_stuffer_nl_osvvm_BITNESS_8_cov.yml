@@ -54,7 +54,7 @@ Models:
         AtLeast: 3
         PercentCov: 233.3333
 
-  - Name: "G4.Stream lane x emitBytes"
+  - Name: "G4.Stream G4.Lane lane x emitBytes"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -62,7 +62,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [2106938900, 1599039192]
+      Seeds: [994950202, 1962787481]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -238,7 +238,7 @@ Models:
         AtLeast: 1
         PercentCov: 73200.0000
 
-  - Name: "G4.Stream lane x flushType"
+  - Name: "G4.Stream G4.Lane lane x flushType"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -246,7 +246,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [927616167, 1350315477]
+      Seeds: [39866571, 2115861617]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -358,7 +358,7 @@ Models:
         AtLeast: 1
         PercentCov: 400.0000
 
-  - Name: "G4.Stream lane x data x almostFull"
+  - Name: "G4.Stream G4.Lane lane x data x almostFull"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -366,7 +366,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1650467666, 2003243105]
+      Seeds: [422179108, 581370678]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -446,7 +446,7 @@ Models:
         AtLeast: 1
         PercentCov: 1000.0000
 
-  - Name: "G4.Branch lane x stuffEvent"
+  - Name: "G4.Branch G4.Lane lane x stuffEvent"
     TestCases: 
       - "tb_byte_stuffer_nl_osvvm"
     Coverage: 100.00
@@ -454,7 +454,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1154535448, 1681923099]
+      Seeds: [597981786, 1315768834]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0

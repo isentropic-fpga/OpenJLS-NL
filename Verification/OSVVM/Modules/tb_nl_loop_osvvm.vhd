@@ -12,14 +12,12 @@
 -- 20 x CYCLES). A.4.1 / A.4.2 arrive precomputed in iCand* (tb_nl_frontend_osvvm).
 --
 -- Guidelines:
---   G2.Clamp    G2.MinMax node (C, B, N = RESET)
---   G3.Stim     G2.MinMax node (most negative Errval), 0 / MAXVAL pixels
 --   G4.Edge     first line, last column, 1-line, Ws = 8 N/A: Rb, Rc, Rd come in
 --               (tb_nl_frontend_osvvm)
---   G4.Run      G4.Edge stripe events, G4.Lane lane x mode; RUNindex N/A: tb_a15_a16_nl_osvvm
---   G4.Coding   G2.MinMax node (N = RESET, C ends); k, escape, A.11 N/A: tb_nl_backend_osvvm
+--   G4.Run      RUNindex N/A: tb_a15_a16_nl_osvvm
+--   G4.Coding   k, escape, A.11 N/A: tb_nl_backend_osvvm
 --   G4.Config   NEAR change N/A: no NEAR-dependent state (tb_nl_config_osvvm, tb_nl_top_osvvm)
---   G5          N/A: no reset; lane state restarts on iFirstPix (G4.Edge stripe events)
+--   G5          N/A: no reset; lane state restarts on iFirstPix
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -79,6 +77,8 @@ architecture sim of tb_nl_loop_osvvm is
   constant R_CMAXH  : natural := 13;
   constant R_BCLN   : natural := 14;
   constant R_BCL0   : natural := 15;
+  constant R_IX0    : natural := 16;
+  constant R_IXMAX  : natural := 17;
 
   constant M_REG   : natural := 0;
   constant M_RUN   : natural := 1;
@@ -484,7 +484,7 @@ begin
     end procedure ctx_of;
 
     procedure cover_values (
-      err, p, r : integer
+      err, x, p, r : integer
     ) is
     begin
 
@@ -493,6 +493,11 @@ begin
       end if;
       if (err = EMAX) then
         ICover(covRange, R_EMAX);
+      end if;
+      if (x = 0) then
+        ICover(covRange, R_IX0);
+      elsif (x = MAXVAL) then
+        ICover(covRange, R_IXMAX);
       end if;
       if (p = 0) then
         ICover(covRange, R_PX0);
@@ -606,7 +611,7 @@ begin
     reqA19  := GetReqID("T87.A19", 2 * MODE_AT * STRIPES);
     reqFwd  := GetReqID("NL.CtxForward", 2 * FWD_AT * STRIPES);
 
-    covMode := NewID("G4.Lane lane x mode");
+    covMode := NewID("G4.Lane G4.Run lane x mode");
     SetFieldName(covMode, "lane", "mode");
     for l in 0 to STRIPES - 1 loop
       AddCross(covMode, "lane=" & to_string(l) & " / regular", MODE_AT, GenBin(l), GenBin(M_REG));
@@ -668,16 +673,18 @@ begin
       end loop;
     end loop;
 
-    covEdge := NewID("G4.Edge stripe events");
+    covEdge := NewID("G4.Edge G4.Run stripe events");
     AddBins(covEdge, "new image with update pending", GenBin(0));
     AddBins(covEdge, "first regular of image on stale pending ctx", GenBin(1));
     AddBins(covEdge, "regular at first column", GenBin(2));
     AddBins(covEdge, "run hit ends at EOL", GenBin(3));
     AddBins(covEdge, "N = RESET rescale", GenBin(4));
 
-    covRange := NewID("G2.MinMax node");
+    covRange := NewID("G2.MinMax G2.Clamp G3.Stim G4.Coding node");
     AddBins(covRange, "Errval = -floor(RANGE/2)", GenBin(R_EMIN));
     AddBins(covRange, "Errval = ceil(RANGE/2)-1", GenBin(R_EMAX));
+    AddBins(covRange, "Ix = 0", GenBin(R_IX0));
+    AddBins(covRange, "Ix = MAXVAL (MSB set)", GenBin(R_IXMAX));
     AddBins(covRange, "Px = 0", GenBin(R_PX0));
     AddBins(covRange, "Px = MAXVAL", GenBin(R_PXMAX));
     AddBins(covRange, "Rx = 0", GenBin(R_RX0));
@@ -876,7 +883,7 @@ begin
             e   := mod_range(eq);
             ex.px   := px;
             ex.wrap := e /= eq;
-            cover_values(e, px, rx);
+            cover_values(e, ix, px, rx);
             ICover(covErr, (1, sign3(e)));
             ICover(covWrap, (1, boolean'pos(e /= eq)));
             ICover(covClamp, (1, clamp_bin(raw)));
@@ -941,7 +948,7 @@ begin
           e   := mod_range(eq);
           ex.px   := px;
           ex.wrap := e /= eq;
-          cover_values(e, px, rx);
+          cover_values(e, ix, px, rx);
           if (nv = 1) then
             ICover(covRange, R_N1);
           end if;

@@ -1,6 +1,6 @@
 
 build ../../OpenJLS/ThirdParty/osvvm/osvvm.pro
-Starting Build at time 14:19:18
+Starting Build at time 13:29:19
 library DefaultLib /home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/VHDL_LIBS/NVC-1.23.0
 nvc --std=08 --work=defaultlib:/home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/VHDL_LIBS/NVC-1.23.0/DEFAULTLIB.08 --init
 set CurrentWorkingDirectory ../../OpenJLS/ThirdParty/osvvm
@@ -137,7 +137,7 @@ creating directory /home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/osvvm
 creating directory /home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/osvvm/reports
 creating directory /home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/osvvm/reports/osvvm
 creating directory /home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/osvvm/results
-Build Start time  14:19:18 -03 Sat Oct 17 2026 
-Build Finish time 14:19:18, Elapsed time: 0:00:00 
+Build Start time  13:29:19 -03 Mon Oct 19 2026 
+Build Finish time 13:29:19, Elapsed time: 0:00:00 
 Build: osvvm PASSED,  Passed: 0,  Failed: 0,  Skipped: 0,  Analyze Errors: 0,  Simulate Errors: 0
 creating directory /home/Vitor/Repos/OpenJLS-NL/Verification/OSVVM/osvvm/logs

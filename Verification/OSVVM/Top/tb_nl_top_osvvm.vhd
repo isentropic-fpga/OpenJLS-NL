@@ -23,8 +23,6 @@
 --   G2.Clamp    N/A: no accumulator at this level
 --   G2.Checked  N/A: bytes are scoreboarded against CharLS, X / U never matches
 --   G3.Stim     N/A: no arithmetic in the TB beyond byte counts
---   G4.Config   W, H, NEAR min/max in G2.MinMax config ranges
---   G4.Lane     G4.Stream lane backpressure hold; every image scored on all 4 lanes
 --   G4 other    N/A: owned by the module TBs
 
 library ieee;
@@ -547,7 +545,7 @@ begin
     AddBins(covB2B, "clean", GenBin(0));
     AddBins(covB2B, "stressed", GenBin(1));
     covStall := NewID("G4.Stream stall propagation");
-    covHold  := NewID("G4.Stream lane backpressure hold");
+    covHold  := NewID("G4.Stream G4.Lane lane backpressure hold");
     for l in 0 to LANES - 1 loop
       AddBins(covStall, "hold lane " & to_string(l), GenBin(l));
       AddBins(covHold, "lane " & to_string(l), GenBin(l));
@@ -564,7 +562,7 @@ begin
     AddBins(covCfg, "NEAR changed", 3, GenBin(0));
     AddBins(covCfg, "W/H changed", 3, GenBin(1));
     AddBins(covCfg, "same config", 3, GenBin(2));
-    covRange := NewID("G2.MinMax config ranges");
+    covRange := NewID("G2.MinMax G4.Config config ranges");
     SetFieldName(covRange, "field", "value");
     AddCross(covRange, "W = 32", GenBin(0), GenBin(32));
     if (MAX_W = 64) then

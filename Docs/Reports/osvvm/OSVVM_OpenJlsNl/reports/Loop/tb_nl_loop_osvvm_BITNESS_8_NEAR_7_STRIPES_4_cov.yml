@@ -3,7 +3,7 @@ Coverage: 100.00
 Settings: 
   WritePassFail: 0
 Models: 
-  - Name: "G4.Lane lane x mode"
+  - Name: "G4.Lane G4.Run lane x mode"
     TestCases: 
       - "tb_nl_loop_osvvm"
     Coverage: 100.00
@@ -11,7 +11,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [290218114, 1979629746]
+      Seeds: [411887855, 87965285]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -508,7 +508,7 @@ Models:
         AtLeast: 1
         PercentCov: 9900.0000
 
-  - Name: "G4.Edge stripe events"
+  - Name: "G4.Edge G4.Run stripe events"
     TestCases: 
       - "tb_nl_loop_osvvm"
     Coverage: 100.00
@@ -516,7 +516,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1357480163, 134688333]
+      Seeds: [579606455, 176306072]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -566,7 +566,7 @@ Models:
         AtLeast: 1
         PercentCov: 84500.0000
 
-  - Name: "G2.MinMax node"
+  - Name: "G2.MinMax G2.Clamp G3.Stim G4.Coding node"
     TestCases: 
       - "tb_nl_loop_osvvm"
     Coverage: 100.00
@@ -574,19 +574,19 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [577387036, 1535670230]
+      Seeds: [304002098, 1271742536]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
       ThresholdEnable: "FALSE"
       IsRequirement: "FALSE"
-      TotalCovCount: 16
-      TotalCovGoal: 16
+      TotalCovCount: 18
+      TotalCovGoal: 18
     BinInfo: 
       Dimensions: 1
       FieldNames: 
         - "Bin1"
-      NumBins: 16
+      NumBins: 18
     Bins: 
       - Name: "Errval = -floor(RANGE/2)"
         Type: "COUNT"
@@ -602,6 +602,20 @@ Models:
         Count: 1916
         AtLeast: 1
         PercentCov: 191600.0000
+      - Name: "Ix = 0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 16, Max: 16}
+        Count: 6743
+        AtLeast: 1
+        PercentCov: 674300.0000
+      - Name: "Ix = MAXVAL (MSB set)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 17, Max: 17}
+        Count: 3480
+        AtLeast: 1
+        PercentCov: 348000.0000
       - Name: "Px = 0"
         Type: "COUNT"
         Range: 

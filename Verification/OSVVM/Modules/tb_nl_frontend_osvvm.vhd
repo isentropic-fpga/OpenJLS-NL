@@ -15,10 +15,7 @@
 --
 -- Guidelines:
 --   G2.Clamp    N/A: no accumulator (C, B, N pass through from the loop)
---   G3.Stim     G2.MinMax node (D1, D2 at -MAXVAL, B at 1-RESET), G4.Coding Q1 x Q2 at -4
---   G4.Config   G2.MinMax node (Ws, H, NEAR, thresholds)
---   G4.Lane     G4.Edge lane x stripe edge
---   G4 other    N/A: Run / Branch belong to tb_nl_loop_osvvm and tb_a15_a16_nl_osvvm
+--   G4 other    N/A: Run / Branch owned by tb_nl_loop_osvvm and tb_a15_a16_nl_osvvm
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -80,6 +77,7 @@ architecture sim of tb_nl_frontend_osvvm is
   constant R_NMAX     : integer := 19;
   constant R_IMGS     : integer := 20;
   constant R_SKEW     : integer := 21;
+  constant R_HMAX     : integer := 22;
 
   signal clk       : std_logic := '0';
   signal rst       : std_logic := '1';
@@ -797,6 +795,7 @@ begin
       if (cfgWs = 8) then ICover(covRange, R_WS_MIN); end if;
       if (cfgWs = MAX_WS) then ICover(covRange, R_WS_MAX); end if;
       if (cfgH = 1) then ICover(covRange, R_H1); end if;
+      if (cfgH = MAX_H) then ICover(covRange, R_HMAX); end if;
       if (cfgNear = 0) then ICover(covRange, R_NEAR0); end if;
       if (cfgNear = NEAR_MAX) then ICover(covRange, R_NEARMAX); end if;
       if (cfgT1 = cfgNear + 1) then ICover(covRange, R_T1MIN); end if;
@@ -862,14 +861,14 @@ begin
     reqTag   := GetReqID("NL.ExitTags", 1000);
     reqRst   := GetReqID("NL.Reset", N_RST);
 
-    covQ := NewID("G4.Coding Q1 x Q2");
+    covQ := NewID("G4.Coding G3.Stim Q1 x Q2");
     SetFieldName(covQ, "Q1", "Q2");
     AddCross(covQ, GenBin(-4, 4), GenBin(-4, 4));
 
     covQ3 := NewID("G4.Coding Q3 from the bounds");
     AddBins(covQ3, GenBin(-4, 4));
 
-    covEdge := NewID("G4.Edge lane x stripe edge");
+    covEdge := NewID("G4.Edge G4.Lane lane x stripe edge");
     SetFieldName(covEdge, "lane", "edge");
     for l in 0 to 3 loop
       AddCross(covEdge, "lane=" & to_string(l) & " / first column", GenBin(l), GenBin(0));
@@ -901,10 +900,11 @@ begin
     AddBins(covRst, "reset with the image open, pipeline empty", 3, GenBin(RP_IDLE));
     AddBins(covRst, "reset in DRAIN", 3, GenBin(RP_DRAIN));
 
-    covRange := NewID("G2.MinMax node");
+    covRange := NewID("G2.MinMax G3.Stim G4.Config node");
     AddBins(covRange, "Ws = 8 (min)", GenBin(R_WS_MIN));
     AddBins(covRange, "Ws = max", GenBin(R_WS_MAX));
     AddBins(covRange, "H = 1", GenBin(R_H1));
+    AddBins(covRange, "H = MAX_H", GenBin(R_HMAX));
     AddBins(covRange, "NEAR = 0", GenBin(R_NEAR0));
     AddBins(covRange, "NEAR = max", GenBin(R_NEARMAX));
     AddBins(covRange, "T1 = NEAR+1", GenBin(R_T1MIN));

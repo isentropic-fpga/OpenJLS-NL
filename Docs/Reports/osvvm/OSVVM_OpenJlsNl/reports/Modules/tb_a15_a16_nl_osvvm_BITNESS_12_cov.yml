@@ -3,7 +3,7 @@ Coverage: 100.00
 Settings: 
   WritePassFail: 0
 Models: 
-  - Name: "G4.Run lane x terminal"
+  - Name: "G4.Run G4.Lane lane x terminal"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -11,7 +11,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [168430502, 220585467]
+      Seeds: [1810104254, 621867035]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -31,67 +31,67 @@ Models:
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 0, Max: 0}
-        Count: 5
+        Count: 40
         AtLeast: 1
-        PercentCov: 500.0000
+        PercentCov: 4000.0000
       - Name: "lane=0 / end of line"
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 1, Max: 1}
-        Count: 9
+        Count: 48
         AtLeast: 1
-        PercentCov: 900.0000
+        PercentCov: 4800.0000
       - Name: "lane=1 / interruption"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 0, Max: 0}
-        Count: 253
+        Count: 53
         AtLeast: 1
-        PercentCov: 25300.0000
+        PercentCov: 5300.0000
       - Name: "lane=1 / end of line"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 1, Max: 1}
-        Count: 219
+        Count: 62
         AtLeast: 1
-        PercentCov: 21900.0000
+        PercentCov: 6200.0000
       - Name: "lane=2 / interruption"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 0, Max: 0}
-        Count: 181
+        Count: 51
         AtLeast: 1
-        PercentCov: 18100.0000
+        PercentCov: 5100.0000
       - Name: "lane=2 / end of line"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 1, Max: 1}
-        Count: 195
+        Count: 53
         AtLeast: 1
-        PercentCov: 19500.0000
+        PercentCov: 5300.0000
       - Name: "lane=3 / interruption"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
           - {Min: 0, Max: 0}
-        Count: 197
+        Count: 43
         AtLeast: 1
-        PercentCov: 19700.0000
+        PercentCov: 4300.0000
       - Name: "lane=3 / end of line"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
           - {Min: 1, Max: 1}
-        Count: 240
+        Count: 50
         AtLeast: 1
-        PercentCov: 24000.0000
+        PercentCov: 5000.0000
 
-  - Name: "G4.Run lane x immediateBreak"
+  - Name: "G4.Run G4.Lane lane x immediateBreak"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -99,7 +99,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1875667854, 858504593]
+      Seeds: [1305673418, 1736714827]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -119,67 +119,67 @@ Models:
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 0, Max: 0}
-        Count: 13
+        Count: 83
         AtLeast: 1
-        PercentCov: 1300.0000
+        PercentCov: 8300.0000
       - Name: "lane=0 / immediate break"
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 1, Max: 1}
-        Count: 1
+        Count: 5
         AtLeast: 1
-        PercentCov: 100.0000
+        PercentCov: 500.0000
       - Name: "lane=1 / nonempty run"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 0, Max: 0}
-        Count: 434
+        Count: 105
         AtLeast: 1
-        PercentCov: 43400.0000
+        PercentCov: 10500.0000
       - Name: "lane=1 / immediate break"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 1, Max: 1}
-        Count: 38
+        Count: 10
         AtLeast: 1
-        PercentCov: 3800.0000
+        PercentCov: 1000.0000
       - Name: "lane=2 / nonempty run"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 0, Max: 0}
-        Count: 350
+        Count: 97
         AtLeast: 1
-        PercentCov: 35000.0000
+        PercentCov: 9700.0000
       - Name: "lane=2 / immediate break"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 1, Max: 1}
-        Count: 26
+        Count: 7
         AtLeast: 1
-        PercentCov: 2600.0000
+        PercentCov: 700.0000
       - Name: "lane=3 / nonempty run"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
           - {Min: 0, Max: 0}
-        Count: 410
+        Count: 90
         AtLeast: 1
-        PercentCov: 41000.0000
+        PercentCov: 9000.0000
       - Name: "lane=3 / immediate break"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
           - {Min: 1, Max: 1}
-        Count: 27
+        Count: 3
         AtLeast: 1
-        PercentCov: 2700.0000
+        PercentCov: 300.0000
 
-  - Name: "G4.Stream lane x eoiReset"
+  - Name: "G4.Stream G4.Lane lane x eoiReset"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -187,7 +187,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1086643679, 1085135052]
+      Seeds: [895628863, 1551557604]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -207,67 +207,67 @@ Models:
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 0, Max: 0}
-        Count: 12
+        Count: 82
         AtLeast: 1
-        PercentCov: 1200.0000
+        PercentCov: 8200.0000
       - Name: "lane=0 / end of image"
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 1, Max: 1}
-        Count: 2
+        Count: 6
         AtLeast: 1
-        PercentCov: 200.0000
+        PercentCov: 600.0000
       - Name: "lane=1 / within image"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 0, Max: 0}
-        Count: 425
+        Count: 103
         AtLeast: 1
-        PercentCov: 42500.0000
+        PercentCov: 10300.0000
       - Name: "lane=1 / end of image"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 1, Max: 1}
-        Count: 47
+        Count: 12
         AtLeast: 1
-        PercentCov: 4700.0000
+        PercentCov: 1200.0000
       - Name: "lane=2 / within image"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 0, Max: 0}
-        Count: 336
+        Count: 96
         AtLeast: 1
-        PercentCov: 33600.0000
+        PercentCov: 9600.0000
       - Name: "lane=2 / end of image"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 1, Max: 1}
-        Count: 40
+        Count: 8
         AtLeast: 1
-        PercentCov: 4000.0000
+        PercentCov: 800.0000
       - Name: "lane=3 / within image"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
           - {Min: 0, Max: 0}
-        Count: 389
+        Count: 83
         AtLeast: 1
-        PercentCov: 38900.0000
+        PercentCov: 8300.0000
       - Name: "lane=3 / end of image"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
           - {Min: 1, Max: 1}
-        Count: 48
+        Count: 10
         AtLeast: 1
-        PercentCov: 4800.0000
+        PercentCov: 1000.0000
 
-  - Name: "G2.Clamp RUNindex"
+  - Name: "G2.Clamp G2.MinMax G4.Lane lane x RUNindex clamp"
     TestCases: 
       - "tb_a15_a16_nl_osvvm"
     Coverage: 100.00
@@ -275,7 +275,279 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [1577220497, 584246357]
+      Seeds: [2003376623, 59460485]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 8
+      TotalCovGoal: 8
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "lane"
+        - "clamp"
+      NumBins: 8
+    Bins: 
+      - Name: "lane=0 / A.15 boundary at RUNindex 31 (holds 31)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 0, Max: 0}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "lane=0 / A.16 break at RUNindex 0 (holds 0)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "lane=1 / A.15 boundary at RUNindex 31 (holds 31)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 0, Max: 0}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "lane=1 / A.16 break at RUNindex 0 (holds 0)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 1}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "lane=2 / A.15 boundary at RUNindex 31 (holds 31)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "lane=2 / A.16 break at RUNindex 0 (holds 0)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 1}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "lane=3 / A.15 boundary at RUNindex 31 (holds 31)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 0, Max: 0}
+        Count: 2
+        AtLeast: 1
+        PercentCov: 200.0000
+      - Name: "lane=3 / A.16 break at RUNindex 0 (holds 0)"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 1}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+
+  - Name: "G4.Run G2.MinMax G4.Lane lane x startIdx"
+    TestCases: 
+      - "tb_a15_a16_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [2073233847, 1300773639]
+      CountMode: "COUNT_FIRST"
+      IllegalMode: "ILLEGAL_ON"
+      Threshold: 45.0
+      ThresholdEnable: "FALSE"
+      IsRequirement: "FALSE"
+      TotalCovCount: 20
+      TotalCovGoal: 20
+    BinInfo: 
+      Dimensions: 2
+      FieldNames: 
+        - "lane"
+        - "startIdx"
+      NumBins: 20
+    Bins: 
+      - Name: "lane=0 / startIdx0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 0, Max: 0}
+        Count: 9
+        AtLeast: 1
+        PercentCov: 900.0000
+      - Name: "lane=0 / startIdxLo"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 1, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "lane=0 / startIdxMid"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 4, Max: 10}
+        Count: 8
+        AtLeast: 1
+        PercentCov: 800.0000
+      - Name: "lane=0 / startIdxHi"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 11, Max: 30}
+        Count: 67
+        AtLeast: 1
+        PercentCov: 6700.0000
+      - Name: "lane=0 / startIdx31"
+        Type: "COUNT"
+        Range: 
+          - {Min: 0, Max: 0}
+          - {Min: 31, Max: 31}
+        Count: 3
+        AtLeast: 1
+        PercentCov: 300.0000
+      - Name: "lane=1 / startIdx0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 0, Max: 0}
+        Count: 16
+        AtLeast: 1
+        PercentCov: 1600.0000
+      - Name: "lane=1 / startIdxLo"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 1, Max: 3}
+        Count: 3
+        AtLeast: 1
+        PercentCov: 300.0000
+      - Name: "lane=1 / startIdxMid"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 4, Max: 10}
+        Count: 21
+        AtLeast: 1
+        PercentCov: 2100.0000
+      - Name: "lane=1 / startIdxHi"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 11, Max: 30}
+        Count: 72
+        AtLeast: 1
+        PercentCov: 7200.0000
+      - Name: "lane=1 / startIdx31"
+        Type: "COUNT"
+        Range: 
+          - {Min: 1, Max: 1}
+          - {Min: 31, Max: 31}
+        Count: 3
+        AtLeast: 1
+        PercentCov: 300.0000
+      - Name: "lane=2 / startIdx0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 0, Max: 0}
+        Count: 13
+        AtLeast: 1
+        PercentCov: 1300.0000
+      - Name: "lane=2 / startIdxLo"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 1, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "lane=2 / startIdxMid"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 4, Max: 10}
+        Count: 13
+        AtLeast: 1
+        PercentCov: 1300.0000
+      - Name: "lane=2 / startIdxHi"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 11, Max: 30}
+        Count: 74
+        AtLeast: 1
+        PercentCov: 7400.0000
+      - Name: "lane=2 / startIdx31"
+        Type: "COUNT"
+        Range: 
+          - {Min: 2, Max: 2}
+          - {Min: 31, Max: 31}
+        Count: 3
+        AtLeast: 1
+        PercentCov: 300.0000
+      - Name: "lane=3 / startIdx0"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 0, Max: 0}
+        Count: 12
+        AtLeast: 1
+        PercentCov: 1200.0000
+      - Name: "lane=3 / startIdxLo"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 1, Max: 3}
+        Count: 1
+        AtLeast: 1
+        PercentCov: 100.0000
+      - Name: "lane=3 / startIdxMid"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 4, Max: 10}
+        Count: 11
+        AtLeast: 1
+        PercentCov: 1100.0000
+      - Name: "lane=3 / startIdxHi"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 11, Max: 30}
+        Count: 66
+        AtLeast: 1
+        PercentCov: 6600.0000
+      - Name: "lane=3 / startIdx31"
+        Type: "COUNT"
+        Range: 
+          - {Min: 3, Max: 3}
+          - {Min: 31, Max: 31}
+        Count: 3
+        AtLeast: 1
+        PercentCov: 300.0000
+
+  - Name: "G2.MinMax G3.Stim RUNcnt"
+    TestCases: 
+      - "tb_a15_a16_nl_osvvm"
+    Coverage: 100.00
+    Settings: 
+      CovWeight: 1
+      Goal: 100.0
+      WeightMode: "REMAIN"
+      Seeds: [1786163510, 1730099207]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -286,79 +558,21 @@ Models:
     BinInfo: 
       Dimensions: 1
       FieldNames: 
-        - "clamp"
+        - "RUNcnt"
       NumBins: 2
     Bins: 
-      - Name: "A.15 boundary at RUNindex 31 (holds 31)"
+      - Name: "RUNcnt=0"
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
-        Count: 1
+        Count: 25
         AtLeast: 1
-        PercentCov: 100.0000
-      - Name: "A.16 break at RUNindex 0 (holds 0)"
+        PercentCov: 2500.0000
+      - Name: "RUNcnt=2^RC_W-1 (MSB set)"
         Type: "COUNT"
         Range: 
-          - {Min: 1, Max: 1}
-        Count: 7
+          - {Min: 65535, Max: 65535}
+        Count: 4
         AtLeast: 1
-        PercentCov: 700.0000
-
-  - Name: "G4.Run startIdx"
-    TestCases: 
-      - "tb_a15_a16_nl_osvvm"
-    Coverage: 100.00
-    Settings: 
-      CovWeight: 1
-      Goal: 100.0
-      WeightMode: "REMAIN"
-      Seeds: [1997612348, 52275474]
-      CountMode: "COUNT_FIRST"
-      IllegalMode: "ILLEGAL_ON"
-      Threshold: 45.0
-      ThresholdEnable: "FALSE"
-      IsRequirement: "FALSE"
-      TotalCovCount: 5
-      TotalCovGoal: 5
-    BinInfo: 
-      Dimensions: 1
-      FieldNames: 
-        - "startIdx"
-      NumBins: 5
-    Bins: 
-      - Name: "startIdx0"
-        Type: "COUNT"
-        Range: 
-          - {Min: 0, Max: 0}
-        Count: 154
-        AtLeast: 1
-        PercentCov: 15400.0000
-      - Name: "startIdxLo"
-        Type: "COUNT"
-        Range: 
-          - {Min: 1, Max: 3}
-        Count: 33
-        AtLeast: 1
-        PercentCov: 3300.0000
-      - Name: "startIdxMid"
-        Type: "COUNT"
-        Range: 
-          - {Min: 4, Max: 10}
-        Count: 207
-        AtLeast: 1
-        PercentCov: 20700.0000
-      - Name: "startIdxHi"
-        Type: "COUNT"
-        Range: 
-          - {Min: 11, Max: 30}
-        Count: 903
-        AtLeast: 1
-        PercentCov: 90300.0000
-      - Name: "startIdx31"
-        Type: "COUNT"
-        Range: 
-          - {Min: 31, Max: 31}
-        Count: 2
-        AtLeast: 1
-        PercentCov: 200.0000
+        PercentCov: 400.0000
 

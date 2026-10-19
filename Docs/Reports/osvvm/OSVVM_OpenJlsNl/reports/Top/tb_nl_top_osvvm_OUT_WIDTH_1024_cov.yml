@@ -314,7 +314,7 @@ Models:
         AtLeast: 1
         PercentCov: 100.0000
 
-  - Name: "G4.Stream lane backpressure hold"
+  - Name: "G4.Stream G4.Lane lane backpressure hold"
     TestCases: 
       - "tb_nl_top_osvvm"
     Coverage: 100.00
@@ -322,7 +322,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [726640049, 398235676]
+      Seeds: [1418661367, 864201611]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -340,30 +340,30 @@ Models:
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
-        Count: 3495
+        Count: 3378
         AtLeast: 1
-        PercentCov: 349500.0000
+        PercentCov: 337800.0000
       - Name: "lane 1"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
-        Count: 3521
+        Count: 3328
         AtLeast: 1
-        PercentCov: 352100.0000
+        PercentCov: 332800.0000
       - Name: "lane 2"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
-        Count: 3498
+        Count: 3436
         AtLeast: 1
-        PercentCov: 349800.0000
+        PercentCov: 343600.0000
       - Name: "lane 3"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
-        Count: 3552
+        Count: 3381
         AtLeast: 1
-        PercentCov: 355200.0000
+        PercentCov: 338100.0000
 
   - Name: "G5.States resetPhase"
     TestCases: 
@@ -405,30 +405,30 @@ Models:
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
-        Count: 3
+        Count: 4
         AtLeast: 2
-        PercentCov: 150.0000
+        PercentCov: 200.0000
       - Name: "reset mid feed"
         Type: "COUNT"
         Range: 
           - {Min: 3, Max: 3}
-        Count: 3
+        Count: 6
         AtLeast: 2
-        PercentCov: 150.0000
+        PercentCov: 300.0000
       - Name: "reset while draining"
         Type: "COUNT"
         Range: 
           - {Min: 4, Max: 4}
-        Count: 3
+        Count: 4
         AtLeast: 2
-        PercentCov: 150.0000
+        PercentCov: 200.0000
       - Name: "reset with output held"
         Type: "COUNT"
         Range: 
           - {Min: 5, Max: 5}
-        Count: 8
+        Count: 3
         AtLeast: 2
-        PercentCov: 400.0000
+        PercentCov: 150.0000
 
   - Name: "G4.Config config across reset"
     TestCases: 
@@ -456,25 +456,25 @@ Models:
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
-        Count: 47
+        Count: 48
         AtLeast: 3
-        PercentCov: 1566.6667
+        PercentCov: 1600.0000
       - Name: "W/H changed"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
-        Count: 48
+        Count: 47
         AtLeast: 3
-        PercentCov: 1600.0000
+        PercentCov: 1566.6667
       - Name: "same config"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
-        Count: 17
+        Count: 14
         AtLeast: 3
-        PercentCov: 566.6667
+        PercentCov: 466.6667
 
-  - Name: "G2.MinMax config ranges"
+  - Name: "G2.MinMax G4.Config config ranges"
     TestCases: 
       - "tb_nl_top_osvvm"
     Coverage: 100.00
@@ -482,7 +482,7 @@ Models:
       CovWeight: 1
       Goal: 100.0
       WeightMode: "REMAIN"
-      Seeds: [383967910, 2067741246]
+      Seeds: [1877162035, 711814604]
       CountMode: "COUNT_FIRST"
       IllegalMode: "ILLEGAL_ON"
       Threshold: 45.0
@@ -502,47 +502,47 @@ Models:
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 32, Max: 32}
-        Count: 53
+        Count: 57
         AtLeast: 1
-        PercentCov: 5300.0000
+        PercentCov: 5700.0000
       - Name: "W = MAX_W"
         Type: "COUNT"
         Range: 
           - {Min: 0, Max: 0}
           - {Min: 64, Max: 64}
-        Count: 26
+        Count: 22
         AtLeast: 1
-        PercentCov: 2600.0000
+        PercentCov: 2200.0000
       - Name: "H = 1"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 1, Max: 1}
-        Count: 12
+        Count: 11
         AtLeast: 1
-        PercentCov: 1200.0000
+        PercentCov: 1100.0000
       - Name: "H = MAX_H"
         Type: "COUNT"
         Range: 
           - {Min: 1, Max: 1}
           - {Min: 64, Max: 64}
-        Count: 26
+        Count: 22
         AtLeast: 1
-        PercentCov: 2600.0000
+        PercentCov: 2200.0000
       - Name: "NEAR = 0"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 0, Max: 0}
-        Count: 49
+        Count: 45
         AtLeast: 1
-        PercentCov: 4900.0000
+        PercentCov: 4500.0000
       - Name: "NEAR = max"
         Type: "COUNT"
         Range: 
           - {Min: 2, Max: 2}
           - {Min: 255, Max: 255}
-        Count: 8
+        Count: 11
         AtLeast: 1
-        PercentCov: 800.0000
+        PercentCov: 1100.0000
 
