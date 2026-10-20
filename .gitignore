@@ -16,3 +16,5 @@ Verification/OSVVM/*.html
 Verification/OSVVM/*.yml
 __pycache__/
 Verification/OSVVM/osvvm/
+
+Docs/t87.pdf
