@@ -32,7 +32,7 @@ RTL_FILES=(
   "$OJ"/{A10_compute_k,A11_error_mapping,A12_variables_update}.vhd
   "$OJ"/{A20_compute_temp,A21_compute_map,A22_errval_mapping,A23_run_interruption_update}.vhd
   "$SRC"/{A11_1_nl_golomb_encoder,A15_A16_nl_encode_run}.vhd
-  "$SRC"/{nl_pkg,nl_loop,nl_config,nl_frontend,nl_backend,byte_stuffer_nl,nl_framer,nl_top}.vhd
+  "$SRC"/{nl_pkg,nl_loop,nl_config,nl_frontend,nl_backend,byte_stuffer_nl,nl_framer,nl_merge,nl_top}.vhd
 )
 RTL_HASH="$( (cat "${RTL_FILES[@]}" "$HERE/synth_funcsim.tcl"; echo "$BITS") | sha256sum | cut -c1-12)"
 if [ "${1:-}" = --synth ] || [ "$(cat "$SYN/rtl.hash" 2>/dev/null)" != "$RTL_HASH" ]; then

@@ -6,8 +6,9 @@
 --
 -- tb_nl_postsynth: nl_top funcsim netlist, every image of a manifest in one elaboration
 --
--- Manifest line: "<pgm> <near> <out_prefix>". nl_top is reset with that size and NEAR and the 4
--- lane streams go to <out_prefix><l>.jls. build_run.sh compares them with CharLS per stripe.
+-- Manifest line: "<pgm> <near> <out_prefix>". nl_top is reset with that size and NEAR and its
+-- stream goes to <out_prefix>.bin. build_run.sh splits it with Scripts/nl_unpack.py and compares
+-- the slices with CharLS per stripe.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -38,17 +39,17 @@ architecture bench of tb_nl_postsynth is
   signal iValid  : std_logic := '0';
   signal iPixel  : std_logic_vector(BITNESS - 1 downto 0) := (others => '0');
   signal oReady  : std_logic;
-  signal oData   : std_logic_vector(4 * OUT_WIDTH - 1 downto 0);
-  signal oValid  : std_logic_vector(3 downto 0);
-  signal oKeep   : std_logic_vector(4 * NB - 1 downto 0);
-  signal oLast   : std_logic_vector(3 downto 0);
+  signal oData   : std_logic_vector(OUT_WIDTH - 1 downto 0);
+  signal oValid  : std_logic;
+  signal oKeep   : std_logic_vector(NB - 1 downto 0);
+  signal oLast   : std_logic;
   signal sImgW   : natural := 32;
   signal sImgH   : natural := 1;
   signal sNear   : natural := 0;
   signal sPrefix : string(1 to PATH_LEN);
   signal sPreLen : natural := 0;
   signal sGo     : std_logic := '0';
-  signal sDone   : std_logic_vector(3 downto 0) := (others => '0');
+  signal sDone   : std_logic := '0';
 
   procedure read_pgm_int (
     file f : char_file_t;
@@ -137,55 +138,73 @@ begin
       oValid       => oValid,
       oKeep        => oKeep,
       oLast        => oLast,
-      iReady       => (others => '1')
+      iReady       => '1'
     );
 
-  -- One writer per lane and image: opens on sGo, closes on oLast.
-  g_cap : for l in 0 to 3 generate
+  -- One raw stream per image: opens on sGo, closes after every slice's last chunk
+  cap : process is
 
-    cap : process is
+    file     f      : char_file_t;
+    variable b      : natural;
+    variable hIdx   : natural;
+    variable hdr2   : natural;
+    variable hdr6   : natural;
+    variable left   : natural;
+    variable sliceE : std_logic_vector(3 downto 0);
 
-      file     f : char_file_t;
-      variable b : natural;
+  begin
 
-    begin
+    loop
 
-      loop
+      wait until sGo = '1';
+      file_open(f, sPrefix(1 to sPreLen) & ".bin", write_mode);
+      hIdx   := 0;
+      left   := 0;
+      sliceE := (others => '0');
 
-        wait until sGo = '1';
-        file_open(f, sPrefix(1 to sPreLen) & integer'image(l) & ".jls", write_mode);
+      while sliceE /= "1111" or left > 0 loop
 
-        loop
+        wait until rising_edge(iClk);
 
-          wait until rising_edge(iClk);
+        if (oValid = '1') then
 
-          if (oValid(l) = '1') then
+          for k in 0 to NB - 1 loop
 
-            for k in 0 to NB - 1 loop
-
-              if (oKeep(l * NB + NB - 1 - k) = '1') then
-                b := to_integer(unsigned(oData(l * OUT_WIDTH + OUT_WIDTH - 1 - 8 * k downto
-                                               l * OUT_WIDTH + OUT_WIDTH - 8 - 8 * k)));
-                write(f, character'val(b));
+            if (oKeep(NB - 1 - k) = '1') then
+              b := to_integer(unsigned(oData(OUT_WIDTH - 1 - 8 * k downto OUT_WIDTH - 8 - 8 * k)));
+              write(f, character'val(b));
+              -- Header bytes 2 (slice, last), 6-7 (length); then the payload
+              if (left > 0) then
+                left := left - 1;
+              else
+                case hIdx is
+                  when 2 => hdr2 := b;
+                  when 6 => hdr6 := b;
+                  when 7 =>
+                    left := hdr6 * 256 + b;
+                    if (hdr2 mod 4 >= 2) then
+                      sliceE(hdr2 / 4 mod 4) := '1';
+                    end if;
+                  when others => null;
+                end case;
+                hIdx := (hIdx + 1) mod 8;
               end if;
+            end if;
 
-            end loop;
+          end loop;
 
-            exit when oLast(l) = '1';
-          end if;
-
-        end loop;
-
-        file_close(f);
-        sDone(l) <= '1';
-        wait until sGo = '0';
-        sDone(l) <= '0';
+        end if;
 
       end loop;
 
-    end process cap;
+      file_close(f);
+      sDone <= '1';
+      wait until sGo = '0';
+      sDone <= '0';
 
-  end generate g_cap;
+    end loop;
+
+  end process cap;
 
   stim : process is
 
@@ -284,18 +303,18 @@ begin
       iValid <= '0';
       cyc    := 0;
 
-      while sDone /= "1111" loop
+      while sDone /= '1' loop
 
         wait until rising_edge(iClk);
         cyc := cyc + 1;
         assert cyc < 100 * w + 100000
-          report "timeout waiting for oLast on all lanes: " & path(1 to pLen)
+          report "timeout waiting for every slice's last chunk: " & path(1 to pLen)
           severity failure;
 
       end loop;
 
       sGo <= '0';
-      wait until sDone = "0000";
+      wait until sDone = '0';
       nImg := nImg + 1;
       report "IMAGE DONE " & tok(1 to tLen) & " " & integer'image(w) & "x" & integer'image(h) &
              " NEAR=" & integer'image(near);

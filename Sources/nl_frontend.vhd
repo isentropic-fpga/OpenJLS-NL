@@ -46,6 +46,8 @@ entity nl_frontend is
     iPixel    : in    std_logic_vector(BITNESS - 1 downto 0);
     oReady    : out   std_logic;
     iHold     : in    std_logic;                                          -- do not issue column groups
+    iStartHold : in   std_logic := '0';                                   -- do not start the next image
+    oStart    : out   std_logic;                                          -- image issue starts (clear sweep ends)
     -- Clear sweep (A RAMs), 512 cycles per image
     oClr      : out   std_logic;
     oClrAddr  : out   unsigned(8 downto 0);
@@ -243,6 +245,7 @@ begin
   -- sLim lags sIdx by a cycle, so a slot is rewritten only after its RAM read
   sReady  <= not iRst and bool2sl(signed(sLim(to_integer(sWrLane)) - sWrIdx) > 0);
   oReady  <= sReady;
+  oStart  <= bool2sl(sState = S_CLEAR and sCnt = 511 and iStartHold = '0');
   sAccept <= iValid and sReady;
 
   ctrl_proc : process (iClk) is
@@ -315,9 +318,12 @@ begin
             sState <= S_CLEAR;
           end if;
 
+        -- Held at the last address (no context write there) while iStartHold
         when S_CLEAR =>
-          sCnt <= sCnt + 1;
-          if (sCnt = 511) then
+          if (sCnt /= 511 or iStartHold = '0') then
+            sCnt <= sCnt + 1;
+          end if;
+          if (sCnt = 511 and iStartHold = '0') then
             sState <= S_RUN;
           end if;
 
@@ -566,7 +572,7 @@ begin
   -- RAMs
   u_row_ram : entity work.olo_base_ram_sdp
     generic map (
-      Depth_g     => 2 ** AW,
+      Depth_g     => MAX_IMAGE_WIDTH,
       Width_g     => BITNESS,
       RdLatency_g => 2
     )
@@ -581,7 +587,7 @@ begin
 
   u_line_ram : entity work.olo_base_ram_sdp
     generic map (
-      Depth_g     => 2 ** AW,
+      Depth_g     => MAX_IMAGE_WIDTH,
       Width_g     => BITNESS,
       RdLatency_g => 2
     )

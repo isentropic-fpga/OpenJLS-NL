@@ -93,9 +93,10 @@ not been run show as "not run".
   max} x STRIPES {1, 4}, giving 36 variants.
 - **Modules**: every other TB x BITNESS {8, 12, 16}, plus one `nl_framer`
   variant at OUT_WIDTH 200. That variant uses 25-byte beats, so the header
-  ends exactly on a full beat.
-- **Top**: `tb_nl_top_osvvm` x BITNESS {8, 12, 16}, plus OUT_WIDTH 48,
-  OUT_WIDTH 1024 and MAX_W / MAX_H 4096 at 12 bits. Six images per bitness
+  ends exactly on a full beat. `tb_nl_merge_osvvm` (no BITNESS) runs with
+  4-beat, 2-beat (1-beat payload) and the 1 KB default chunks.
+- **Top**: `tb_nl_top_osvvm` x BITNESS {8, 12, 16}, plus 2-beat and 1 KB
+  chunks and MAX_W / MAX_H 4096 at 12 bits. Six images per bitness
   (structured, smooth, NEAR 3 / NMAX, one row, 64x64 noise) are compared
   byte-exact per lane against CharLS. `Top/tb_nl_top_golden_pkg.vhd` is
   generated: rerun `Top/gen_golden.py` after changing the image set.
@@ -111,7 +112,7 @@ time-sharing of one instance.
 
 ## Code coverage (G6)
 
-`build_run.sh` reports 100 % statement coverage (1024/1024) on every NL
+`build_run.sh` reports 100 % statement coverage (1131/1131) on every NL
 source, and 100 % branch coverage except one line in `byte_stuffer_nl` (79/80).
 The script prints statements only; branches are in the HTML report.
 Justified gaps:

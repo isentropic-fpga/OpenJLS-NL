@@ -160,7 +160,76 @@ picked. **Picked** marks the choice; everything here is open for review.
   The framer still uses the registered copies (it reads them after reset).
 - Found by tb_nl_top (1-cycle reset with a new config, G5).
 
+## D24. Output structure: one chunk stream per band
+- Chosen: B (below). Spec: [output_format.md](output_format.md); reference
+  unpacker: `Scripts/nl_unpack.py`. RTL: `nl_merge` after the framer.
+- Constraints: vendor-agnostic core, Xilinx specifics only in the AXI
+  wrappers; must not require MCDMA; no mission policy in the IP (packet
+  standards, APIDs or other IDs that could clash with the client's).
+- Facts: slice rates differ by content, so a fixed-ratio merge pads or
+  deadlocks. Beat interleave needs a tag per beat and is illegal into a DMA
+  (TID/TDEST fixed per packet, PG021). TID alone steers nothing: plain AXI DMA
+  drops it, MCDMA only writes it to the BD status; only MCDMA TDEST picks a
+  DDR region (max 16 channels).
+- Options:
+  - A. Keep separate streams (4 per band, 20 for 5 bands). Rejected: pushes
+    the merge onto every client.
+  - B. One stream per band: per-slice ping-pong chunk buffers (generic
+    `CHUNK_BYTES` including the header, default 1 KB, all full except a
+    slice's last), each chunk sent after an 8-byte header. Chosen.
+    Header (64 bits): FF B0 | ver(4) slice(2) last(1) rsvd(1) | band(8) |
+    image_count(16) | length(16).
+    - FF B0: reserved T.81 marker (RES range). Never in coded data (stuffed
+      bit after FF); our marker segments only put bytes < 0x40 or fixed
+      marker bytes after FF. Recheck if APP/COM/LSE segments are added. Can
+      appear inside a header (band, image_count), so resync must also check
+      the version, the length and the next header at +length.
+    - band: generic BAND_ID, set by the client per instance. Bands merged
+      outside the IP stay identifiable.
+    - image_count: internal, cleared on reset, +1 per image. Consecutive
+      images overlap at the output (lane skew), and a lost last chunk would
+      otherwise merge two images.
+    - CHUNK_BYTES counts the header, so a full chunk fills a power-of-two
+      buffer. OUT_WIDTH is fixed at 64: the header is one beat and the
+      payload whole beats, no realign. The core emits at most 4 bytes per
+      clock, so 64 bits has 2x headroom; a standard AXIS width converter
+      widens it. A native wider bus would need a write-side realign whose
+      shift moves 8 bytes per chunk (payload CHUNK_BYTES - 8 is not a beat
+      multiple); deferred until needed.
+    - oLast ends every chunk (one DMA packet each); oKeep is all ones except
+      on oLast.
+    - A lost middle chunk is not visible in the headers; left to the link
+      layer (sequence count, CRC).
+  - C. As B, with the slice index as sideband (TID/TUSER) and no header.
+    Rejected: only works for consumers that keep the sideband.
+- No in-IP AXI4 DDR writer. Scope rule: D27.
+
+## D25. Lane count fixed at 4
+- 4 lanes already match OpenJLS throughput; a lane-count generic (8 lanes to
+  drop the Q3 speculation) is over-engineering.
+
+## D26. Full-beat stuffer + word framer (tried, rejected)
+- Stuffer emitting only full 4-byte beats (33 refill alignments) and a framer
+  rebuilt around a word accumulator; both passed OSVVM and the golden slice.
+- Stuffer +642 LUT (8-bit) / +1202 (16-bit), framer only -357: the framer cost
+  is the per-cycle ring logic, not the byte-offset mux. nl_top P&R: 8-bit +246
+  LUT, 292 -> 273 MHz; 16-bit +787 LUT, 260 -> 274 MHz. Not ported to OpenJLS.
+
+## D27. IP scope: FPGA vs software
+- Rule: a feature goes in the FPGA only if it must run at line rate or needs
+  information only the FPGA has. Everything else is software or the client's.
+- FPGA: compress (1 pixel/cycle, 4 valid .jls slices per band); merge the
+  slices into one stream per band without loss or deadlock (D24); write the
+  header (slice, last, length, version, band, image_count); report status
+  (config errors, overflow, done) as flags.
+- Software / client: packet standards (CCSDS/PUS), mission IDs, timestamps,
+  link CRC and framing, DMA setup and storage, merging bands, demux, decoding,
+  stitching slices and bands into an image.
+- Shipped with the RTL: output format spec and a reference unpacker. AXI
+  wrappers only map signals.
+
 ## Status (nl_top, xczu7eg-1, OOC, Vivado 2025.2)
+Before nl_merge (D24), MAX_IMAGE_WIDTH 4096:
 | BITNESS | est. fmax | LUT | FF | BRAM | DSP |
 |---|---|---|---|---|---|
 | 8  | 288 MHz | 8646  | 4737 | 9.5  | 3 |
@@ -170,8 +239,15 @@ picked. **Picked** marks the choice; everything here is open for review.
 - Worst path is still the loop (r(3).dS to r(4).ra).
 - Sim throughput ~0.98 pix/cycle on 512-wide images (no back-pressure).
 
+With nl_merge (D24 B), BITNESS 12, MAX_IMAGE_WIDTH 12288, 2 ns target, retiming:
+| Design | est. fmax | LUT | FF | BRAM | DSP |
+|---|---|---|---|---|---|
+| OpenJLS | 269 MHz | 6578  | 2040 | 5.5  | 0 |
+| NL      | 287 MHz | 11375 | 5765 | 17.5 | 4 |
+- LUT: framer 3.9k, stuffer 2.5k, frontend 1.6k, backend 1.3k, loop 1.2k,
+  merge 0.3k. Worst path moved to the framer (header byte index to buffer).
+- BRAM: frontend rows 9, context banks 4.5, backend 2, merge 2. Context banks
+  to LUTRAM would save ~4.5 for ~0.8k LUT (not done).
+
 ## Open (for review)
-- Output: 4 separate JPEG-LS streams today. Options: keep 4 AXI-S ports,
-  merge into one stream (needs a container or restart-marker scheme), or
-  DMA each stripe to its own buffer.
 - Constraint W % 4 = 0, W/4 >= 8 (asserted in nl_top).

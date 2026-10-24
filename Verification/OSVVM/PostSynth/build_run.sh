@@ -8,7 +8,7 @@
 
 # Post-synthesis smoke test. nl_top is synthesized (OOC, Vivado) at BITNESS 8
 # and the funcsim netlist runs under NVC on the small images of the golden
-# corpus: every lane must match CharLS per stripe, byte-exact.
+# corpus: its stream, split by Scripts/nl_unpack.py, must match CharLS per stripe, byte-exact.
 #
 # Images: the OpenJLS corpus, the T.87 PGMs and the NL corpus
 # (Golden/gen_nl_images.py), 8 bit, <= MAX_MP, cropped to
@@ -153,6 +153,9 @@ RES="$OUT/ps_results.tsv"
   printf 'Image\tDims\tBits\tNEAR\tBytes\tResult\n'
   while IFS=$'\t' read -r b px stem c near; do
     d="$RUND/${stem}_N$near"; r="$REFD/${stem}_N$near"; res=PASS; mt=0; tt=0
+    if [ -f "$d/out.bin" ] && ! python3 "$HERE/../../../Scripts/nl_unpack.py" "$d/out.bin" -o "$d/out{slice}.jls" 2>>"$LOGD/unpack.log"; then
+      res="FAIL (unpack)"
+    fi
     for l in 0 1 2 3; do
       t=$(stat -c %s "$r/ref$l.jls" 2>/dev/null || echo 0)
       if [ "$t" -eq 0 ]; then res="FAIL (charls)"; m=0

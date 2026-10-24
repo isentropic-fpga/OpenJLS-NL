@@ -77,7 +77,7 @@ foreach f {openjls_pkg A11_2_bit_packer A10_compute_k A11_error_mapping A12_vari
   analyze $OJ/Sources/$f.vhd
 }
 foreach f {A11_1_nl_golomb_encoder A15_A16_nl_encode_run nl_pkg nl_loop nl_config
-           nl_frontend nl_backend byte_stuffer_nl nl_framer nl_top} {
+           nl_frontend nl_backend byte_stuffer_nl nl_framer nl_merge nl_top} {
   analyze ../../Sources/$f.vhd
 }
 analyze Top/tb_nl_top_golden_pkg.vhd
@@ -108,17 +108,22 @@ foreach bitness {8 12 16} {
   Test Modules/tb_nl_frontend_osvvm.vhd [generic BITNESS $bitness]
   Test Modules/tb_nl_backend_osvvm.vhd [generic BITNESS $bitness]
 }
-# OUT_WIDTH 200: 25-byte beats, the header ends on a full beat (nl_top allows 48..1024).
+# OUT_WIDTH 200: 25-byte beats, the header ends on a full beat (the framer is width-generic;
+# nl_top is 64-bit only, D24).
 Test Modules/tb_nl_framer_osvvm.vhd [generic BITNESS 12] [generic OUT_WIDTH 200]
+# nl_merge: 4-beat chunks; 2-beat (1-beat payload); the 1 KB default with BAND_ID 0.
+Test Modules/tb_nl_merge_osvvm.vhd
+Test Modules/tb_nl_merge_osvvm.vhd [generic CHUNK_BEATS 2]
+Test Modules/tb_nl_merge_osvvm.vhd [generic CHUNK_BEATS 128] [generic BAND_ID 0]
 
-# nl_top stress (4 streams vs CharLS per stripe, backpressure, stall
+# nl_top stress (chunk stream vs CharLS per stripe, backpressure, stall
 # propagation, reset per phase). Defaults: MAX_W 64 / MAX_H 64 = the largest
-# golden image, so W and H reach their max; then OUT_WIDTH at both ends and
-# nl_top's default 4096 x 4096 limits.
+# golden image, so W and H reach their max, and 32-byte chunks; then
+# 2-beat and 1 KB chunks, and nl_top's default 4096 x 4096 limits.
 TestSuite Top
 foreach bitness {8 12 16} {
   Test Top/tb_nl_top_osvvm.vhd [generic BITNESS $bitness]
 }
-Test Top/tb_nl_top_osvvm.vhd [generic OUT_WIDTH 48]
-Test Top/tb_nl_top_osvvm.vhd [generic OUT_WIDTH 1024]
+Test Top/tb_nl_top_osvvm.vhd [generic CHUNK_BEATS 2]
+Test Top/tb_nl_top_osvvm.vhd [generic CHUNK_BEATS 128] [generic BAND_ID 0]
 Test Top/tb_nl_top_osvvm.vhd [generic MAX_W 4096] [generic MAX_H 4096]

@@ -20,7 +20,7 @@ set FILES [concat \
     A20_compute_temp A21_compute_map A22_errval_mapping A23_run_interruption_update} \
     {file join $OJ $f.vhd}] \
   [lmap f {A11_1_nl_golomb_encoder A15_A16_nl_encode_run nl_pkg nl_loop nl_config nl_frontend nl_backend \
-    byte_stuffer_nl nl_framer nl_top} {file join $SRC $f.vhd}]]
+    byte_stuffer_nl nl_framer nl_merge nl_top} {file join $SRC $f.vhd}]]
 
 read_vhdl -vhdl2008 $FILES
 foreach b $BITS {

@@ -49,7 +49,7 @@ cd "$OUT/sim-osvvm"
 LOG="$OUT/postsynth_osvvm.log"
 start=$(date +%s)
 if "${NVC[@]}" --work=work:"$LIB/work.08" -e --jit --no-save \
-    -g POST_SYNTH=true -g BITNESS=8 -g MAX_W=4096 -g MAX_H=4096 -g OUT_WIDTH=64 "$TB" \
+    -g POST_SYNTH=true -g BITNESS=8 -g MAX_W=4096 -g MAX_H=4096 -g OUT_WIDTH=64 -g CHUNK_BEATS=128 -g BAND_ID=0 "$TB" \
     -r --exit-severity=error 2>&1 | tee "$LOG"; then rc=0; else rc=1; fi
 
 aff=$(awk '/DONE/ && /Affirmations Checked:/ {

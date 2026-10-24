@@ -6,11 +6,12 @@
 --
 -- nl_top: near-lossless JPEG-LS encoder, 4 vertical stripes coded as 4 images in parallel
 --
--- Lane l codes stripe l (W/4 x H) onto slice l of the output buses. iNear, iImageWidth and
--- iImageHeight are sampled while iRst = '1'; W is a multiple of 4 in [32, MAX_IMAGE_WIDTH].
+-- Lane l codes stripe l (W/4 x H) as slice l, a .jls of its own; nl_merge sends the 4 slices as
+-- one stream of chunks (Docs/output_format.md). iNear, iImageWidth and iImageHeight are sampled
+-- while iRst = '1'; W is a multiple of 4 in [32, MAX_IMAGE_WIDTH].
 -- nl_config -> nl_frontend -> nl_loop -> nl_backend -> per-lane skid FIFO -> byte_stuffer_nl ->
--- nl_framer -> per-lane output FIFO. The stuffer and framer serve the lanes in turn (lane sSlot),
--- so the core emits at most 4 payload bytes per clock.
+-- nl_framer -> nl_merge. The stuffer and framer serve the lanes in turn (lane sSlot), so the core
+-- emits at most 4 payload bytes per clock.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -25,7 +26,9 @@ entity nl_top is
     BITNESS          : positive range 8 to 16    := 12;
     MAX_IMAGE_WIDTH  : positive range 32 to 65532 := 4096;
     MAX_IMAGE_HEIGHT : positive range 1 to 65535 := 4096;
-    OUT_WIDTH        : positive range 48 to 1024 := 64
+    OUT_WIDTH        : positive range 64 to 64    := 64;   -- wider: Docs/decisions.md D24
+    CHUNK_BYTES      : positive range 16 to 65528 := 1024;  -- header included; multiple of 8
+    BAND_ID          : natural range 0 to 255    := 0       -- header band field
   );
   port (
     iClk         : in    std_logic;
@@ -36,12 +39,12 @@ entity nl_top is
     iValid       : in    std_logic;
     iPixel       : in    std_logic_vector(BITNESS - 1 downto 0);
     oReady       : out   std_logic;
-    -- 4 output streams, lane l = slice l
-    oData        : out   std_logic_vector(4 * OUT_WIDTH - 1 downto 0);
-    oValid       : out   std_logic_vector(3 downto 0);
-    oKeep        : out   std_logic_vector(4 * OUT_WIDTH / 8 - 1 downto 0);
-    oLast        : out   std_logic_vector(3 downto 0);
-    iReady       : in    std_logic_vector(3 downto 0)
+    -- Chunk stream, oLast per chunk
+    oData        : out   std_logic_vector(OUT_WIDTH - 1 downto 0);
+    oValid       : out   std_logic;
+    oKeep        : out   std_logic_vector(OUT_WIDTH / 8 - 1 downto 0);
+    oLast        : out   std_logic;
+    iReady       : in    std_logic
   );
 end entity nl_top;
 
@@ -56,6 +59,9 @@ architecture rtl of nl_top is
   constant BS_OUT_W   : natural := 32;
   constant FW_W       : natural := log2ceil(MAX_IMAGE_WIDTH / 4 + 1);
   constant FH_W       : natural := log2ceil(MAX_IMAGE_HEIGHT + 1);
+  -- Must not exceed the shallowest per-image queue per lane: nl_framer EOI FIFO (3), start
+  -- queue (4), byte_stuffer_nl valid-bits queue (3)
+  constant MAX_IMAGES_IN_FLIGHT : natural := 3;
 
   signal sWidth     : unsigned(15 downto 0);                            -- [32, MAX_IMAGE_WIDTH], multiple of 4
   signal sHeight    : unsigned(15 downto 0);                            -- [1, MAX_IMAGE_HEIGHT]
@@ -127,7 +133,6 @@ architecture rtl of nl_top is
 
   -- Shared stuffer + framer, lane sSlot this cycle
   constant OB_W     : natural := log2ceil(OUT_WIDTH / 8 + 1);
-  constant OUTF_W   : natural := 1 + OB_W + OUT_WIDTH;
   signal sSlot      : unsigned(1 downto 0);                           -- [0, 3], lane served this cycle
   signal sSkidOut   : t_slv_array(0 to 3)(SKID_W - 1 downto 0);
   signal sSkidValid : std_logic_vector(3 downto 0);
@@ -147,6 +152,12 @@ architecture rtl of nl_top is
   signal sFrLast    : std_logic;
   signal sOutRdy    : std_logic_vector(3 downto 0);
   signal sImgOpen   : std_logic_vector(3 downto 0) := (others => '0');  -- simulation only: lane between start and last word
+
+  -- Images from issue start to the lane's last framer beat accepted
+  type t_in_flight is array (0 to 3) of natural range 0 to MAX_IMAGES_IN_FLIGHT;
+  signal sImgStart  : std_logic;
+  signal sInFlight  : t_in_flight;
+  signal sStartHold : std_logic;
 
   function bool2sl (
     b : boolean
@@ -223,6 +234,8 @@ begin
       iPixel      => iPixel,
       oReady      => oReady,
       iHold       => sHold,
+      iStartHold  => sStartHold,
+      oStart      => sImgStart,
       oClr        => sClr,
       oClrAddr    => sClrAddr,
       oValid      => fValid,
@@ -440,40 +453,59 @@ begin
       iReady       => sOutRdy(to_integer(sSlot))
     );
 
-  -- Per lane output FIFO, written on the lane's turn
-  gen_out : for l in 0 to 3 generate
+  u_merge : entity work.nl_merge
+    generic map (
+      OUT_WIDTH   => OUT_WIDTH,
+      CHUNK_BYTES => CHUNK_BYTES,
+      BAND_ID     => BAND_ID
+    )
+    port map (
+      iClk   => iClk,
+      iRst   => iRst,
+      iLane  => sSlot,
+      iWord  => sFrWord,
+      iValid => sFrValid,
+      iBytes => sFrBytes,
+      iLast  => sFrLast,
+      oReady => sOutRdy,
+      oData  => oData,
+      oValid => oValid,
+      oKeep  => oKeep,
+      oLast  => oLast,
+      iReady => iReady
+    );
 
-    signal sOutData : std_logic_vector(OUTF_W - 1 downto 0);
-    signal sOutBytes : unsigned(OB_W - 1 downto 0);
+  -- Holding the next image's start at the cap bounds every per-image queue downstream
+  p_in_flight : process (iClk) is
+
+    variable vCount : natural range 0 to MAX_IMAGES_IN_FLIGHT + 1;
 
   begin
 
-    u_out : entity work.olo_base_fifo_sync
-      generic map (
-        Width_g  => OUTF_W,
-        Depth_g  => 4
-      )
-      port map (
-        Clk       => iClk,
-        Rst       => iRst,
-        In_Data   => sFrLast & std_logic_vector(sFrBytes) & sFrWord,
-        In_Valid  => sFrValid and bool2sl(sSlot = l),
-        In_Ready  => sOutRdy(l),
-        Out_Data  => sOutData,
-        Out_Valid => oValid(l),
-        Out_Ready => iReady(l)
-      );
+    if rising_edge(iClk) then
+      if (iRst = '1') then
+        sInFlight <= (others => 0);
+      else
+        for l in 0 to 3 loop
+          vCount := sInFlight(l);
+          if (sImgStart = '1') then
+            vCount := vCount + 1;
+          end if;
+          if (sFrValid = '1' and sOutRdy(l) = '1' and sFrLast = '1' and sSlot = l) then
+            vCount := vCount - 1;
+          end if;
+          assert vCount <= MAX_IMAGES_IN_FLIGHT
+            report "nl_top: images in flight past MAX_IMAGES_IN_FLIGHT" severity failure;
+          sInFlight(l) <= vCount;
+        end loop;
+      end if;
+    end if;
 
-    oData((l + 1) * OUT_WIDTH - 1 downto l * OUT_WIDTH) <= sOutData(OUT_WIDTH - 1 downto 0);
-    sOutBytes <= unsigned(sOutData(OUT_WIDTH + OB_W - 1 downto OUT_WIDTH));
-    oLast(l) <= sOutData(OUTF_W - 1);
+  end process p_in_flight;
 
-    gen_keep : for i in 0 to OUT_WIDTH / 8 - 1 generate
-      oKeep(l * OUT_WIDTH / 8 + OUT_WIDTH / 8 - 1 - i) <= '1' when sOutBytes > i else
-                                                         '0';
-    end generate gen_keep;
-
-  end generate gen_out;
+  sStartHold <= '1' when sInFlight(0) = MAX_IMAGES_IN_FLIGHT or sInFlight(1) = MAX_IMAGES_IN_FLIGHT or
+                         sInFlight(2) = MAX_IMAGES_IN_FLIGHT or sInFlight(3) = MAX_IMAGES_IN_FLIGHT else
+                '0';
 
   -- Lane hand-off: one start per lane image, framed before the next; the back end
   -- emits words of a lane only inside its image, and the last one once
@@ -513,13 +545,8 @@ begin
   postponed assert sFrValid /= '1' or is_x(sFrBytes) or sFrBytes <= OUT_WIDTH / 8
     report "nl_top: framer byte count past OUT_WIDTH/8" severity error;
 
-  gen_psl : for l in 0 to 3 generate
-  begin
-
-    -- psl default clock is rising_edge(iClk);
-    -- psl assert always (((iRst = '0' and oValid(l) = '1' and iReady(l) = '0') -> next (oValid(l) = '1')) abort (iRst = '1')) report "nl_top: oValid must hold until the beat is accepted (AXIS)";
-    -- psl assert always (iRst = '1' -> next (oValid(l) = '0')) report "nl_top: reset must clear the output streams";
-
-  end generate gen_psl;
+  -- psl default clock is rising_edge(iClk);
+  -- psl assert always (((iRst = '0' and oValid = '1' and iReady = '0') -> next (oValid = '1')) abort (iRst = '1')) report "nl_top: oValid must hold until the beat is accepted (AXIS)";
+  -- psl assert always (iRst = '1' -> next (oValid = '0')) report "nl_top: reset must clear the output stream";
 
 end architecture rtl;

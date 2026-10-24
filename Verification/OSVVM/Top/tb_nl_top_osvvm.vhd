@@ -7,17 +7,19 @@
 -- tb_nl_top_osvvm: nl_top, tb_openjls_top_osvvm ported to the 4 stripe lanes
 --
 -- Payload correctness on real images is the golden suite's job. Here the oracle is small seeded
--- images coded per stripe by CharLS (tb_nl_top_golden_pkg), and the TB checks the 4 streams stay
--- byte-exact under stress:
+-- images coded per stripe by CharLS (tb_nl_top_golden_pkg). The TB parses the chunk stream
+-- (Docs/output_format.md) and checks each slice stays byte-exact under stress:
 --   A  every image alone, clean
 --   B  4 images back to back, no reset between them
---   C  every image under random per-lane iReady, input gaps, and both
+--   C  every image under random iReady, input gaps, and both
 --   D  back to back under both
---   E  long iReady hold on each lane and on all 4: oReady must drop, nothing is lost
---   F  reset while idle, in the config divider, in the clear sweep, mid feed, while draining and
+--   E  long iReady hold, from the start and mid image: oReady must drop, nothing is lost
+--   F  minimal images (8 px per lane) flooded back to back, output ready then held: the
+--      per-image queues must stall the input, not overflow
+--   G  reset while idle, in the config divider, in the clear sweep, mid feed, while draining and
 --      with a beat held; the recovery image uses a random NEAR / W / H and is scored
--- Every lane also checks oKeep (contiguous from the MSB, >= 1 byte), oLast on FF D9 and the AXIS
--- hold.
+-- Every header is checked (marker, version, band, image_count, length), as are oLast at each
+-- chunk end, oKeep (all ones but on oLast, contiguous from the MSB) and the AXIS hold.
 --
 -- Guidelines:
 --   G2.Clamp    N/A: no accumulator at this level
@@ -42,6 +44,8 @@ entity tb_nl_top_osvvm is
   generic (
     BITNESS   : natural range 8 to 16 := 12;
     OUT_WIDTH : natural := 64;
+    CHUNK_BEATS : positive := 4;          -- header beat included, >= 2
+    BAND_ID   : natural range 0 to 255 := 16#5A#;
     -- Defaults equal the largest golden image (64 x 64), so W and H reach max.
     MAX_W     : natural := 64;
     MAX_H     : natural := 64;
@@ -54,16 +58,21 @@ architecture sim of tb_nl_top_osvvm is
 
   constant LANES      : natural := 4;
   constant NB         : natural := OUT_WIDTH / 8;
+  constant CHUNK      : natural := CHUNK_BEATS * NB - 8;   -- payload per chunk
   constant CLK_PERIOD : time    := CLK_PERIOD_DEFAULT;
   constant NMAX       : natural := minimum(255, (2 ** BITNESS - 1) / 2);
 
   constant N_KIND     : natural := 6;                                -- cases per BITNESS in the golden pkg
   constant N_RST      : natural := 24;
   constant HOLD_CYC   : natural := 3500;
+  -- Past every per-image queue (upstream jls_framer start queue, 4)
+  constant FLOOD      : natural := 8;
+  -- Flood cases in the golden pkg: 32 x 1 (8 px per lane), 32 x 6 smooth at NEAR max (least payload)
+  constant C_FLOOD    : integer_vector := (4, 3);
 
   -- Stress modes.
   constant M_CLEAN    : natural := 0;
-  constant M_BP       : natural := 1;                                -- random per-lane iReady
+  constant M_BP       : natural := 1;                                -- random iReady
   constant M_GAP      : natural := 2;                                -- random input gaps
   constant M_BOTH     : natural := 3;
 
@@ -83,11 +92,11 @@ architecture sim of tb_nl_top_osvvm is
   signal iValid       : std_logic := '0';
   signal iPixel       : std_logic_vector(BITNESS - 1 downto 0) := (others => '0');
   signal oReady       : std_logic;
-  signal oData        : std_logic_vector(LANES * OUT_WIDTH - 1 downto 0);
-  signal oValid       : std_logic_vector(LANES - 1 downto 0);
-  signal oKeep        : std_logic_vector(LANES * NB - 1 downto 0);
-  signal oLast        : std_logic_vector(LANES - 1 downto 0);
-  signal iReady       : std_logic_vector(LANES - 1 downto 0) := (others => '1');
+  signal oData        : std_logic_vector(OUT_WIDTH - 1 downto 0);
+  signal oValid       : std_logic;
+  signal oKeep        : std_logic_vector(NB - 1 downto 0);
+  signal oLast        : std_logic;
+  signal iReady       : std_logic := '1';
 
   -- First golden case of this BITNESS.
   function first_case return natural is
@@ -102,6 +111,19 @@ architecture sim of tb_nl_top_osvvm is
   end function first_case;
 
   constant BASE : natural := first_case;
+
+  -- Some slice of this BITNESS ends exactly on a chunk boundary.
+  function has_exact_chunk return boolean is
+  begin
+    for c in CASES'range loop
+      for l in 0 to LANES - 1 loop
+        if (CASES(c).bits = BITNESS and CASES(c).lane_len(l) mod CHUNK = 0) then
+          return true;
+        end if;
+      end loop;
+    end loop;
+    return false;
+  end function has_exact_chunk;
 
 begin
 
@@ -121,11 +143,11 @@ begin
         iValid       : in  std_logic;
         iPixel       : in  std_logic_vector(BITNESS - 1 downto 0);
         oReady       : out std_logic;
-        oData        : out std_logic_vector(LANES * OUT_WIDTH - 1 downto 0);
-        oValid       : out std_logic_vector(LANES - 1 downto 0);
-        oKeep        : out std_logic_vector(LANES * NB - 1 downto 0);
-        oLast        : out std_logic_vector(LANES - 1 downto 0);
-        iReady       : in  std_logic_vector(LANES - 1 downto 0)
+        oData        : out std_logic_vector(OUT_WIDTH - 1 downto 0);
+        oValid       : out std_logic;
+        oKeep        : out std_logic_vector(NB - 1 downto 0);
+        oLast        : out std_logic;
+        iReady       : in  std_logic
       );
     end component nl_top;
 
@@ -155,7 +177,9 @@ begin
         BITNESS          : natural;
         MAX_IMAGE_WIDTH  : natural;
         MAX_IMAGE_HEIGHT : natural;
-        OUT_WIDTH        : natural
+        OUT_WIDTH        : natural;
+        CHUNK_BYTES      : natural;
+        BAND_ID          : natural
       );
       port (
         iClk         : in  std_logic;
@@ -166,11 +190,11 @@ begin
         iValid       : in  std_logic;
         iPixel       : in  std_logic_vector(BITNESS - 1 downto 0);
         oReady       : out std_logic;
-        oData        : out std_logic_vector(LANES * OUT_WIDTH - 1 downto 0);
-        oValid       : out std_logic_vector(LANES - 1 downto 0);
-        oKeep        : out std_logic_vector(LANES * NB - 1 downto 0);
-        oLast        : out std_logic_vector(LANES - 1 downto 0);
-        iReady       : in  std_logic_vector(LANES - 1 downto 0)
+        oData        : out std_logic_vector(OUT_WIDTH - 1 downto 0);
+        oValid       : out std_logic;
+        oKeep        : out std_logic_vector(NB - 1 downto 0);
+        oLast        : out std_logic;
+        iReady       : in  std_logic
       );
     end component nl_top;
 
@@ -181,7 +205,9 @@ begin
         BITNESS          => BITNESS,
         MAX_IMAGE_WIDTH  => MAX_W,
         MAX_IMAGE_HEIGHT => MAX_H,
-        OUT_WIDTH        => OUT_WIDTH
+        OUT_WIDTH        => OUT_WIDTH,
+        CHUNK_BYTES      => CHUNK + 8,
+        BAND_ID          => BAND_ID
       )
       port map (
         iClk         => clk,
@@ -208,11 +234,9 @@ begin
     alias sClr is << signal .tb_nl_top_osvvm.g_dut.dut.sClr : std_logic >>;
 
     type t_int is array (0 to LANES - 1) of integer;
-    type t_bool is array (0 to LANES - 1) of boolean;
-    type t_data is array (0 to LANES - 1) of std_logic_vector(OUT_WIDTH - 1 downto 0);
-    type t_keep is array (0 to LANES - 1) of std_logic_vector(NB - 1 downto 0);
+    type t_hdr is array (0 to 7) of natural range 0 to 255;
 
-    constant SB : ScoreboardIDArrayType := NewID("lane SB", LANES);
+    constant SB : ScoreboardIDArrayType := NewID("slice SB", LANES);
 
     variable rv        : RandomPType;
     variable reqGold   : AlertLogIDType;
@@ -222,13 +246,15 @@ begin
     variable reqNoStl  : AlertLogIDType;
     variable reqCfg    : AlertLogIDType;
     variable reqRst    : AlertLogIDType;
+    variable reqFlood  : AlertLogIDType;
+    variable reqChunk  : AlertLogIDType;
     variable covStress : CoverageIDType;
     variable covB2B    : CoverageIDType;
     variable covStall  : CoverageIDType;
-    variable covHold   : CoverageIDType;
     variable covRst    : CoverageIDType;
     variable covCfg    : CoverageIDType;
     variable covRange  : CoverageIDType;
+    variable covChunk  : CoverageIDType;
 
     -- Session: images queued since the last reset (all share its config).
     variable cfgCase   : natural := BASE;
@@ -239,18 +265,25 @@ begin
     variable vld       : boolean := false;                            -- pixel offered, not taken
     variable gapLeft   : natural := 0;
     variable mode      : natural := M_CLEAN;
-    variable holdMask  : std_logic_vector(LANES - 1 downto 0) := (others => '0');
+    variable holdOut   : boolean := false;
     variable newCfg    : boolean := false;                            -- config changed at the last reset
 
-    -- Per lane output state.
+    -- Per slice output state.
     variable imgDone   : t_int := (others => 0);
     variable laneBytes : t_int := (others => 0);
     variable sbErr     : t_int := (others => 0);
-    variable notRdy    : t_int := (others => 0);
-    variable held      : t_bool := (others => false);
-    variable heldData  : t_data;
-    variable heldKeep  : t_keep;
-    variable heldLast  : t_bool;
+
+    -- Stream state: header bytes seen, payload left in the current chunk.
+    variable hdr       : t_hdr;
+    variable hIdx      : natural := 0;
+    variable payLeft   : natural := 0;
+    variable chSlice   : natural := 0;
+    variable chLast    : boolean := false;
+    variable notRdy    : natural := 0;
+    variable held      : boolean := false;
+    variable heldData  : std_logic_vector(OUT_WIDTH - 1 downto 0);
+    variable heldKeep  : std_logic_vector(NB - 1 downto 0);
+    variable heldLast  : std_logic;
 
     -- oReady low while a pixel is offered, outside config / clear sweep.
     variable stallCyc  : natural := 0;
@@ -260,6 +293,7 @@ begin
     variable hit       : boolean;
     variable ph        : natural;
     variable c         : natural;
+    variable floodErr  : t_int;
 
     impure function npix (cs : natural) return natural is
     begin
@@ -297,24 +331,26 @@ begin
       rst <= '0';
       wait for 1 ns;
       -- oLast / oData are FIFO data (not reset); only oValid qualifies them.
-      AffirmIf(reqRst, oValid = "0000", "reset: output streams cleared");
+      AffirmIf(reqRst, oValid = '0', "reset: output stream cleared");
       for l in 0 to LANES - 1 loop
         while not IsEmpty(SB(SB'low + l)) loop
           Pop(SB(SB'low + l), dropped);
         end loop;
         imgDone(l)   := 0;
         laneBytes(l) := 0;
-        held(l)      := false;
-        notRdy(l)    := 0;
         sbErr(l)     := GetErrorCount(SB(SB'low + l));
       end loop;
+      hIdx    := 0;
+      payLeft := 0;
+      held    := false;
+      notRdy  := 0;
       cfgCase  := cs;
       nFq      := 0;
       fedImg   := 0;
       pixIdx   := 0;
       vld      := false;
       gapLeft  := 0;
-      holdMask := (others => '0');
+      holdOut  := false;
       newCfg   := CASES(cs).near /= CASES(OLD).near or CASES(cs).w /= CASES(OLD).w or
                   CASES(cs).h /= CASES(OLD).h;
       if (CASES(cs).near /= CASES(OLD).near) then
@@ -331,88 +367,138 @@ begin
       ICover(covRange, (2, CASES(cs).near));
     end procedure do_reset;
 
-    -- Lane l's iReady this cycle.
-    procedure lane_ready (l : natural; r : out std_logic) is
+    -- iReady this cycle.
+    procedure out_ready (r : out std_logic) is
     begin
-      if (holdMask(l) = '1') then
+      if (holdOut) then
         r := '0';
       elsif (mode /= M_BP and mode /= M_BOTH) then
         r := '1';
-      elsif (notRdy(l) > 0) then
-        notRdy(l) := notRdy(l) - 1;
-        r         := '0';
+      elsif (notRdy > 0) then
+        notRdy := notRdy - 1;
+        r      := '0';
       elsif (rv.DistValInt(((1, 1), (0, 15))) = 1) then
-        notRdy(l) := rv.RandInt(1, 12);
-        r         := '0';
+        notRdy := rv.RandInt(1, 12);
+        r      := '0';
       else
         r := bool2bit(rv.DistValInt(((1, 3), (0, 1))) = 1);
       end if;
-    end procedure lane_ready;
+    end procedure out_ready;
 
-    -- Check lane l's output at this edge.
-    procedure check_lane (l : natural) is
-      variable data : std_logic_vector(OUT_WIDTH - 1 downto 0);
-      variable keep : std_logic_vector(NB - 1 downto 0);
-      variable n    : natural;
-      variable ok   : boolean;
-      variable cs   : natural;
+    -- Header complete in hdr: check it and open its chunk.
+    procedure open_chunk is
+      variable len : natural;
+      variable img : natural;
     begin
-      data := oData((l + 1) * OUT_WIDTH - 1 downto l * OUT_WIDTH);
-      keep := oKeep((l + 1) * NB - 1 downto l * NB);
-      if (held(l)) then
-        AffirmIf(reqAxis, oValid(l) = '1' and data = heldData(l) and keep = heldKeep(l) and
-                          (oLast(l) = '1') = heldLast(l),
-                 "lane " & to_string(l) & ": beat held while iReady is low");
+      chSlice := hdr(2) / 4 mod 4;
+      chLast  := hdr(2) / 2 mod 2 = 1;
+      img     := hdr(4) * 256 + hdr(5);
+      len     := hdr(6) * 256 + hdr(7);
+      AffirmIf(reqChunk, hdr(0) = 16#FF# and hdr(1) = 16#B0# and hdr(2) / 16 = 1 and hdr(2) mod 2 = 0,
+               "header: FF B0, version 1, reserved 0; got " & to_hstring(to_unsigned(hdr(0), 8)) &
+               to_hstring(to_unsigned(hdr(1), 8)) & to_hstring(to_unsigned(hdr(2), 8)));
+      AffirmIfEqual(reqChunk, hdr(3), BAND_ID, "header: band");
+      AffirmIfEqual(reqChunk, img, imgDone(chSlice) mod 65536, "header slice " & to_string(chSlice) & ": image_count");
+      AffirmIf(reqChunk, len >= 1 and len <= CHUNK and (chLast or len = CHUNK),
+               "header slice " & to_string(chSlice) & ": length " & to_string(len) & ", last " & boolean'image(chLast));
+      payLeft := len;
+      if (not chLast) then
+        ICover(covChunk, 0);
+      elsif (len < CHUNK) then
+        ICover(covChunk, 1);
+      else
+        ICover(covChunk, 2);
       end if;
-      held(l) := oValid(l) = '1' and iReady(l) = '0';
-      if (held(l)) then
-        heldData(l) := data;
-        heldKeep(l) := keep;
-        heldLast(l) := oLast(l) = '1';
-        ICover(covHold, l);
-      end if;
+    end procedure open_chunk;
 
-      if (oValid(l) = '1' and iReady(l) = '1') then
-        -- oKeep: n ones from the MSB, then zeros.
-        n := 0;
-        while n < NB and keep(NB - 1 - n) = '1' loop
-          n := n + 1;
-        end loop;
-        ok := n >= 1;
-        for i in n to NB - 1 loop
-          ok := ok and keep(NB - 1 - i) = '0';
-        end loop;
-        AffirmIf(reqAxis, ok, "lane " & to_string(l) & ": oKeep contiguous from the MSB, " & to_hstring(keep));
-        for i in 0 to n - 1 loop
-          Check(SB(SB'low + l), bool2bit(oLast(l) = '1' and i = n - 1) &
-                                data(OUT_WIDTH - 1 - 8 * i downto OUT_WIDTH - 8 * (i + 1)));
-          laneBytes(l) := laneBytes(l) + 1;
-        end loop;
-        if (oLast(l) = '1') then
-          AffirmIf(reqAxis, imgDone(l) < nFq, "lane " & to_string(l) & ": oLast only for a queued image");
-          if (imgDone(l) < nFq) then
-            cs := fq(imgDone(l));
-            AffirmIf(reqGold, laneBytes(l) = CASES(cs).lane_len(l) and GetErrorCount(SB(SB'low + l)) = sbErr(l),
-                     "lane " & to_string(l) & ": image " & to_string(imgDone(l)) & " (case " & to_string(cs) &
-                     ") byte-exact, " & to_string(laneBytes(l)) & " of " & to_string(CASES(cs).lane_len(l)) & " bytes");
-            if (imgDone(l) > 0) then
-              AffirmIf(reqB2B, GetErrorCount(SB(SB'low + l)) = sbErr(l),
-                       "lane " & to_string(l) & ": back-to-back image " & to_string(imgDone(l)) & " byte-exact");
-            elsif (newCfg) then
-              AffirmIf(reqCfg, GetErrorCount(SB(SB'low + l)) = sbErr(l),
-                       "lane " & to_string(l) & ": first image after a config change byte-exact");
-            end if;
-          end if;
-          sbErr(l)     := GetErrorCount(SB(SB'low + l));
-          imgDone(l)   := imgDone(l) + 1;
-          laneBytes(l) := 0;
+    -- Last chunk of slice l's image done: score the image.
+    procedure slice_done (l : natural) is
+      variable cs : natural;
+    begin
+      AffirmIf(reqAxis, imgDone(l) < nFq, "slice " & to_string(l) & ": last chunk only for a queued image");
+      if (imgDone(l) < nFq) then
+        cs := fq(imgDone(l));
+        AffirmIf(reqGold, laneBytes(l) = CASES(cs).lane_len(l) and GetErrorCount(SB(SB'low + l)) = sbErr(l),
+                 "slice " & to_string(l) & ": image " & to_string(imgDone(l)) & " (case " & to_string(cs) &
+                 ") byte-exact, " & to_string(laneBytes(l)) & " of " & to_string(CASES(cs).lane_len(l)) & " bytes");
+        if (imgDone(l) > 0) then
+          AffirmIf(reqB2B, GetErrorCount(SB(SB'low + l)) = sbErr(l),
+                   "slice " & to_string(l) & ": back-to-back image " & to_string(imgDone(l)) & " byte-exact");
+        elsif (newCfg) then
+          AffirmIf(reqCfg, GetErrorCount(SB(SB'low + l)) = sbErr(l),
+                   "slice " & to_string(l) & ": first image after a config change byte-exact");
         end if;
       end if;
-    end procedure check_lane;
+      sbErr(l)     := GetErrorCount(SB(SB'low + l));
+      imgDone(l)   := imgDone(l) + 1;
+      laneBytes(l) := 0;
+    end procedure slice_done;
+
+    -- Check the output at this edge.
+    procedure check_out is
+      variable n     : natural;
+      variable ok    : boolean;
+      variable b     : natural;
+      variable ended : integer;                                      -- byte index a chunk ended at
+      variable early : boolean;                                      -- a chunk ended before the beat's last byte
+    begin
+      if (held) then
+        AffirmIf(reqAxis, oValid = '1' and oData = heldData and oKeep = heldKeep and oLast = heldLast,
+                 "beat held while iReady is low");
+      end if;
+      held := oValid = '1' and iReady = '0';
+      if (held) then
+        heldData := oData;
+        heldKeep := oKeep;
+        heldLast := oLast;
+        ICover(covChunk, 3);
+      end if;
+
+      if (oValid = '1' and iReady = '1') then
+        -- oKeep: n ones from the MSB, then zeros; all ones unless oLast.
+        n := 0;
+        while n < NB and oKeep(NB - 1 - n) = '1' loop
+          n := n + 1;
+        end loop;
+        ok := n >= 1 and (oLast = '1' or n = NB);
+        for i in n to NB - 1 loop
+          ok := ok and oKeep(NB - 1 - i) = '0';
+        end loop;
+        AffirmIf(reqAxis, ok, "oKeep contiguous from the MSB, all ones but on oLast: " & to_hstring(oKeep) &
+                              " oLast " & to_string(oLast));
+        ended := -1;
+        early := false;
+        for i in 0 to n - 1 loop
+          b := to_integer(unsigned(oData(OUT_WIDTH - 1 - 8 * i downto OUT_WIDTH - 8 * (i + 1))));
+          if (payLeft = 0) then
+            early   := early or ended >= 0;
+            hdr(hIdx) := b;
+            hIdx    := hIdx + 1;
+            if (hIdx = 8) then
+              hIdx := 0;
+              open_chunk;
+            end if;
+          else
+            Check(SB(SB'low + chSlice), bool2bit(chLast and payLeft = 1) & std_logic_vector(to_unsigned(b, 8)));
+            laneBytes(chSlice) := laneBytes(chSlice) + 1;
+            payLeft := payLeft - 1;
+            if (payLeft = 0) then
+              ended := i;
+              if (chLast) then
+                slice_done(chSlice);
+              end if;
+            end if;
+          end if;
+        end loop;
+        AffirmIf(reqChunk, not early and (oLast = '1') = (ended = n - 1),
+                 "oLast exactly at each chunk end (oLast " & to_string(oLast) & ", chunk end at byte " &
+                 to_string(ended) & " of " & to_string(n) & ")");
+      end if;
+    end procedure check_out;
 
     -- One clock: drive just after an edge, check at the next.
     procedure step is
-      variable rdy     : std_logic_vector(LANES - 1 downto 0);
+      variable rdy     : std_logic;
       variable w       : natural;
       variable expWait : boolean;
     begin
@@ -427,9 +513,7 @@ begin
         end if;
       end if;
       iValid <= bool2bit(vld);
-      for l in 0 to LANES - 1 loop
-        lane_ready(l, rdy(l));
-      end loop;
+      out_ready(rdy);
       iReady <= rdy;
 
       wait until rising_edge(clk);
@@ -459,9 +543,7 @@ begin
           fedImg := fedImg + 1;
         end if;
       end if;
-      for l in 0 to LANES - 1 loop
-        check_lane(l);
-      end loop;
+      check_out;
       wait for 1 ns;
     end procedure step;
 
@@ -482,7 +564,7 @@ begin
         step;
         exit when cycles - START > 200_000;
       end loop;
-      AffirmIf(GetAlertLogID("Completion"), all_done, what & ": every lane framed every image");
+      AffirmIf(GetAlertLogID("Completion"), all_done, what & ": every slice of every image out");
     end procedure run_done;
 
     -- One session: reset into case cs, queue it (and partners), run.
@@ -509,13 +591,7 @@ begin
         when RP_CLEAR => return sClr = '1';
         when RP_FEED  => return fedImg < nFq and pixIdx > 0 and sClr = '0';
         when RP_DRAIN => return fedImg = nFq and not all_done;
-        when others   =>
-          for l in 0 to LANES - 1 loop
-            if (held(l)) then
-              return true;
-            end if;
-          end loop;
-          return false;
+        when others   => return held;
       end case;
     end function phase_hit;
 
@@ -528,10 +604,12 @@ begin
     reqGold  := GetReqID("NL.StripeGolden", LANES * (N_KIND * 4 + 4 + 3 + 5 + N_RST));
     reqB2B   := GetReqID("NL.BackToBack", LANES * (3 + 2));
     reqAxis  := GetReqID("NL.AxisOut", 1000);
-    reqStall := GetReqID("NL.StallPropagation", 5);
+    reqStall := GetReqID("NL.StallPropagation", 2);
     reqNoStl := GetReqID("NL.NoStall", N_KIND + 1);
     reqCfg   := GetReqID("NL.ConfigInReset", LANES * N_KIND);
     reqRst   := GetReqID("NL.Reset", 2 * N_RST);
+    reqFlood := GetReqID("NL.ImageFlood", C_FLOOD'length * (2 * LANES + 1));
+    reqChunk := GetReqID("NL.Chunks", 1000);
 
     covStress := NewID("G4.Stream image kind x stress mode");
     SetFieldName(covStress, "case", "mode");
@@ -545,12 +623,15 @@ begin
     AddBins(covB2B, "clean", GenBin(0));
     AddBins(covB2B, "stressed", GenBin(1));
     covStall := NewID("G4.Stream stall propagation");
-    covHold  := NewID("G4.Stream G4.Lane lane backpressure hold");
-    for l in 0 to LANES - 1 loop
-      AddBins(covStall, "hold lane " & to_string(l), GenBin(l));
-      AddBins(covHold, "lane " & to_string(l), GenBin(l));
-    end loop;
-    AddBins(covStall, "hold all lanes", GenBin(LANES));
+    AddBins(covStall, "hold from the start", GenBin(0));
+    AddBins(covStall, "hold mid image", GenBin(1));
+    covChunk := NewID("G4.Stream chunks");
+    AddBins(covChunk, "full chunk", GenBin(0));
+    AddBins(covChunk, "last chunk, partial", GenBin(1));
+    if (has_exact_chunk) then
+      AddBins(covChunk, "last chunk, full payload", GenBin(2));
+    end if;
+    AddBins(covChunk, "beat held", GenBin(3));
     covRst := NewID("G5.States resetPhase");
     AddBins(covRst, "reset while idle", 2, GenBin(RP_IDLE));
     AddBins(covRst, "reset in the config divider", 2, GenBin(RP_CFG));
@@ -602,38 +683,64 @@ begin
     session(BASE, M_BOTH, 3);
     ICover(covB2B, 1);
 
-    -- E: long iReady hold on the noise image: one lane at a time, then all.
-    for t in 0 to LANES loop
+    -- E: long iReady hold on the noise image, from the start, then mid image.
+    -- Enough copies back to back to overflow the 2 chunks per slice.
+    for t in 0 to 1 loop
       do_reset(BASE + N_KIND - 1, 2);
       mode := M_CLEAN;
-      enqueue(BASE + N_KIND - 1);
-      while not (fedImg = 0 and pixIdx > 2 * CASES(BASE + N_KIND - 1).w and sClr = '0') loop
+      for i in 0 to minimum(fq'high, 1 + 2 * CHUNK / minimum(CASES(BASE + N_KIND - 1).lane_len)) loop
+        enqueue(BASE + N_KIND - 1);
+      end loop;
+      while t = 1 and not (fedImg = 0 and pixIdx > 2 * CASES(BASE + N_KIND - 1).w and sClr = '0') loop
         step;
       end loop;
-      if (t = LANES) then
-        holdMask := (others => '1');
-      else
-        holdMask    := (others => '0');
-        holdMask(t) := '1';
-      end if;
+      holdOut  := true;
       stallCyc := 0;
-      -- Until oReady has dropped for a while (OUT_WIDTH 1024 needs ~2.5k
-      -- cycles to fill the output FIFOs), or HOLD_CYC.
-      for i in 1 to HOLD_CYC loop
+      -- Until oReady has dropped for a while, or the buffers had time to fill.
+      for i in 1 to HOLD_CYC + 8 * CHUNK loop
         step;
         exit when stallCyc >= 16;
       end loop;
       stallSeen := stallCyc > 0;
-      AffirmIf(reqStall, stallSeen, "hold " & to_hstring(holdMask) & ": oReady dropped (" &
+      AffirmIf(reqStall, stallSeen, "hold " & to_string(t) & ": oReady dropped (" &
                                     to_string(stallCyc) & " stalled cycles)");
       if (stallSeen) then
         ICover(covStall, t);
       end if;
-      holdMask := (others => '0');
+      holdOut := false;
       run_done("stall propagation " & to_string(t));
     end loop;
 
-    -- F: reset rounds. Traffic, reset in the target phase, then a scored
+    -- F: flood, outputs ready then all held.
+    for f in C_FLOOD'range loop
+    for hld in boolean loop
+      do_reset(BASE + C_FLOOD(f), 2);
+      mode := M_CLEAN;
+      for n in 1 to FLOOD loop
+        enqueue(BASE + C_FLOOD(f));
+      end loop;
+      for l in 0 to LANES - 1 loop
+        floodErr(l) := GetErrorCount(SB(SB'low + l));
+      end loop;
+      if (hld) then
+        holdOut := true;
+        for i in 1 to HOLD_CYC loop
+          step;
+        end loop;
+        AffirmIf(reqFlood, fedImg < nFq, "flood case " & to_string(C_FLOOD(f)) & " held: input stalled at image " & to_string(fedImg) &
+                                         " of " & to_string(nFq));
+        holdOut := false;
+      end if;
+      run_done("flood case " & to_string(C_FLOOD(f)) & " held=" & boolean'image(hld));
+      for l in 0 to LANES - 1 loop
+        AffirmIf(reqFlood, imgDone(l) = FLOOD and GetErrorCount(SB(SB'low + l)) = floodErr(l),
+                 "flood case " & to_string(C_FLOOD(f)) & " held=" & boolean'image(hld) & " slice " & to_string(l) & ": " & to_string(imgDone(l)) &
+                 " images byte-exact");
+      end loop;
+    end loop;
+    end loop;
+
+    -- G: reset rounds. Traffic, reset in the target phase, then a scored
     -- recovery image at a random config.
     for r in 0 to N_RST - 1 loop
       if (r < 2 * 6) then
@@ -670,22 +777,22 @@ begin
 
     for l in 0 to LANES - 1 loop
       AffirmIf(GetAlertLogID("ScoreboardCompletion"), IsEmpty(SB(SB'low + l)),
-               "lane " & to_string(l) & " scoreboard drained");
+               "slice " & to_string(l) & " scoreboard drained");
       AffirmIfEqual(GetAlertLogID("ScoreboardCompletion"), GetErrorCount(SB(SB'low + l)), 0,
-                    "lane " & to_string(l) & " scoreboard mismatches");
+                    "slice " & to_string(l) & " scoreboard mismatches");
     end loop;
 
     WriteBin(covStress);
     WriteBin(covB2B);
     WriteBin(covStall);
-    WriteBin(covHold);
+    WriteBin(covChunk);
     WriteBin(covRst);
     WriteBin(covCfg);
     WriteBin(covRange);
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covStress), "image x stress coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covB2B), "back-to-back coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covStall), "stall propagation coverage closed");
-    AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covHold), "lane hold coverage closed");
+    AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covChunk), "chunk coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covRst), "reset-phase coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covCfg), "config change coverage closed");
     AffirmIf(GetAlertLogID("CoverageClosure"), IsCovered(covRange), "config range coverage closed");

@@ -8,7 +8,8 @@
 
 # Golden-model cross-check for nl_top (NVC). Each image is cropped to a width
 # multiple of 4, split into 4 stripes and encoded per stripe with CharLS at the
-# given NEAR; the 4 nl_top lane streams must match byte-exact.
+# given NEAR; the 4 nl_top slices, split from its stream by Scripts/nl_unpack.py,
+# must match byte-exact.
 #
 # Three batches:
 #   wide   every image under MAX_MP, at NEAR_WIDE (default "3 7")
@@ -73,10 +74,11 @@ RTL_FILES=(
   "$OJ"/{A10_compute_k,A11_error_mapping,A12_variables_update}.vhd
   "$OJ"/{A20_compute_temp,A21_compute_map,A22_errval_mapping,A23_run_interruption_update}.vhd
   "$SRC"/{A11_1_nl_golomb_encoder,A15_A16_nl_encode_run}.vhd
-  "$SRC"/{nl_pkg,nl_loop,nl_config,nl_frontend,nl_backend,byte_stuffer_nl,nl_framer,nl_top}.vhd
+  "$SRC"/{nl_pkg,nl_loop,nl_config,nl_frontend,nl_backend,byte_stuffer_nl,nl_framer,nl_merge,nl_top}.vhd
 )
 "${NVC[@]}" --work=work:"$LIBS/work.08" -a --relaxed --psl "${RTL_FILES[@]}" "$HERE/tb_nl_golden.vhd"
-RTL_HASH="$(cat "${RTL_FILES[@]}" "$HERE/tb_nl_golden.vhd" "$HERE/ref/nl_charls.cpp" | sha256sum | cut -c1-12)"
+UNPACK="$ROOT/Scripts/nl_unpack.py"
+RTL_HASH="$(cat "${RTL_FILES[@]}" "$HERE/tb_nl_golden.vhd" "$HERE/ref/nl_charls.cpp" "$UNPACK" | sha256sum | cut -c1-12)"
 
 # 2. Image set: stem -> path, cropped to W % 4 = 0 (cached under Output/cropped)
 python3 "$HERE/gen_nl_images.py" "$NL_IMG"
@@ -149,6 +151,8 @@ run_job() {
         -g PGM_PATH="$pgm" -g OUT_PREFIX="$d/out" -g BITNESS="$bits" -g NEAR="$near" tb_nl_golden \
         -r --exit-severity=error >>"$LOGD/$tag.log" 2>&1; then
       r="FAIL (sim)"
+    elif ! python3 "$UNPACK" "$d/out.bin" -o "$d/out{slice}.jls" >>"$LOGD/$tag.log" 2>&1; then
+      r="FAIL (unpack)"
     else
       r=PASS
     fi
@@ -170,7 +174,7 @@ run_job() {
   return 0
 }
 export -f run_job
-export OUT LOGD RUND LIBS NVC_HEAP
+export OUT LOGD RUND LIBS NVC_HEAP UNPACK
 
 NJ=$(wc -l < "$JOBS")
 echo "BATCH=$BATCH: $NJ job(s), $NCACHED cached, $(wc -l < "$SKIPS") image(s) skipped, $NUMBER_OF_THREADS thread(s), RTL $RTL_HASH"
