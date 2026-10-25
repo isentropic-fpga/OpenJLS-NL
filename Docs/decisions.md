@@ -228,6 +228,26 @@ picked. **Picked** marks the choice; everything here is open for review.
 - Shipped with the RTL: output format spec and a reference unpacker. AXI
   wrappers only map signals.
 
+## D28. Wide pixel input (open)
+- A system needs two lines per band: the current raw line and the previous
+  (reconstructed in NL) line. OpenJLS leaves the current one to the client;
+  NL already holds it (D3 C row RAM). Proposal: accept the sensor bus width
+  so the client's band line buffer and pixel unpacker go away.
+- Case: CLHS delivers a band line as a burst of 64-bit words (768 cycles per
+  lane buffer) that must be drained before the next band arrives. The IP's
+  current-line RAM absorbs the burst; the core then reads 1 px/cycle.
+- 1 row is enough if each band line is consumed before that band's next line
+  arrives, which any sustainable rate already requires. A second row would
+  only add tolerance to arrival jitter. While the writer waits, oReady is low,
+  and a CLHS-style source then loses data: flag it (D27 status).
+- Generics: IN_WIDTH (64, 128, ...), PIXEL_BITS >= BITNESS (contiguous 12-bit
+  or padded 16). Pixels may straddle words: even/odd word banks, read mux.
+  Portable wide-word RAM, no asymmetric BRAM inference.
+- D3 C assumes a 1 px/cycle writer that never waits; a burst writer needs the
+  overwrite check to stall it.
+- Later: dual-clock RAM (sensor clock in) needs a reviewed CDC.
+- Same feature for OpenJLS, at the cost of a new RAM in the IP.
+
 ## Status (nl_top, xczu7eg-1, OOC, Vivado 2025.2)
 Before nl_merge (D24), MAX_IMAGE_WIDTH 4096:
 | BITNESS | est. fmax | LUT | FF | BRAM | DSP |
