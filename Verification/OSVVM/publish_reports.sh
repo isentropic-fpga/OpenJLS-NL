@@ -40,11 +40,11 @@ PS_OSVVM_LOG="$HERE/PostSynth/Output/postsynth_osvvm.log"
 
 rm -rf "$DEST"
 mkdir -p "$DEST/assets"
-cp "$OJ/Verification/OSVVM/report_assets/report.css" "$OJ/Verification/OSVVM/report_assets/theme.js" "$DEST/assets/"
+cp "$HERE/report_assets/report.css" "$HERE/report_assets/theme.js" "$DEST/assets/"
 for f in isentropic-wordmark isentropic-wordmark-dark; do
-  cp "$OJ/Docs/Images/$f.svg" "$DEST/assets/"
+  cp "$ROOT/Docs/Images/$f.svg" "$DEST/assets/"
 done
-cp "$OJ/Docs/Images/isentropic-icon-64.png" "$DEST/assets/"
+cp "$ROOT/Docs/Images/isentropic-icon-64.png" "$DEST/assets/"
 cp "$ROOT/Docs/Images/openjls-nl-wordmark.svg" "$ROOT/Docs/Images/openjls-nl-wordmark-dark.svg" "$DEST/assets/"
 
 # page_head <title> <asset-prefix> / page_foot: shared chrome.
